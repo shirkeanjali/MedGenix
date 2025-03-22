@@ -16,13 +16,13 @@ import { motion } from 'framer-motion';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
-import InventoryOutlinedIcon from '@mui/icons-material/InventoryOutlined';
+import CompareArrowsOutlinedIcon from '@mui/icons-material/CompareArrowsOutlined';
 import MedicationOutlinedIcon from '@mui/icons-material/MedicationOutlined';
 import TranslateOutlinedIcon from '@mui/icons-material/TranslateOutlined';
 import HistoryOutlinedIcon from '@mui/icons-material/HistoryOutlined';
 
 // Feature section background
-const featureBackgroundImg = 'https://img.freepik.com/free-photo/closeup-doctor-checking-blood-sample-with-microscope_23-2149008907.jpg';
+const featureBackgroundImg = 'https://www.medicaldevice-network.com/wp-content/uploads/sites/23/2021/02/shutterstock_544348294-1.jpg';
 
 const features = [
   {
@@ -41,9 +41,9 @@ const features = [
     icon: <LocationOnOutlinedIcon fontSize="large" color="primary" />,
   },
   {
-    title: 'Availability Checker',
-    description: 'Real-time stock checker for medications at partner pharmacies',
-    icon: <InventoryOutlinedIcon fontSize="large" color="primary" />,
+    title: 'Price Comparison',
+    description: 'Real-time price comparisons between medicines at different pharmacies',
+    icon: <CompareArrowsOutlinedIcon fontSize="large" color="primary" />,
   },
   {
     title: 'Medicine Details',
@@ -54,11 +54,6 @@ const features = [
     title: 'Language Support',
     description: 'Multi-language accessibility for diverse user needs',
     icon: <TranslateOutlinedIcon fontSize="large" color="primary" />,
-  },
-  {
-    title: 'Prescription History',
-    description: 'Track your prescription history and view potential savings',
-    icon: <HistoryOutlinedIcon fontSize="large" color="primary" />,
   },
 ];
 
@@ -71,46 +66,50 @@ const FeaturesSection = () => {
     <Box
       component="section"
       sx={{
-        py: { xs: 8, md: 12 },
+        py: { xs: 0, md: 0 },
+        pt: { xs: 0, md: 0 },
+        pb: { xs: 8, md: 12 },
         position: 'relative',
         zIndex: 1,
-        '&::before': {
-          content: '""',
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          backgroundImage: `url(${featureBackgroundImg})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          opacity: 0.15,
-          zIndex: -1,
-        },
+        marginTop: 0,
         '&::after': {
           content: '""',
           position: 'absolute',
           top: 0,
           left: 0,
           width: '100%',
-          height: '100%',
-          background: 'linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(249,249,249,0.98) 100%)',
+          height: '60px',
+          background: 'linear-gradient(to bottom, rgba(255,255,255,0.8), rgba(255,255,255,0))',
+          zIndex: 0,
+        },
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: '60px',
+          left: 0,
+          width: '100%',
+          height: 'calc(100% - 60px)',
+          backgroundImage: `url(${featureBackgroundImg})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          opacity: 0.3,
           zIndex: -1,
         }
       }}
     >
-      <Container>
+      <Container sx={{ pt: 3 }}>
         <Paper 
           elevation={0} 
           sx={{ 
             p: 4, 
             textAlign: 'center', 
             mb: 8, 
+            mt: 3,
             borderRadius: '16px',
-            backgroundColor: 'rgba(255,255,255,0.8)', 
+            backgroundColor: 'rgba(255,255,255,0.95)', 
             backdropFilter: 'blur(10px)',
-            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.05)',
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
             border: '1px solid rgba(0, 128, 128, 0.1)',
           }}
         >
@@ -175,14 +174,14 @@ const FeaturesSection = () => {
                     borderRadius: '12px',
                     overflow: 'hidden',
                     border: '1px solid rgba(0, 0, 0, 0.05)',
-                    transition: 'all 0.3s ease',
+                    transition: 'all 0.4s ease',
+                    backgroundColor: 'rgba(255, 255, 255, 0.97)',
+                    backdropFilter: 'blur(10px)',
                     '&:hover': {
-                      boxShadow: '0 8px 24px rgba(0, 0, 0, 0.07)',
-                      transform: 'translateY(-5px)',
-                      borderColor: 'rgba(0, 128, 128, 0.2)',
+                      boxShadow: '0 12px 28px rgba(0, 128, 128, 0.2)',
+                      transform: 'translateY(-15px)',
+                      borderColor: 'rgba(0, 128, 128, 0.3)',
                     },
-                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                    backdropFilter: 'blur(5px)',
                   }}
                 >
                   <CardContent 
@@ -206,6 +205,7 @@ const FeaturesSection = () => {
                         borderRadius: '50%',
                         backgroundColor: 'rgba(0, 128, 128, 0.1)',
                         boxShadow: '0 4px 8px rgba(0, 128, 128, 0.1)',
+                        transition: 'all 0.3s ease',
                       }}
                     >
                       {feature.icon}

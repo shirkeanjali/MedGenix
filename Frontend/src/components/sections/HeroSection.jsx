@@ -3,7 +3,6 @@ import {
   Container, 
   Typography, 
   Button, 
-  Grid, 
   useMediaQuery,
 } from '@mui/material';
 import { useState } from 'react';
@@ -20,122 +19,138 @@ const HeroSection = () => {
     <Box 
       component="section" 
       sx={{ 
-        pt: { xs: 10, md: 12 },
-        pb: { xs: 10, md: 14 },
+        height: '94vh',
+        display: 'flex',
+        alignItems: 'center',
+        pt: { xs: 8, md: 0 },
+        pb: { xs: 0, md: 0 },
         position: 'relative',
         overflow: 'hidden',
-        backgroundColor: 'transparent' // Completely transparent
+        backgroundColor: 'transparent',
+        width: '100%',
+        maxWidth: '100%',
+        marginBottom: 0,
+        boxSizing: 'border-box',
       }}
     >
-      <Container>
-        <Grid container spacing={4} alignItems="center">
-          {/* Text Content */}
-          <Grid 
-            item 
-            xs={12} 
-            md={7} 
-            sx={{ 
-              textAlign: { xs: 'center', md: 'left' },
-            }}
+      <Container 
+        maxWidth={false} 
+        sx={{ 
+          width: '100%', 
+          maxWidth: '100%', 
+          height: '100%', 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'flex-start',
+          pl: { xs: 4, md: 10 },
+          pr: { xs: 4, md: 0 },
+        }}
+      >
+        <Box
+          sx={{ 
+            textAlign: { xs: 'center', md: 'left' },
+            width: { xs: '100%', md: '60%' },
+            mt: { xs: -10, md: 0 },
+          }}
+        >
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
           >
-            <Box 
-              sx={{
-                backgroundColor: 'rgba(255, 255, 255, 0.2)', // Very light background
-                backdropFilter: 'blur(2px)', // Light blur effect
-                borderRadius: '12px',
-                p: { xs: 3, md: 4 },
-                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.05)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
+            <Typography 
+              variant="h2" 
+              component="h1" 
+              sx={{ 
+                fontWeight: 800,
+                fontSize: { xs: '2.2rem', sm: '2.8rem', md: '3.5rem' },
+                mb: 3,
+                color: 'white',
+                lineHeight: 1.1,
+                textShadow: '0 3px 5px rgba(0, 0, 0, 0.3)',
+                maxWidth: { md: '90%' },
+                letterSpacing: '-0.5px',
               }}
             >
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
+              Scan your prescription and save up to{' '}
+              <Box component="span" sx={{ 
+                color: 'white',
+                position: 'relative',
+              }}>
+                70%
+              </Box>{' '}
+              on your medicines.
+            </Typography>
+
+            <Typography 
+              variant="h6" 
+              sx={{ 
+                mb: 4,
+                fontWeight: 400,
+                fontSize: { xs: '1rem', md: '1.1rem' },
+                maxWidth: { md: '80%' },
+                color: '#333333',
+              }}
+            >
+              MedGenix helps you find trusted generic alternatives to your prescribed medications at a fraction of the cost.
+            </Typography>
+
+            <Box sx={{ 
+              display: 'flex', 
+              gap: 2, 
+              flexWrap: 'wrap',
+              justifyContent: { xs: 'center', md: 'flex-start' },
+              mt: 5,
+            }}>
+              <Button 
+                variant="contained" 
+                size="large"
+                startIcon={<DocumentScannerIcon />}
+                sx={{ 
+                  px: 3,
+                  py: 1.5,
+                  fontWeight: 600,
+                  borderRadius: '8px',
+                  backgroundColor: '#008080',
+                  color: 'white',
+                  boxShadow: '0 4px 14px rgba(0, 128, 128, 0.3)',
+                  '&:hover': {
+                    backgroundColor: '#006666',
+                    boxShadow: '0 6px 20px rgba(0, 128, 128, 0.4)',
+                    transform: 'translateY(-8px)',
+                  },
+                  transition: 'all 0.3s ease',
+                }}
               >
-                <Typography 
-                  variant="h2" 
-                  component="h1" 
-                  sx={{ 
-                    fontWeight: 700,
-                    fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' },
-                    mb: 3,
-                    color: theme.palette.primary.dark,
-                    lineHeight: 1.2,
-                    textShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
-                  }}
-                >
-                  Scan your prescription and save up to{' '}
-                  <Box component="span" sx={{ color: theme.palette.primary.main }}>
-                    70%
-                  </Box>{' '}
-                  on your medicines.
-                </Typography>
-
-                <Typography 
-                  variant="h6" 
-                  sx={{ 
-                    mb: 4,
-                    fontWeight: 400,
-                    fontSize: { xs: '1rem', md: '1.1rem' },
-                    maxWidth: { md: '90%' },
-                    color: '#333',
-                  }}
-                >
-                  MedGenix helps you find trusted generic alternatives to your prescribed medications at a fraction of the cost.
-                </Typography>
-
-                <Box sx={{ 
-                  display: 'flex', 
-                  gap: 2, 
-                  flexWrap: 'wrap',
-                  justifyContent: { xs: 'center', md: 'flex-start' } 
-                }}>
-                  <Button 
-                    variant="contained" 
-                    color="primary" 
-                    size="large"
-                    startIcon={<DocumentScannerIcon />}
-                    sx={{ 
-                      px: 3,
-                      py: 1.5,
-                      fontWeight: 600,
-                      borderRadius: '8px',
-                      boxShadow: '0 4px 14px rgba(0, 128, 128, 0.4)',
-                      '&:hover': {
-                        boxShadow: '0 6px 20px rgba(0, 128, 128, 0.5)',
-                        transform: 'translateY(-2px)',
-                      },
-                      transition: 'all 0.3s ease',
-                    }}
-                  >
-                    Scan Prescription
-                  </Button>
-                  <Button 
-                    variant="outlined" 
-                    color="primary"
-                    size="large" 
-                    startIcon={<InfoOutlinedIcon />}
-                    sx={{
-                      px: 3,
-                      py: 1.5,
-                      fontWeight: 600,
-                      borderRadius: '8px',
-                      borderWidth: '2px',
-                      backgroundColor: 'rgba(255, 255, 255, 0.4)',
-                      '&:hover': {
-                        borderWidth: '2px',
-                        backgroundColor: 'rgba(255, 255, 255, 0.5)',
-                      },
-                    }}
-                  >
-                    Learn More
-                  </Button>
-                </Box>
-              </motion.div>
+                Scan Prescription
+              </Button>
+              <Button 
+                variant="outlined" 
+                size="large" 
+                startIcon={<InfoOutlinedIcon />}
+                sx={{
+                  px: 3,
+                  py: 1.5,
+                  fontWeight: 600,
+                  borderRadius: '8px',
+                  borderWidth: '2px',
+                  color: 'white',
+                  borderColor: 'white',
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    borderWidth: '2px',
+                    borderColor: '#e6e6e6',
+                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                    transform: 'translateY(-8px)',
+                  },
+                }}
+              >
+                How it Works
+              </Button>
             </Box>
-          </Grid>
-        </Grid>
+          </motion.div>
+        </Box>
       </Container>
     </Box>
   );

@@ -30,8 +30,6 @@ import {
   Dashboard as DashboardIcon,
   Help as HelpIcon,
   Widgets as FeaturesIcon,
-  MedicalServices as MedicalIcon,
-  NotificationsOutlined as NotificationIcon,
   Search as SearchIcon,
   LightMode as LightModeIcon
 } from '@mui/icons-material';
@@ -63,8 +61,7 @@ const Header = () => {
   // Navigation items with icons
   const navItems = [
     { name: 'Home', path: '/' },
-    { name: 'Features', path: '/features' },
-    { name: 'About', path: '/about' },
+    { name: 'Dashboard', path: '/dashboard' },
     { name: 'Contact', path: '/contact' }
   ];
 
@@ -121,9 +118,44 @@ const Header = () => {
         bgcolor: 'primary.main',
         color: 'white'
       }}>
-        <MedicalIcon sx={{ fontSize: 32, mb: 1 }} />
-        <Typography variant="h6" sx={{ fontWeight: 700 }}>
-          MedGenix
+        <Box
+          component="img"
+          src="/images/MedGenix Logo.png"
+          alt="MedGenix Logo"
+          sx={{ 
+            height: 40, 
+            mb: 1,
+            objectFit: 'contain',
+            border: 'none'
+          }}
+        />
+        <Typography variant="h6" sx={{ 
+            fontWeight: 700,
+            backgroundImage: 'linear-gradient(to bottom, #67c27c, #008080)',
+            backgroundClip: 'text',
+            WebkitBackgroundClip: 'text',
+            color: 'transparent',
+            position: 'relative',
+            '&:hover .letter': {
+              animation: 'letterHover 0.5s ease forwards',
+            },
+            '& .letter': {
+              display: 'inline-block',
+              transition: 'transform 0.3s ease',
+              backgroundImage: 'linear-gradient(to bottom, #67c27c, #008080)',
+              backgroundClip: 'text',
+              WebkitBackgroundClip: 'text',
+              color: 'transparent',
+            },
+          }}>
+          <span className="letter" style={{ animationDelay: '0.05s' }}>M</span>
+          <span className="letter" style={{ animationDelay: '0.1s' }}>e</span>
+          <span className="letter" style={{ animationDelay: '0.15s' }}>d</span>
+          <span className="letter" style={{ animationDelay: '0.2s' }}>G</span>
+          <span className="letter" style={{ animationDelay: '0.25s' }}>e</span>
+          <span className="letter" style={{ animationDelay: '0.3s' }}>n</span>
+          <span className="letter" style={{ animationDelay: '0.35s' }}>i</span>
+          <span className="letter" style={{ animationDelay: '0.4s' }}>x</span>
         </Typography>
         <Typography variant="caption" sx={{ opacity: 0.8 }}>
           Where Health Meets Affordability
@@ -140,9 +172,9 @@ const Header = () => {
             sx={{ 
               py: 1.5,
               color: location.pathname === item.path ? 'primary.main' : 'text.primary',
-              bgcolor: location.pathname === item.path ? 'rgba(0, 128, 128, 0.08)' : 'transparent',
+              bgcolor: location.pathname === item.path ? 'rgba(103, 194, 124, 0.08)' : 'transparent',
               '&:hover': {
-                bgcolor: 'rgba(0, 128, 128, 0.08)',
+                bgcolor: 'rgba(103, 194, 124, 0.08)',
               }
             }}
           >
@@ -170,7 +202,16 @@ const Header = () => {
           sx={{ 
             mb: 2,
             borderRadius: '8px',
-            py: 1.2
+            py: 1.2,
+            backgroundColor: '#008080',
+            color: 'white',
+            transition: 'all 0.3s ease',
+            '&:hover': {
+              backgroundColor: '#006666',
+              color: 'white',
+              transform: 'translateY(-3px) scale(1.02)',
+              boxShadow: '0 6px 15px rgba(0, 128, 128, 0.3)',
+            }
           }}
         >
           Sign Up
@@ -217,12 +258,16 @@ const Header = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <MedicalIcon 
-              color="primary" 
+            <Box
+              component="img"
+              src="/images/MedGenix Logo.png"
+              alt="MedGenix Logo"
               sx={{ 
-                mr: 1.5, 
-                fontSize: { xs: 24, md: 28 } 
-              }} 
+                height: { xs: 30, md: 36 }, 
+                mr: 1.5,
+                objectFit: 'contain',
+                border: 'none'
+              }}
             />
             <Typography
               variant="h5"
@@ -232,12 +277,42 @@ const Header = () => {
                 mr: 1,
                 display: 'flex',
                 fontWeight: 700,
-                color: 'primary.main',
+                backgroundImage: 'linear-gradient(to bottom, #67c27c, #008080)',
+                backgroundClip: 'text',
+                WebkitBackgroundClip: 'text',
+                color: 'transparent',
                 textDecoration: 'none',
-                fontSize: { xs: '1.2rem', md: '1.5rem' }
+                fontSize: { xs: '1.2rem', md: '1.5rem' },
+                position: 'relative',
+                '&:hover .letter': {
+                  animation: 'letterHover 0.5s ease forwards',
+                },
+                '& .letter': {
+                  display: 'inline-block',
+                  transition: 'transform 0.3s ease',
+                  backgroundImage: 'linear-gradient(to bottom, #67c27c, #008080)',
+                  backgroundClip: 'text',
+                  WebkitBackgroundClip: 'text',
+                  color: 'transparent',
+                },
+                '@keyframes letterHover': {
+                  '0%': {
+                    transform: 'translateY(0)',
+                  },
+                  '100%': {
+                    transform: 'translateY(-3px)',
+                  },
+                },
               }}
             >
-              MedGenix
+              <span className="letter" style={{ animationDelay: '0.05s' }}>M</span>
+              <span className="letter" style={{ animationDelay: '0.1s' }}>e</span>
+              <span className="letter" style={{ animationDelay: '0.15s' }}>d</span>
+              <span className="letter" style={{ animationDelay: '0.2s' }}>G</span>
+              <span className="letter" style={{ animationDelay: '0.25s' }}>e</span>
+              <span className="letter" style={{ animationDelay: '0.3s' }}>n</span>
+              <span className="letter" style={{ animationDelay: '0.35s' }}>i</span>
+              <span className="letter" style={{ animationDelay: '0.4s' }}>x</span>
             </Typography>
             {!isSmall && (
               <>
@@ -281,13 +356,13 @@ const Header = () => {
                   py: 1,
                   borderRadius: '8px',
                   fontWeight: 500,
-                  bgcolor: location.pathname === item.path ? 'rgba(0, 128, 128, 0.08)' : 'transparent',
+                  bgcolor: location.pathname === item.path ? 'rgba(103, 194, 124, 0.08)' : 'transparent',
                   '&:hover': {
-                    bgcolor: 'rgba(0, 128, 128, 0.08)',
+                    bgcolor: 'rgba(103, 194, 124, 0.08)',
                     color: 'primary.main'
                   },
                   '&.active': {
-                    bgcolor: 'rgba(0, 128, 128, 0.12)',
+                    background: 'rgba(103, 194, 124, 0.12)',
                     color: 'primary.main'
                   }
                 }}
@@ -317,7 +392,7 @@ const Header = () => {
                       mr: 1,
                       borderRadius: '8px',
                       '&:hover': {
-                        bgcolor: 'rgba(0, 128, 128, 0.08)'
+                        bgcolor: 'rgba(103, 194, 124, 0.08)'
                       }
                     }}
                   >
@@ -336,7 +411,7 @@ const Header = () => {
                       mr: 1,
                       borderRadius: '8px',
                       '&:hover': {
-                        bgcolor: 'rgba(0, 128, 128, 0.08)'
+                        bgcolor: 'rgba(103, 194, 124, 0.08)'
                       }
                     }}
                   >
@@ -387,7 +462,7 @@ const Header = () => {
                         py: 1,
                         px: 2,
                         '&:hover': {
-                          bgcolor: 'rgba(0, 128, 128, 0.08)',
+                          bgcolor: 'rgba(103, 194, 124, 0.08)',
                         },
                       }}
                     >
@@ -403,7 +478,7 @@ const Header = () => {
                       mr: 2,
                       borderRadius: '8px',
                       '&:hover': {
-                        bgcolor: 'rgba(0, 128, 128, 0.08)'
+                        bgcolor: 'rgba(103, 194, 124, 0.08)'
                       }
                     }}
                   >
@@ -426,8 +501,14 @@ const Header = () => {
                     fontWeight: 500,
                     boxShadow: 'none',
                     px: isSmall ? 2 : 3,
+                    backgroundColor: '#008080',
+                    color: 'white',
+                    transition: 'all 0.3s ease',
                     '&:hover': {
-                      boxShadow: '0 4px 8px rgba(0, 128, 128, 0.2)'
+                      backgroundColor: '#006666',
+                      color: 'white',
+                      transform: 'translateY(-3px) scale(1.02)',
+                      boxShadow: '0 6px 15px rgba(0, 128, 128, 0.3)'
                     }
                   }}
                 >
@@ -439,9 +520,9 @@ const Header = () => {
                   onClick={handleDrawerToggle}
                   sx={{
                     color: 'primary.main',
-                    bgcolor: 'rgba(0, 128, 128, 0.08)',
+                    bgcolor: 'rgba(103, 194, 124, 0.08)',
                     '&:hover': {
-                      bgcolor: 'rgba(0, 128, 128, 0.15)'
+                      bgcolor: 'rgba(103, 194, 124, 0.15)'
                     }
                   }}
                 >
@@ -467,7 +548,7 @@ const Header = () => {
                     py: 1,
                     color: 'text.primary',
                     '&:hover': {
-                      bgcolor: 'rgba(0, 128, 128, 0.08)'
+                      bgcolor: 'rgba(103, 194, 124, 0.08)'
                     }
                   }}
                 >
@@ -475,7 +556,6 @@ const Header = () => {
                 </Button>
                 <Button
                   variant="contained"
-                  color="primary"
                   component={RouterLink}
                   to="/signup"
                   disableElevation
@@ -484,8 +564,14 @@ const Header = () => {
                     py: 1,
                     borderRadius: 0,
                     fontWeight: 500,
+                    backgroundColor: '#008080',
+                    color: 'white',
+                    transition: 'all 0.3s ease',
                     '&:hover': {
-                      boxShadow: 'none'
+                      boxShadow: '0 4px 12px rgba(0, 128, 128, 0.25)',
+                      backgroundColor: '#006666',
+                      color: 'white',
+                      transform: 'translateY(-3px)',
                     }
                   }}
                 >
