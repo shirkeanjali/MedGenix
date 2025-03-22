@@ -1,7 +1,7 @@
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { Box } from '@mui/material';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Header from './components/layout/Header';
 import HeroSection from './components/sections/HeroSection';
 import FeaturesSection from './components/sections/FeaturesSection';
@@ -9,6 +9,9 @@ import Footer from './components/layout/Footer';
 import SplineBackground from './components/ui/SplineBackground';
 import SignUpPage from './pages/SignUpPage';
 import LoginPage from './pages/LoginPage';
+import EmailVerificationPage from './pages/EmailVerificationPage';
+import OtpVerificationPage from './pages/OtpVerificationPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 
 // Create a theme with teal as the primary color
 const theme = createTheme({
@@ -157,6 +160,9 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/signup" element={<SignUpPage />} />
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/forgot-password" element={<EmailVerificationPage />} />
+            <Route path="/otp-verification" element={<OtpVerificationPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
           </Routes>
         </Box>
       </BrowserRouter>
