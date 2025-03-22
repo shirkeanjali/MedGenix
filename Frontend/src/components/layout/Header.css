@@ -1,0 +1,164 @@
+/* Header.css */
+.header-logo {
+  transition: transform 0.3s ease;
+}
+
+.header-logo:hover {
+  transform: scale(1.05);
+}
+
+.nav-link {
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: 0;
+  left: 50%;
+  background-color: #008080;
+  transition: all 0.3s ease;
+  transform: translateX(-50%);
+}
+
+.nav-link:hover::after {
+  width: 70%;
+}
+
+.cta-button {
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 128, 128, 0.1);
+}
+
+.cta-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px rgba(0, 128, 128, 0.2);
+}
+
+/* Responsive adjustments */
+@media (max-width: 960px) {
+  .mobile-menu-item {
+    transition: background-color 0.3s ease;
+  }
+  
+  .mobile-menu-item:hover {
+    background-color: rgba(0, 128, 128, 0.08);
+  }
+}
+
+/* Custom scrollbar for dropdown menus */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #008080 #f1f1f1;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #008080;
+  border-radius: 6px;
+}
+
+/* Subtle animation for dropdown menus */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.dropdown-animation {
+  animation: fadeIn 0.2s ease-out forwards;
+}
+
+/* Header Component Styles */
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.nav-button {
+  position: relative;
+  overflow: hidden;
+}
+
+.nav-button::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: 0;
+  left: 50%;
+  background-color: #008080;
+  transition: all 0.3s ease;
+  transform: translateX(-50%);
+}
+
+.nav-button:hover::after {
+  width: 60%;
+}
+
+.signup-button {
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+}
+
+.signup-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 128, 128, 0.1);
+  z-index: -1;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.3s ease;
+}
+
+.signup-button:hover::before {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+.header-animation {
+  animation: fadeIn 0.5s ease forwards;
+}
+
+/* Mobile menu animations */
+.mobile-menu-enter {
+  opacity: 0;
+  transform: translateX(-20px);
+}
+
+.mobile-menu-enter-active {
+  opacity: 1;
+  transform: translateX(0);
+  transition: opacity 0.3s, transform 0.3s;
+}
+
+.mobile-menu-exit {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.mobile-menu-exit-active {
+  opacity: 0;
+  transform: translateX(-20px);
+  transition: opacity 0.3s, transform 0.3s;
+}
+
+/* Medicine background image */
+body::before {
+  display: none; /* Removing the background image */
+}
