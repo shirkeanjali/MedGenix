@@ -1,27 +1,38 @@
 import express from "express";
 import {
-  login,
   register,
+  login,
   logout,
-  sendVerifyOtp,
-  verifyEmail,
-  isAuthenticated,
+  sendLoginOTP,
+  verifyLoginOTP,
   sendPasswordResetOTP,
   resetPassword,
-  verifyMobileOtp,
+  isAuthenticated,
+  sendVerificationEmail,
+  verifyEmail
 } from "../controllers/authController.js";
-import userAuth from "../middleware/userAuth.js";
+import { authMiddleware } from "../middleware/authMiddleware.js";
 
-const authRouter = express.Router();
+const router = express.Router();
 
-authRouter.post("/register", register);
-authRouter.post("/login", login);
-authRouter.post("/logout", logout);
-authRouter.post("/send-verify-otp", userAuth, sendVerifyOtp);
-authRouter.post("/verify-account", userAuth, verifyEmail);
-authRouter.get("/is-auth", userAuth, isAuthenticated);
-authRouter.post("/send-reset-otp", sendPasswordResetOTP);
-authRouter.post("/reset-password", resetPassword);
-authRouter.post("/verify-mobile-otp", verifyMobileOtp);
+// Authentication routes
+router.post("/register", register);
+router.post("/login", login);
+router.post("/logout", logout);
 
-export default authRouter;
+// OTP Login routes
+router.post("/send-login-otp", sendLoginOTP);
+router.post("/verify-login-otp", verifyLoginOTP);
+
+// Email verification routes
+router.post("/send-verification-email", authMiddleware, sendVerificationEmail);
+router.post("/verify-email", authMiddleware, verifyEmail);
+
+// Password reset routes
+router.post("/send-reset-otp", sendPasswordResetOTP);
+router.post("/reset-password", resetPassword);
+
+// Check authentication status
+router.get("/is-authenticated", authMiddleware, isAuthenticated);
+
+export default router;
