@@ -12,6 +12,10 @@ import LoginPage from './pages/LoginPage';
 import EmailVerificationPage from './pages/EmailVerificationPage';
 import OtpVerificationPage from './pages/OtpVerificationPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
+import { AuthProvider } from './context/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
+import Dashboard from './pages/Dashboard';
+import EmailVerifyPage from './pages/EmailVerifyPage';
 
 // Create a theme with teal as the primary color
 const theme = createTheme({
@@ -104,6 +108,15 @@ const theme = createTheme({
         },
       },
     },
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          '& .MuiOutlinedInput-root': {
+            borderRadius: 8,
+          },
+        },
+      },
+    },
   },
 });
 
@@ -148,24 +161,35 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <BrowserRouter>
-        <Box sx={{ 
-          display: 'flex', 
-          flexDirection: 'column', 
-          minHeight: '100vh', 
-          position: 'relative',
-          overflowX: 'hidden',
-        }}>
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/signup" element={<SignUpPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/forgot-password" element={<EmailVerificationPage />} />
-            <Route path="/otp-verification" element={<OtpVerificationPage />} />
-            <Route path="/reset-password" element={<ResetPasswordPage />} />
-          </Routes>
-        </Box>
-      </BrowserRouter>
+      <AuthProvider>
+        <BrowserRouter>
+          <Box sx={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            minHeight: '100vh', 
+            position: 'relative',
+            overflowX: 'hidden',
+          }}>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/signup" element={<SignUpPage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/verify-email" element={<EmailVerifyPage />} />
+              <Route path="/forgot-password" element={<EmailVerificationPage />} />
+              <Route path="/otp-verification" element={<OtpVerificationPage />} />
+              <Route path="/reset-password" element={<ResetPasswordPage />} />
+              <Route
+                path="/dashboard"
+                element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                }
+              />
+            </Routes>
+          </Box>
+        </BrowserRouter>
+      </AuthProvider>
     </ThemeProvider>
   );
 }
