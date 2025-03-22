@@ -15,9 +15,7 @@ const userSchema = new mongoose.Schema({
         enum: ['local', 'google'],
         default: 'local'
     },
-    mobileNumber: { type: String, required: true },
-    mobileOtp: { type: String, default: "" },
-    mobileOtpExpireAt: { type: Number, default: 0 },
+    mobileNumber: { type: String, required: true }
 });
 
 const userModel = mongoose.models.user || mongoose.model("user", userSchema);

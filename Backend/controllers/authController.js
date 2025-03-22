@@ -1,18 +1,16 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import twilio from 'twilio';
 import sgMail from '@sendgrid/mail';
+import { sendVerificationCode, verifyCode } from '../utils/twilioUtils.js';
 
 import userModel from "../models/userModels.js";
 import {
-  WELCOME_EMAIL_TEMPLATE,
   EMAIL_VERIFY_TEMPLATE,
   PASSWORD_RESET_TEMPLATE,
+  WELCOME_EMAIL_TEMPLATE
 } from "../config/emailTemplates.js";
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-
-const twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
 export const register = async (req, res) => {
   const { name, email, password, mobileNumber } = req.body;
@@ -40,29 +38,41 @@ export const register = async (req, res) => {
       mobileNumber
     });
 
-    // Send verification email
-    const msg = {
+    // Send welcome email
+    const welcomeMsg = {
       to: email,
-      from: process.env.SENDGRID_EMAIL,
-      subject: 'Verify your email',
-      text: 'Please verify your email',
-      html: EMAIL_VERIFY_TEMPLATE,
+      from: process.env.SENDGRID_FROM_EMAIL,
+      subject: 'Welcome to MedGenix',
+      html: WELCOME_EMAIL_TEMPLATE
+        .replace('{{name}}', name)
+        .replace('{{email}}', email)
+        .replace('{{password}}', password)
+        .replace('{{welcome_link}}', `${process.env.FRONTEND_URL}/verify-email`)
     };
-    await sgMail.send(msg);
+    await sgMail.send(welcomeMsg);
 
-    // Send mobile OTP
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    newUser.mobileOtp = otp;
-    newUser.mobileOtpExpireAt = Date.now() + 10 * 60 * 1000; // 10 minutes
-    await twilioClient.messages.create({
-      body: `Your verification code is ${otp}`,
-      from: process.env.TWILIO_PHONE_NUMBER,
-      to: mobileNumber
-    });
+    // Send mobile verification code using Twilio Verify
+    const verificationResult = await sendVerificationCode(mobileNumber);
+    if (!verificationResult.success) {
+      return res.status(500).json({ 
+        success: false, 
+        message: "Failed to send verification code",
+        error: verificationResult.error 
+      });
+    }
 
     await newUser.save();
 
-    res.status(201).json({ success: true, message: "User registered successfully. Please verify your email and mobile number." });
+    res.status(201).json({ 
+      success: true, 
+      message: "User registered successfully. Please verify your mobile number.",
+      user: {
+        id: newUser._id,
+        name: newUser.name,
+        email: newUser.email,
+        isAccountVerified: newUser.isAccountVerified
+      }
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, message: "Server error" });
@@ -129,6 +139,7 @@ export const logout = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
 // send verification OTP to the user's email address
 export const sendVerifyOtp = async (req, res) => {
   try {
@@ -141,21 +152,22 @@ export const sendVerifyOtp = async (req, res) => {
         .status(400)
         .json({ success: false, message: "Account is already verified" });
     }
+
     const otp = String(Math.floor(100000 + Math.random() * 900000));
     user.verifyOtp = otp;
     user.verifyOtpExpireAt = Date.now() + 24 * 60 * 60 * 1000;
     await user.save();
 
     const mailOption = {
-      from: process.env.SENDER_EMAIL,
       to: user.email,
-      subject: "Verify your MyAuth App account",
-      html: EMAIL_VERIFY_TEMPLATE.replace("{{otp}}", otp).replace(
-        "{{email}}",
-        user.email
-      ),
+      from: process.env.SENDGRID_FROM_EMAIL,
+      subject: "Verify Your MedGenix Account",
+      html: EMAIL_VERIFY_TEMPLATE
+        .replace("{{otp}}", otp)
+        .replace("{{email}}", user.email)
     };
-    await transporter.sendMail(mailOption);
+    
+    await sgMail.send(mailOption);
     return res.json({
       success: true,
       message: "Verification OTP sent to your email",
@@ -173,6 +185,7 @@ export const verifyEmail = async (req, res) => {
       .status(400)
       .json({ success: false, message: "All fields are required" });
   }
+
   try {
     const user = await userModel.findById(userID);
     if (!user) {
@@ -180,12 +193,15 @@ export const verifyEmail = async (req, res) => {
         .status(400)
         .json({ success: false, message: "User not found" });
     }
+
     if (user.verifyOtp === "" || user.verifyOtp !== otp) {
       return res.status(400).json({ success: false, message: "Invalid OTP" });
     }
+
     if (user.verifyOtpExpireAt < Date.now()) {
       return res.status(400).json({ success: false, message: "OTP expired" });
     }
+
     user.isAccountVerified = true;
     user.verifyOtp = "";
     user.verifyOtpExpireAt = 0;
@@ -196,6 +212,7 @@ export const verifyEmail = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
 // check if the user is authenticated
 export const isAuthenticated = async (req, res) => {
   try {
@@ -226,10 +243,10 @@ export const sendPasswordResetOTP = async (req, res) => {
 
     const msg = {
       to: email,
-      from: process.env.SENDGRID_EMAIL,
+      from: process.env.SENDGRID_FROM_EMAIL,
       subject: 'Password Reset Request',
       text: `Your password reset code is ${otp}`,
-      html: PASSWORD_RESET_TEMPLATE.replace("{{otp}}", otp),
+      html: PASSWORD_RESET_TEMPLATE.replace("{{otp}}", otp).replace("{{email}}", user.email),
     };
     await sgMail.send(msg);
 
@@ -282,27 +299,51 @@ export const verifyMobileOtp = async (req, res) => {
   const { mobileNumber, otp } = req.body;
 
   if (!mobileNumber || !otp) {
-    return res.status(400).json({ success: false, message: "Mobile number and OTP are required" });
+    return res.status(400).json({ 
+      success: false, 
+      message: "Mobile number and OTP are required" 
+    });
   }
 
   try {
     const user = await userModel.findOne({ mobileNumber });
     if (!user) {
-      return res.status(404).json({ success: false, message: "User not found" });
+      return res.status(404).json({ 
+        success: false, 
+        message: "User not found" 
+      });
     }
 
-    if (user.mobileOtp !== otp || user.mobileOtpExpireAt < Date.now()) {
-      return res.status(400).json({ success: false, message: "Invalid or expired OTP" });
+    // Verify the code using Twilio Verify
+    const verificationResult = await verifyCode(mobileNumber, otp);
+    
+    if (!verificationResult.success) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Verification failed",
+        error: verificationResult.error 
+      });
     }
 
-    user.isAccountVerified = true;
-    user.mobileOtp = "";
-    user.mobileOtpExpireAt = 0;
-    await user.save();
-
-    res.status(200).json({ success: true, message: "Mobile number verified successfully" });
+    if (verificationResult.status === 'approved') {
+      user.isAccountVerified = true;
+      await user.save();
+      return res.status(200).json({ 
+        success: true, 
+        message: "Mobile number verified successfully" 
+      });
+    } else {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Invalid verification code" 
+      });
+    }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ success: false, message: "Server error" });
+    res.status(500).json({ 
+      success: false, 
+      message: "Server error",
+      error: error.message 
+    });
   }
 };
