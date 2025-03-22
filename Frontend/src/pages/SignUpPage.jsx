@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   Box, 
   Container, 
@@ -10,15 +11,8 @@ import {
   Link, 
   InputAdornment, 
   IconButton, 
-  Tabs,
-  Tab,
-  Divider,
-  OutlinedInput,
-  FormControl,
-  InputLabel,
-  FormHelperText,
-  CircularProgress,
-  Avatar
+  Alert,
+  CircularProgress
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { 
@@ -27,13 +21,14 @@ import {
   Email, 
   Phone, 
   Lock, 
-  Person,
-  MedicalServices
+  Person
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import { Link as RouterLink } from 'react-router-dom';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
+import { register } from '../services/authService';
+import { useAuth } from '../context/AuthContext';
 
 // Styled components
 const StyledPaper = styled(Paper)(({ theme }) => ({
@@ -48,7 +43,7 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
   },
 }));
 
-const SignUpButton = styled(Button)(({ theme }) => ({
+const SignupButton = styled(Button)(({ theme }) => ({
   padding: theme.spacing(1.5),
   marginTop: theme.spacing(3),
   borderRadius: '8px',
@@ -63,121 +58,109 @@ const SignUpButton = styled(Button)(({ theme }) => ({
   },
 }));
 
-const StyledDivider = styled(Divider)(({ theme }) => ({
-  margin: theme.spacing(3, 0),
-  '&::before, &::after': {
-    borderColor: 'rgba(0, 128, 128, 0.2)',
-  },
-}));
-
-const SignUpPage = () => {
-  // State management
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+const SignupPage = () => {
+  const navigate = useNavigate();
+  const { login: loginContext } = useAuth();
   const [loading, setLoading] = useState(false);
-  
-  // Form values
-  const [formValues, setFormValues] = useState({
-    fullName: '',
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+
+  // Form state
+  const [formData, setFormData] = useState({
+    name: '',
     email: '',
-    phone: '',
-    password: '',
-    confirmPassword: '',
+    mobileNumber: '',
+    password: ''
   });
-  
+
   // Form errors
   const [formErrors, setFormErrors] = useState({
-    fullName: '',
+    name: '',
     email: '',
-    phone: '',
-    password: '',
-    confirmPassword: '',
+    mobileNumber: '',
+    password: ''
   });
-
-  // Event handlers
-  const togglePasswordVisibility = () => {
-    setShowPassword((prev) => !prev);
-  };
-
-  const toggleConfirmPasswordVisibility = () => {
-    setShowConfirmPassword((prev) => !prev);
-  };
-
-  const handleFormChange = (event) => {
-    const { name, value } = event.target;
-    setFormValues({
-      ...formValues,
-      [name]: value,
-    });
-    
-    // Clear errors when typing
-    if (formErrors[name]) {
-      setFormErrors({
-        ...formErrors,
-        [name]: '',
-      });
-    }
-  };
 
   const validateForm = () => {
     let isValid = true;
     const errors = {};
-    
-    // Validate name
-    if (!formValues.fullName.trim()) {
-      errors.fullName = 'Full name is required';
+
+    // Name validation
+    if (!formData.name.trim()) {
+      errors.name = 'Name is required';
       isValid = false;
     }
-    
-    // Validate email
-    if (!formValues.email.trim()) {
+
+    // Email validation
+    if (!formData.email) {
       errors.email = 'Email is required';
       isValid = false;
-    } else if (!/\S+@\S+\.\S+/.test(formValues.email)) {
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       errors.email = 'Email is invalid';
       isValid = false;
     }
-    
-    // Validate phone (optional)
-    if (formValues.phone.trim() && !/^\d{10}$/.test(formValues.phone.replace(/\D/g, ''))) {
-      errors.phone = 'Please enter a valid 10-digit phone number';
+
+    // Mobile number validation
+    if (!formData.mobileNumber) {
+      errors.mobileNumber = 'Mobile number is required';
+      isValid = false;
+    } else if (!/^\d{10}$/.test(formData.mobileNumber.replace(/\D/g, ''))) {
+      errors.mobileNumber = 'Please enter a valid 10-digit mobile number';
       isValid = false;
     }
-    
-    // Validate password
-    if (!formValues.password) {
+
+    // Password validation
+    if (!formData.password) {
       errors.password = 'Password is required';
       isValid = false;
-    } else if (formValues.password.length < 8) {
-      errors.password = 'Password must be at least 8 characters';
+    } else if (formData.password.length < 6) {
+      errors.password = 'Password must be at least 6 characters long';
       isValid = false;
     }
-    
-    // Validate confirm password
-    if (!formValues.confirmPassword) {
-      errors.confirmPassword = 'Please confirm your password';
-      isValid = false;
-    } else if (formValues.password !== formValues.confirmPassword) {
-      errors.confirmPassword = 'Passwords do not match';
-      isValid = false;
-    }
-    
+
     setFormErrors(errors);
     return isValid;
   };
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    
-    if (validateForm()) {
-      setLoading(true);
-      
-      // Simulate form submission
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    // Clear error when user types
+    if (formErrors[name]) {
+      setFormErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }));
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
+
+    if (!validateForm()) {
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await register(formData);
+      setSuccess(response.message);
+      // Update auth context with new user data
+      loginContext(response.user);
+      // Redirect to home page after successful registration
       setTimeout(() => {
-        setLoading(false);
-        // Handle successful registration (redirect to login or dashboard)
-        console.log('Form submitted:', formValues);
+        navigate('/');
       }, 2000);
+    } catch (err) {
+      setError(err.message || 'Registration failed. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -211,11 +194,11 @@ const SignUpPage = () => {
             <StyledPaper component="form" onSubmit={handleSubmit}>
               <Typography
                 variant="h5"
-                component="h2"
+                component="h1"
                 align="center"
                 gutterBottom
-                sx={{ 
-                  fontWeight: 600, 
+                sx={{
+                  fontWeight: 600,
                   color: 'primary.dark',
                   mb: 3
                 }}
@@ -223,17 +206,28 @@ const SignUpPage = () => {
                 Create Your MedGenix Account
               </Typography>
 
+              {error && (
+                <Alert severity="error" sx={{ mb: 2 }}>
+                  {error}
+                </Alert>
+              )}
+
+              {success && (
+                <Alert severity="success" sx={{ mb: 2 }}>
+                  {success}
+                </Alert>
+              )}
+
               <Grid container spacing={2}>
                 <Grid item xs={12}>
                   <TextField
                     fullWidth
-                    name="fullName"
+                    name="name"
                     label="Full Name"
-                    variant="outlined"
-                    value={formValues.fullName}
-                    onChange={handleFormChange}
-                    error={!!formErrors.fullName}
-                    helperText={formErrors.fullName}
+                    value={formData.name}
+                    onChange={handleChange}
+                    error={!!formErrors.name}
+                    helperText={formErrors.name}
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
@@ -249,10 +243,9 @@ const SignUpPage = () => {
                     fullWidth
                     name="email"
                     label="Email Address"
-                    variant="outlined"
                     type="email"
-                    value={formValues.email}
-                    onChange={handleFormChange}
+                    value={formData.email}
+                    onChange={handleChange}
                     error={!!formErrors.email}
                     helperText={formErrors.email}
                     InputProps={{
@@ -268,13 +261,12 @@ const SignUpPage = () => {
                 <Grid item xs={12}>
                   <TextField
                     fullWidth
-                    name="phone"
-                    label="Phone Number (Optional)"
-                    variant="outlined"
-                    value={formValues.phone}
-                    onChange={handleFormChange}
-                    error={!!formErrors.phone}
-                    helperText={formErrors.phone}
+                    name="mobileNumber"
+                    label="Mobile Number"
+                    value={formData.mobileNumber}
+                    onChange={handleChange}
+                    error={!!formErrors.mobileNumber}
+                    helperText={formErrors.mobileNumber}
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
@@ -286,73 +278,37 @@ const SignUpPage = () => {
                 </Grid>
 
                 <Grid item xs={12}>
-                  <FormControl fullWidth variant="outlined" error={!!formErrors.password}>
-                    <InputLabel htmlFor="password">Create Password</InputLabel>
-                    <OutlinedInput
-                      id="password"
-                      name="password"
-                      type={showPassword ? 'text' : 'password'}
-                      value={formValues.password}
-                      onChange={handleFormChange}
-                      startAdornment={
+                  <TextField
+                    fullWidth
+                    name="password"
+                    label="Password"
+                    type={showPassword ? 'text' : 'password'}
+                    value={formData.password}
+                    onChange={handleChange}
+                    error={!!formErrors.password}
+                    helperText={formErrors.password}
+                    InputProps={{
+                      startAdornment: (
                         <InputAdornment position="start">
                           <Lock color="primary" />
                         </InputAdornment>
-                      }
-                      endAdornment={
+                      ),
+                      endAdornment: (
                         <InputAdornment position="end">
                           <IconButton
-                            aria-label="toggle password visibility"
-                            onClick={togglePasswordVisibility}
+                            onClick={() => setShowPassword(!showPassword)}
                             edge="end"
                           >
                             {showPassword ? <VisibilityOff /> : <Visibility />}
                           </IconButton>
                         </InputAdornment>
-                      }
-                      label="Create Password"
-                    />
-                    {formErrors.password && (
-                      <FormHelperText>{formErrors.password}</FormHelperText>
-                    )}
-                  </FormControl>
-                </Grid>
-
-                <Grid item xs={12}>
-                  <FormControl fullWidth variant="outlined" error={!!formErrors.confirmPassword}>
-                    <InputLabel htmlFor="confirmPassword">Confirm Password</InputLabel>
-                    <OutlinedInput
-                      id="confirmPassword"
-                      name="confirmPassword"
-                      type={showConfirmPassword ? 'text' : 'password'}
-                      value={formValues.confirmPassword}
-                      onChange={handleFormChange}
-                      startAdornment={
-                        <InputAdornment position="start">
-                          <Lock color="primary" />
-                        </InputAdornment>
-                      }
-                      endAdornment={
-                        <InputAdornment position="end">
-                          <IconButton
-                            aria-label="toggle confirm password visibility"
-                            onClick={toggleConfirmPasswordVisibility}
-                            edge="end"
-                          >
-                            {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
-                          </IconButton>
-                        </InputAdornment>
-                      }
-                      label="Confirm Password"
-                    />
-                    {formErrors.confirmPassword && (
-                      <FormHelperText>{formErrors.confirmPassword}</FormHelperText>
-                    )}
-                  </FormControl>
+                      ),
+                    }}
+                  />
                 </Grid>
               </Grid>
 
-              <SignUpButton
+              <SignupButton
                 type="submit"
                 fullWidth
                 variant="contained"
@@ -360,23 +316,17 @@ const SignUpPage = () => {
                 disabled={loading}
                 startIcon={loading && <CircularProgress size={20} color="inherit" />}
               >
-                {loading ? 'Creating Account...' : 'Sign Up'}
-              </SignUpButton>
+                {loading ? 'Creating Account...' : 'Create Account'}
+              </SignupButton>
 
-              <StyledDivider>
-                <Typography variant="body2" color="text.secondary">
-                  OR
-                </Typography>
-              </StyledDivider>
-
-              <Box sx={{ textAlign: 'center' }}>
+              <Box sx={{ mt: 3, textAlign: 'center' }}>
                 <Typography variant="body2" color="text.secondary">
                   Already have an account?{' '}
-                  <Link 
+                  <Link
                     component={RouterLink}
                     to="/login"
                     underline="hover"
-                    sx={{ 
+                    sx={{
                       fontWeight: 600,
                       color: 'primary.main',
                       '&:hover': {
@@ -397,4 +347,4 @@ const SignUpPage = () => {
   );
 };
 
-export default SignUpPage; 
+export default SignupPage; 

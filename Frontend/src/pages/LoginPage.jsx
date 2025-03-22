@@ -20,7 +20,8 @@ import {
   CircularProgress,
   Checkbox,
   FormControlLabel,
-  Avatar
+  Avatar,
+  Alert
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { 
@@ -32,9 +33,11 @@ import {
   MedicalServices
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
+import { login, sendLoginOTP, verifyLoginOTP } from '../services/authService';
+import { useAuth } from '../context/AuthContext';
 
 // Styled components
 const StyledPaper = styled(Paper)(({ theme }) => ({
@@ -72,178 +75,182 @@ const StyledDivider = styled(Divider)(({ theme }) => ({
 }));
 
 const LoginPage = () => {
-  // State management
+  const navigate = useNavigate();
+  const { login: loginContext } = useAuth();
   const [tabValue, setTabValue] = useState(0);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
   const [contactType, setContactType] = useState('email');
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   
   // Form values
   const [formValues, setFormValues] = useState({
     email: '',
-    phone: '',
     password: '',
+    contactInfo: '',
     otp: '',
-    rememberMe: false,
-    contactInfo: ''
+    rememberMe: false
   });
   
   // Form errors
   const [formErrors, setFormErrors] = useState({
     email: '',
-    phone: '',
     password: '',
-    otp: '',
-    contactInfo: ''
+    contactInfo: '',
+    otp: ''
   });
 
-  // Event handlers
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
     setOtpSent(false);
+    setError('');
+    setSuccess('');
+    setFormErrors({});
   };
 
   const handleContactTypeChange = (event, newType) => {
     if (newType !== null) {
       setContactType(newType);
-      setFormValues({
-        ...formValues,
+      setFormValues(prev => ({
+        ...prev,
         contactInfo: ''
-      });
-      setFormErrors({
-        ...formErrors,
-        contactInfo: ''
-      });
+      }));
+      setFormErrors({});
       setOtpSent(false);
+      setError('');
     }
-  };
-
-  const togglePasswordVisibility = () => {
-    setShowPassword((prev) => !prev);
   };
 
   const handleFormChange = (event) => {
     const { name, value, checked } = event.target;
-    setFormValues({
-      ...formValues,
+    setFormValues(prev => ({
+      ...prev,
       [name]: name === 'rememberMe' ? checked : value,
-    });
+    }));
     
-    // Clear errors when typing
     if (formErrors[name]) {
-      setFormErrors({
-        ...formErrors,
+      setFormErrors(prev => ({
+        ...prev,
         [name]: '',
-      });
+      }));
     }
   };
 
-  const handleSendOTP = () => {
-    if (!formValues.contactInfo) {
-      setFormErrors({
-        ...formErrors,
-        contactInfo: `${contactType === 'email' ? 'Email' : 'Phone number'} is required`,
-      });
-      return;
-    }
-
-    // Validate contact info
-    if (contactType === 'email' && !/\S+@\S+\.\S+/.test(formValues.contactInfo)) {
-      setFormErrors({
-        ...formErrors,
-        contactInfo: 'Email is invalid',
-      });
-      return;
-    } else if (contactType === 'phone' && !/^\d{10}$/.test(formValues.contactInfo.replace(/\D/g, ''))) {
-      setFormErrors({
-        ...formErrors,
-        contactInfo: 'Please enter a valid 10-digit phone number',
-      });
-      return;
-    }
-    
-    setLoading(true);
-    
-    // Simulate OTP sending
-    setTimeout(() => {
-      setLoading(false);
-      setOtpSent(true);
-    }, 1500);
-  };
-
-  const validateForm = () => {
-    let isValid = true;
+  const validatePasswordLogin = () => {
     const errors = {};
-    
-    // Validate for password login
-    if (tabValue === 0) {
-      if (!formValues.email.trim()) {
-        errors.email = 'Email is required';
-        isValid = false;
-      } else if (!/\S+@\S+\.\S+/.test(formValues.email)) {
-        errors.email = 'Email is invalid';
-        isValid = false;
-      }
-      
-      if (!formValues.password) {
-        errors.password = 'Password is required';
-        isValid = false;
-      }
+    let isValid = true;
+
+    if (!formValues.email) {
+      errors.email = 'Email is required';
+      isValid = false;
+    } else if (!/\S+@\S+\.\S+/.test(formValues.email)) {
+      errors.email = 'Email is invalid';
+      isValid = false;
     }
-    
-    // Validate for OTP login
-    if (tabValue === 1) {
-      if (!formValues.contactInfo.trim()) {
-        errors.contactInfo = `${contactType === 'email' ? 'Email' : 'Phone number'} is required`;
-        isValid = false;
-      } else if (contactType === 'email' && !/\S+@\S+\.\S+/.test(formValues.contactInfo)) {
-        errors.contactInfo = 'Email is invalid';
-        isValid = false;
-      } else if (contactType === 'phone' && !/^\d{10}$/.test(formValues.contactInfo.replace(/\D/g, ''))) {
-        errors.contactInfo = 'Please enter a valid 10-digit phone number';
-        isValid = false;
-      }
-      
-      if (otpSent && !formValues.otp.trim()) {
-        errors.otp = 'OTP is required';
-        isValid = false;
-      }
+
+    if (!formValues.password) {
+      errors.password = 'Password is required';
+      isValid = false;
     }
-    
+
     setFormErrors(errors);
     return isValid;
   };
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    
-    if (validateForm()) {
-      setLoading(true);
-      
-      // Prepare the data for submission based on login method
-      const loginData = {
-        method: tabValue === 0 ? 'password' : 'otp',
-        rememberMe: formValues.rememberMe
-      };
+  const validateOTPLogin = () => {
+    const errors = {};
+    let isValid = true;
 
-      if (tabValue === 0) {
-        // Password login data
-        loginData.email = formValues.email;
-        loginData.password = formValues.password;
-      } else {
-        // OTP login data
-        loginData.contactType = contactType;
-        loginData.contactInfo = formValues.contactInfo;
-        loginData.otp = formValues.otp;
-      }
-      
-      // Simulate form submission
-      setTimeout(() => {
+    if (!formValues.contactInfo) {
+      errors.contactInfo = `${contactType === 'email' ? 'Email' : 'Phone number'} is required`;
+      isValid = false;
+    } else if (contactType === 'email' && !/\S+@\S+\.\S+/.test(formValues.contactInfo)) {
+      errors.contactInfo = 'Email is invalid';
+      isValid = false;
+    } else if (contactType === 'phone' && !/^\d{10}$/.test(formValues.contactInfo.replace(/\D/g, ''))) {
+      errors.contactInfo = 'Please enter a valid 10-digit phone number';
+      isValid = false;
+    }
+
+    if (otpSent && !formValues.otp) {
+      errors.otp = 'OTP is required';
+      isValid = false;
+    }
+
+    setFormErrors(errors);
+    return isValid;
+  };
+
+  const handleSendOTP = async () => {
+    if (!validateOTPLogin()) return;
+
+    setLoading(true);
+    setError('');
+    
+    try {
+      // Send only the email for OTP login
+      const response = await sendLoginOTP(formValues.contactInfo);
+      setSuccess(response.message);
+      setOtpSent(true);
+    } catch (err) {
+      setError(err.message || 'Failed to send OTP');
+      setOtpSent(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setError('');
+    setSuccess('');
+
+    if (tabValue === 0) {
+      // Password login
+      if (!validatePasswordLogin()) return;
+
+      setLoading(true);
+      try {
+        const response = await login({
+          email: formValues.email,
+          password: formValues.password
+        });
+        setSuccess(response.message);
+        // Update auth context with user data
+        loginContext(response.user);
+        // Redirect to home page after successful login
+        setTimeout(() => {
+          navigate('/');
+        }, 1000);
+      } catch (err) {
+        setError(err.message || 'Login failed');
+      } finally {
         setLoading(false);
-        // Handle successful login (redirect to dashboard)
-        console.log('Form submitted:', loginData);
-      }, 2000);
+      }
+    } else {
+      // OTP login
+      if (!validateOTPLogin()) return;
+
+      setLoading(true);
+      try {
+        const response = await verifyLoginOTP({
+          email: formValues.contactInfo,
+          otp: formValues.otp
+        });
+        setSuccess(response.message);
+        // Update auth context with user data
+        loginContext(response.user);
+        // Redirect to home page after successful login
+        setTimeout(() => {
+          navigate('/');
+        }, 1000);
+      } catch (err) {
+        setError(err.message || 'OTP verification failed');
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -277,7 +284,7 @@ const LoginPage = () => {
             <StyledPaper component="form" onSubmit={handleSubmit}>
               <Typography
                 variant="h5"
-                component="h2"
+                component="h1"
                 align="center"
                 gutterBottom
                 sx={{ 
@@ -289,16 +296,17 @@ const LoginPage = () => {
                 Welcome Back to MedGenix
               </Typography>
 
-              <Typography
-                variant="body1"
-                align="center"
-                sx={{ 
-                  color: 'text.secondary',
-                  mb: 3
-                }}
-              >
-                Choose your preferred login method
-              </Typography>
+              {error && (
+                <Alert severity="error" sx={{ mb: 2 }}>
+                  {error}
+                </Alert>
+              )}
+
+              {success && (
+                <Alert severity="success" sx={{ mb: 2 }}>
+                  {success}
+                </Alert>
+              )}
 
               <Tabs
                 value={tabValue}
@@ -313,9 +321,7 @@ const LoginPage = () => {
                     fontWeight: 500,
                     fontSize: '0.95rem',
                     textTransform: 'none',
-                  },
-                  borderBottom: 1,
-                  borderColor: 'divider' 
+                  }
                 }}
               >
                 <Tab 
@@ -331,14 +337,14 @@ const LoginPage = () => {
               </Tabs>
 
               <Grid container spacing={2}>
-                {tabValue === 0 && (
+                {tabValue === 0 ? (
+                  // Password Login Form
                   <>
                     <Grid item xs={12}>
                       <TextField
                         fullWidth
                         name="email"
                         label="Email Address"
-                        variant="outlined"
                         type="email"
                         value={formValues.email}
                         onChange={handleFormChange}
@@ -355,41 +361,37 @@ const LoginPage = () => {
                     </Grid>
                     
                     <Grid item xs={12}>
-                      <FormControl fullWidth variant="outlined" error={!!formErrors.password}>
-                        <InputLabel htmlFor="password">Password</InputLabel>
-                        <OutlinedInput
-                          id="password"
-                          name="password"
-                          type={showPassword ? 'text' : 'password'}
-                          value={formValues.password}
-                          onChange={handleFormChange}
-                          startAdornment={
+                      <TextField
+                        fullWidth
+                        name="password"
+                        label="Password"
+                        type={showPassword ? 'text' : 'password'}
+                        value={formValues.password}
+                        onChange={handleFormChange}
+                        error={!!formErrors.password}
+                        helperText={formErrors.password}
+                        InputProps={{
+                          startAdornment: (
                             <InputAdornment position="start">
                               <Lock color="primary" />
                             </InputAdornment>
-                          }
-                          endAdornment={
+                          ),
+                          endAdornment: (
                             <InputAdornment position="end">
                               <IconButton
-                                aria-label="toggle password visibility"
-                                onClick={togglePasswordVisibility}
+                                onClick={() => setShowPassword(!showPassword)}
                                 edge="end"
                               >
                                 {showPassword ? <VisibilityOff /> : <Visibility />}
                               </IconButton>
                             </InputAdornment>
-                          }
-                          label="Password"
-                        />
-                        {formErrors.password && (
-                          <FormHelperText>{formErrors.password}</FormHelperText>
-                        )}
-                      </FormControl>
+                          ),
+                        }}
+                      />
                     </Grid>
                   </>
-                )}
-
-                {tabValue === 1 && (
+                ) : (
+                  // OTP Login Form
                   <>
                     <Grid item xs={12}>
                       <Tabs
@@ -399,30 +401,20 @@ const LoginPage = () => {
                         indicatorColor="secondary"
                         textColor="primary"
                         aria-label="contact type tabs"
-                        sx={{ 
-                          mb: 2,
-                          '& .MuiTab-root': {
-                            fontSize: '0.85rem',
-                            color: 'rgba(0, 0, 0, 0.7)',
-                          },
-                          '& .Mui-selected': {
-                            color: 'primary.main',
-                            fontWeight: 'bold',
-                          }
-                        }}
+                        sx={{ mb: 2 }}
                       >
-                        <Tab value="email" label="Email" icon={<Email fontSize="small" />} iconPosition="start" />
-                        <Tab value="phone" label="Phone" icon={<Phone fontSize="small" />} iconPosition="start" />
+                        <Tab value="email" label="Email" icon={<Email />} />
+                        <Tab value="phone" label="Phone" icon={<Phone />} />
                       </Tabs>
                     </Grid>
+
                     <Grid item xs={12}>
                       <Grid container spacing={1}>
-                        <Grid item xs={otpSent ? 8 : 12}>
+                        <Grid item xs={otpSent ? 12 : 8}>
                           <TextField
                             fullWidth
                             name="contactInfo"
                             label={contactType === 'email' ? "Email Address" : "Phone Number"}
-                            variant="outlined"
                             type={contactType === 'email' ? "email" : "tel"}
                             value={formValues.contactInfo}
                             onChange={handleFormChange}
@@ -445,10 +437,7 @@ const LoginPage = () => {
                               color="primary"
                               onClick={handleSendOTP}
                               disabled={loading}
-                              sx={{ 
-                                height: '56px',
-                                textTransform: 'none'
-                              }}
+                              sx={{ height: '56px' }}
                             >
                               {loading ? <CircularProgress size={24} /> : 'Send OTP'}
                             </Button>
@@ -458,37 +447,17 @@ const LoginPage = () => {
                     </Grid>
 
                     {otpSent && (
-                      <>
-                        <Grid item xs={12}>
-                          <TextField
-                            fullWidth
-                            name="otp"
-                            label="Enter OTP"
-                            variant="outlined"
-                            value={formValues.otp}
-                            onChange={handleFormChange}
-                            error={!!formErrors.otp}
-                            helperText={formErrors.otp || `OTP sent to your ${contactType === 'email' ? 'email address' : 'phone number'}`}
-                            sx={{ mt: 1 }}
-                          />
-                        </Grid>
-                        <Grid item xs={12}>
-                          <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                            <Button
-                              color="secondary"
-                              size="small"
-                              onClick={handleSendOTP}
-                              disabled={loading}
-                              sx={{
-                                textTransform: 'none',
-                                fontSize: '0.8rem'
-                              }}
-                            >
-                              {loading ? <CircularProgress size={16} /> : 'Resend OTP'}
-                            </Button>
-                          </Box>
-                        </Grid>
-                      </>
+                      <Grid item xs={12}>
+                        <TextField
+                          fullWidth
+                          name="otp"
+                          label="Enter OTP"
+                          value={formValues.otp}
+                          onChange={handleFormChange}
+                          error={!!formErrors.otp}
+                          helperText={formErrors.otp}
+                        />
+                      </Grid>
                     )}
                   </>
                 )}
@@ -497,7 +466,7 @@ const LoginPage = () => {
                   <FormControlLabel
                     control={
                       <Checkbox 
-                        checked={formValues.rememberMe} 
+                        checked={formValues.rememberMe}
                         onChange={handleFormChange}
                         name="rememberMe"
                         color="primary"
@@ -507,13 +476,11 @@ const LoginPage = () => {
                   />
                   
                   <Link 
-                    href="#" 
-                    underline="hover"
                     component={RouterLink}
                     to="/forgot-password"
+                    underline="hover"
                     sx={{ 
                       color: 'primary.main',
-                      fontSize: '0.875rem',
                       '&:hover': {
                         color: 'primary.dark'
                       }
@@ -535,13 +502,7 @@ const LoginPage = () => {
                 {loading ? 'Logging in...' : 'Log In'}
               </LoginButton>
 
-              <StyledDivider>
-                <Typography variant="body2" color="text.secondary">
-                  OR
-                </Typography>
-              </StyledDivider>
-
-              <Box sx={{ textAlign: 'center' }}>
+              <Box sx={{ mt: 3, textAlign: 'center' }}>
                 <Typography variant="body2" color="text.secondary">
                   Don't have an account?{' '}
                   <Link 
