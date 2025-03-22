@@ -33,18 +33,24 @@ import {
   MedicalServices as MedicalIcon,
   NotificationsOutlined as NotificationIcon,
   Search as SearchIcon,
-  LightMode as LightModeIcon
+  LightMode as LightModeIcon,
+  ExitToApp,
+  MarkEmailRead as VerifyEmailIcon
 } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
 import { motion } from 'framer-motion';
-import { Link as RouterLink, useLocation } from 'react-router-dom';
+import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
 import './Header.css';
+import { useAuth } from '../../context/AuthContext';
+import { logout } from '../../services/authService';
 
 const Header = () => {
   const theme = useTheme();
   const location = useLocation();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
+  const navigate = useNavigate();
+  const { user, logout: logoutContext } = useAuth();
   
   // State for mobile drawer
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -109,6 +115,33 @@ const Header = () => {
   // Toggle drawer
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      logoutContext();
+      navigate('/');
+      handleUserMenuClose();
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
+
+  const handleDashboard = () => {
+    navigate('/dashboard');
+    handleUserMenuClose();
+  };
+
+  const handleVerifyEmail = () => {
+    navigate('/verify-email');
+    handleUserMenuClose();
+  };
+
+  // Add this function to get the avatar letter
+  const getAvatarLetter = () => {
+    if (!user || !user.name) return '?';
+    return user.name.charAt(0).toUpperCase();
   };
 
   const drawer = (
@@ -458,39 +491,118 @@ const Header = () => {
                   border: '1px solid rgba(0, 128, 128, 0.15)'
                 }}
               >
-                <Button
-                  variant="text"
-                  component={RouterLink}
-                  to="/login"
-                  sx={{
-                    px: 2,
-                    py: 1,
-                    color: 'text.primary',
-                    '&:hover': {
-                      bgcolor: 'rgba(0, 128, 128, 0.08)'
-                    }
-                  }}
-                >
-                  Login
-                </Button>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  component={RouterLink}
-                  to="/signup"
-                  disableElevation
-                  sx={{
-                    px: 2,
-                    py: 1,
-                    borderRadius: 0,
-                    fontWeight: 500,
-                    '&:hover': {
-                      boxShadow: 'none'
-                    }
-                  }}
-                >
-                  Sign Up
-                </Button>
+                {user ? (
+                  <>
+                    <IconButton onClick={handleUserMenuOpen}>
+                      <Avatar
+                        sx={{
+                          bgcolor: theme.palette.primary.main,
+                          color: theme.palette.primary.contrastText,
+                          textTransform: 'uppercase',
+                          width: 40,
+                          height: 40,
+                          fontSize: '1.2rem',
+                          fontWeight: 500
+                        }}
+                      >
+                        {getAvatarLetter()}
+                      </Avatar>
+                    </IconButton>
+                    <Menu
+                      anchorEl={userAnchorEl}
+                      open={userMenuOpen}
+                      onClose={handleUserMenuClose}
+                      anchorOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'right',
+                      }}
+                      transformOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                      }}
+                      PaperProps={{
+                        elevation: 3,
+                        sx: {
+                          mt: 1.5,
+                          overflow: 'visible',
+                          borderRadius: '10px',
+                          border: '1px solid rgba(0, 128, 128, 0.1)',
+                          '&:before': {
+                            content: '""',
+                            display: 'block',
+                            position: 'absolute',
+                            top: 0,
+                            right: 14,
+                            width: 10,
+                            height: 10,
+                            bgcolor: 'background.paper',
+                            transform: 'translateY(-50%) rotate(45deg)',
+                            zIndex: 0,
+                            borderTop: '1px solid rgba(0, 128, 128, 0.1)',
+                            borderLeft: '1px solid rgba(0, 128, 128, 0.1)',
+                          },
+                        },
+                      }}
+                    >
+                      <MenuItem onClick={handleDashboard}>
+                        <ListItemIcon>
+                          <DashboardIcon fontSize="small" />
+                        </ListItemIcon>
+                        Dashboard
+                      </MenuItem>
+                      {user && !user.isEmailVerified && (
+                        <MenuItem onClick={handleVerifyEmail}>
+                          <ListItemIcon>
+                            <VerifyEmailIcon fontSize="small" color="warning" />
+                          </ListItemIcon>
+                          Verify Email
+                        </MenuItem>
+                      )}
+                      <MenuItem onClick={handleLogout}>
+                        <ListItemIcon>
+                          <ExitToApp fontSize="small" />
+                        </ListItemIcon>
+                        Logout
+                      </MenuItem>
+                    </Menu>
+                  </>
+                ) : (
+                  <>
+                    <Button
+                      variant="text"
+                      component={RouterLink}
+                      to="/login"
+                      sx={{
+                        px: 2,
+                        py: 1,
+                        color: 'text.primary',
+                        '&:hover': {
+                          bgcolor: 'rgba(0, 128, 128, 0.08)'
+                        }
+                      }}
+                    >
+                      Login
+                    </Button>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      component={RouterLink}
+                      to="/signup"
+                      disableElevation
+                      sx={{
+                        px: 2,
+                        py: 1,
+                        borderRadius: 0,
+                        fontWeight: 500,
+                        '&:hover': {
+                          boxShadow: 'none'
+                        }
+                      }}
+                    >
+                      Sign Up
+                    </Button>
+                  </>
+                )}
               </Paper>
             )}
           </Box>
