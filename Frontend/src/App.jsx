@@ -12,6 +12,9 @@ import LoginPage from './pages/LoginPage';
 import EmailVerificationPage from './pages/EmailVerificationPage';
 import OtpVerificationPage from './pages/OtpVerificationPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
+import DashboardPage from './pages/DashboardPage';
+import MedicineDetailPage from './pages/MedicineDetailPage';
+import GenericMedicineDetailPage from './pages/GenericMedicineDetailPage';
 
 // Create a theme with teal as the primary color
 const theme = createTheme({
@@ -163,6 +166,9 @@ function App() {
             <Route path="/forgot-password" element={<EmailVerificationPage />} />
             <Route path="/otp-verification" element={<OtpVerificationPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/medicine/:id" element={<MedicineDetailPage />} />
+            <Route path="/generic/medicine/:id" element={<GenericMedicineDetailPage />} />
           </Routes>
         </Box>
       </BrowserRouter>

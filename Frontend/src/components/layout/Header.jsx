@@ -63,6 +63,7 @@ const Header = () => {
   // Navigation items with icons
   const navItems = [
     { name: 'Home', path: '/' },
+    { name: 'Dashboard', path: '/dashboard' },
     { name: 'Features', path: '/features' },
     { name: 'About', path: '/about' },
     { name: 'Contact', path: '/contact' }
