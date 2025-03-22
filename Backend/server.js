@@ -40,9 +40,6 @@ app.use(cookieParser());
 // Explicitly handle OPTIONS requests for preflight
 app.options('*', cors());
 
-// Initialize Passport
-// app.use(passport.initialize());
-// app.use(passport.session());
 
 // Test route
 app.get('/', (req, res) => {
@@ -52,7 +49,6 @@ app.get('/', (req, res) => {
 // Routes
 app.use('/api/auth', authRouter);
 app.use('/api/user', userRouter);
-// app.use('/api/auth', oauthRouter);
 
 // Error handling
 app.use((err, req, res, next) => {
