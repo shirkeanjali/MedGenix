@@ -2,12 +2,14 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import sgMail from '@sendgrid/mail';
 import { sendVerificationCode, verifyCode } from '../utils/twilioUtils.js';
-
-import userModel from "../models/userModels.js";
+import userModel from '../models/userModels.js';
+import { generateOTP, verifyOTP } from '../utils/otpUtils.js';
+import { sendEmail } from '../utils/emailUtils.js';
 import {
   EMAIL_VERIFY_TEMPLATE,
   PASSWORD_RESET_TEMPLATE,
-  WELCOME_EMAIL_TEMPLATE
+  WELCOME_EMAIL_TEMPLATE,
+  EMAIL_OTP_VERIFY_TEMPLATE
 } from "../config/emailTemplates.js";
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
@@ -23,11 +25,15 @@ export const register = async (req, res) => {
 
   try {
     // Check if user already exists
-    const existingUser = await userModel.findOne({ email });
+    const existingUser = await userModel.findOne({ 
+      $or: [{ email }, { mobileNumber }] 
+    });
+    
     if (existingUser) {
-      return res
-        .status(400)
-        .json({ success: false, message: "User already exists" });
+      return res.status(400).json({ 
+        success: false, 
+        message: existingUser.email === email ? "Email already registered" : "Mobile number already registered" 
+      });
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
@@ -47,30 +53,17 @@ export const register = async (req, res) => {
         .replace('{{name}}', name)
         .replace('{{email}}', email)
         .replace('{{password}}', password)
-        .replace('{{welcome_link}}', `${process.env.FRONTEND_URL}/verify-email`)
     };
     await sgMail.send(welcomeMsg);
-
-    // Send mobile verification code using Twilio Verify
-    const verificationResult = await sendVerificationCode(mobileNumber);
-    if (!verificationResult.success) {
-      return res.status(500).json({ 
-        success: false, 
-        message: "Failed to send verification code",
-        error: verificationResult.error 
-      });
-    }
-
     await newUser.save();
 
     res.status(201).json({ 
       success: true, 
-      message: "User registered successfully. Please verify your mobile number.",
+      message: "Registration successful! Please login to continue.",
       user: {
         id: newUser._id,
         name: newUser.name,
-        email: newUser.email,
-        isAccountVerified: newUser.isAccountVerified
+        email: newUser.email
       }
     });
   } catch (error) {
@@ -79,50 +72,108 @@ export const register = async (req, res) => {
   }
 };
 
-export const login = async (req, res) => {
-  const { email, password } = req.body;
+// Send OTP for login (supports both email and phone)
+export const sendLoginOTP = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await userModel.findOne({ email });
 
-  if (!email || !password) {
-    return res
-      .status(400)
-      .json({ success: false, message: "All fields are required" });
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    const otp = generateOTP();
+    user.loginOtp = otp;
+    user.loginOtpExpireAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
+    await user.save();
+
+    // Send login OTP email using the new template
+    await sendEmail({
+      to: user.email,
+      subject: 'Login Verification - MedGenix',
+      html: EMAIL_VERIFY_TEMPLATE.replace('{{email}}', user.email).replace('{{otp}}', otp)
+    });
+
+    res.json({ success: true, message: 'Login verification code sent successfully' });
+  } catch (error) {
+    console.error('Send login OTP error:', error);
+    res.status(500).json({ success: false, message: 'Failed to send login verification code' });
+  }
+};
+
+// Verify OTP and login (supports both email and phone)
+export const verifyLoginOTP = async (req, res) => {
+  const { email, otp } = req.body;
+
+  if (!email || !otp) {
+    return res.status(400).json({ 
+      success: false, 
+      message: "Email and OTP are required" 
+    });
   }
 
   try {
     const user = await userModel.findOne({ email });
+
     if (!user) {
-      return res.status(400).json({ success: false, message: "Invalid email" });
+      return res.status(404).json({ 
+        success: false, 
+        message: "User not found" 
+      });
     }
 
-    const isPasswordMatch = await bcrypt.compare(password, user.password);
-    if (!isPasswordMatch) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Invalid password" });
+    // Verify email OTP
+    if (user.loginOtp !== otp) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Invalid OTP" 
+      });
     }
 
+    if (user.loginOtpExpireAt < Date.now()) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "OTP has expired" 
+      });
+    }
+
+    // Clear OTP after successful verification
+    user.loginOtp = undefined;
+    user.loginOtpExpireAt = undefined;
+    await user.save();
+
+    // Generate JWT token
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "7d",
     });
 
+    // Set cookie
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
-      maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
+    // Return user data and token
     return res.json({
       success: true,
-      message: "Login success",
+      message: "Login successful",
       user: {
+        id: user._id,
         name: user.name,
         email: user.email,
-        isAccountVerified: user.isAccountVerified,
+        isEmailVerified: user.isEmailVerified
       },
+      token // Include token in response for header auth
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    console.error('OTP verification error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: "Server error",
+      error: error.message 
+    });
   }
 };
 
@@ -162,7 +213,7 @@ export const sendVerifyOtp = async (req, res) => {
       to: user.email,
       from: process.env.SENDGRID_FROM_EMAIL,
       subject: "Verify Your MedGenix Account",
-      html: EMAIL_VERIFY_TEMPLATE
+      html: EMAIL_OTP_VERIFY_TEMPLATE
         .replace("{{otp}}", otp)
         .replace("{{email}}", user.email)
     };
@@ -177,39 +228,113 @@ export const sendVerifyOtp = async (req, res) => {
   }
 };
 
-export const verifyEmail = async (req, res) => {
-  const { userID, otp } = req.body;
-
-  if (!userID || !otp) {
-    return res
-      .status(400)
-      .json({ success: false, message: "All fields are required" });
-  }
-
+// Send verification email
+export const sendVerificationEmail = async (req, res) => {
   try {
-    const user = await userModel.findById(userID);
+    const user = await userModel.findById(req.user._id);
     if (!user) {
-      return res
-        .status(400)
-        .json({ success: false, message: "User not found" });
+      return res.status(404).json({ success: false, message: 'User not found' });
     }
 
-    if (user.verifyOtp === "" || user.verifyOtp !== otp) {
-      return res.status(400).json({ success: false, message: "Invalid OTP" });
+    if (user.isEmailVerified) {
+      return res.status(400).json({ success: false, message: 'Email is already verified' });
     }
 
-    if (user.verifyOtpExpireAt < Date.now()) {
-      return res.status(400).json({ success: false, message: "OTP expired" });
-    }
-
-    user.isAccountVerified = true;
-    user.verifyOtp = "";
-    user.verifyOtpExpireAt = 0;
-
+    // Generate 6-digit OTP
+    const otp = String(Math.floor(100000 + Math.random() * 900000));
+    user.verifyOtp = otp;
+    user.verifyOtpExpireAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
     await user.save();
-    return res.json({ success: true, message: "Email verified successfully" });
+
+    // Send verification email using SendGrid
+    const msg = {
+      to: user.email,
+      from: process.env.SENDGRID_FROM_EMAIL,
+      subject: 'Verify Your Email - MedGenix',
+      html: EMAIL_VERIFY_TEMPLATE
+        .replace(/\{\{email\}\}/g, user.email)
+        .replace(/\{\{otp\}\}/g, otp)
+    };
+    
+    console.log('Sending verification email to:', user.email);
+    await sgMail.send(msg);
+    console.log('Verification email sent successfully');
+
+    res.json({ 
+      success: true, 
+      message: 'Verification code sent successfully',
+      email: user.email // Return email for confirmation
+    });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    console.error('Send verification email error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Failed to send verification email',
+      error: error.response ? error.response.body : error.message
+    });
+  }
+};
+
+// Verify email with OTP
+export const verifyEmail = async (req, res) => {
+  try {
+    const { otp } = req.body;
+    const user = await userModel.findById(req.user._id);
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    if (user.isEmailVerified) {
+      return res.status(400).json({ success: false, message: 'Email is already verified' });
+    }
+
+    if (!user.verifyOtp || !user.verifyOtpExpireAt) {
+      return res.status(400).json({ success: false, message: 'Please request a new verification code' });
+    }
+
+    if (new Date(user.verifyOtpExpireAt) < new Date()) {
+      return res.status(400).json({ success: false, message: 'Verification code has expired' });
+    }
+
+    if (user.verifyOtp !== otp) {
+      return res.status(400).json({ success: false, message: 'Invalid verification code' });
+    }
+
+    // Update user verification status
+    user.isEmailVerified = true;
+    user.verifyOtp = undefined;
+    user.verifyOtpExpireAt = undefined;
+    await user.save();
+
+    // Generate a new token with updated user data
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    });
+
+    // Set cookie with new token
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+
+    // Return success with updated user data and token
+    res.json({
+      success: true,
+      message: 'Email verified successfully',
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        isEmailVerified: true
+      },
+      token
+    });
+  } catch (error) {
+    console.error('Verify email error:', error);
+    res.status(500).json({ success: false, message: 'Failed to verify email' });
   }
 };
 
@@ -236,62 +361,105 @@ export const sendPasswordResetOTP = async (req, res) => {
       return res.status(404).json({ success: false, message: "User not found" });
     }
 
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otp = String(Math.floor(100000 + Math.random() * 900000));
     user.resetOtp = otp;
-    user.resetOtpExpireAt = Date.now() + 10 * 60 * 1000; // 10 minutes
+    user.resetOtpExpireAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
     await user.save();
 
     const msg = {
       to: email,
       from: process.env.SENDGRID_FROM_EMAIL,
-      subject: 'Password Reset Request',
-      text: `Your password reset code is ${otp}`,
-      html: PASSWORD_RESET_TEMPLATE.replace("{{otp}}", otp).replace("{{email}}", user.email),
+      subject: 'Password Reset - MedGenix',
+      html: PASSWORD_RESET_TEMPLATE
+        .replace(/\{\{email\}\}/g, email)
+        .replace(/\{\{otp\}\}/g, otp)
     };
-    await sgMail.send(msg);
 
-    res.status(200).json({ success: true, message: "Password reset OTP sent to email" });
+    console.log('Sending password reset email to:', email);
+    await sgMail.send(msg);
+    console.log('Password reset email sent successfully');
+
+    res.status(200).json({ 
+      success: true, 
+      message: "Password reset code sent to your email",
+      email: email // Return email for confirmation
+    });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ success: false, message: "Server error" });
+    console.error('Send password reset error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: "Failed to send password reset email",
+      error: error.response ? error.response.body : error.message
+    });
   }
 };
 
 // reset user password
-
 export const resetPassword = async (req, res) => {
   const { email, otp, newPassword } = req.body;
 
   if (!email || !otp || !newPassword) {
-    return res
-      .status(400)
-      .json({ success: false, message: "All fields are required" });
+    return res.status(400).json({ 
+      success: false, 
+      message: "Email, OTP, and new password are required" 
+    });
   }
+
   try {
     const user = await userModel.findOne({ email });
     if (!user) {
-      return res
-        .status(400)
-        .json({ success: false, message: "User not found" });
+      return res.status(404).json({ 
+        success: false, 
+        message: "User not found" 
+      });
     }
 
-    if (user.resetOtp === "" || user.resetOtp !== otp) {
-      return res.status(400).json({ success: false, message: "Invalid OTP" });
+    if (!user.resetOtp || user.resetOtp !== otp) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Invalid reset code" 
+      });
     }
 
-    if (user.resetOtpExpireAt < Date.now()) {
-      return res.status(400).json({ success: false, message: "OTP expired" });
+    if (!user.resetOtpExpireAt || new Date(user.resetOtpExpireAt) < new Date()) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Reset code has expired" 
+      });
     }
 
     const hashedPassword = await bcrypt.hash(newPassword, 12);
     user.password = hashedPassword;
-    user.resetOtp = "";
-    user.resetOtpExpireAt = 0;
-
+    user.resetOtp = undefined;
+    user.resetOtpExpireAt = undefined;
     await user.save();
-    return res.json({ success: true, message: "Password reset successfully" });
+
+    // Send password change confirmation email
+    const msg = {
+      to: email,
+      from: process.env.SENDGRID_FROM_EMAIL,
+      subject: 'Password Changed Successfully - MedGenix',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2>Password Changed Successfully</h2>
+          <p>Your password has been successfully changed. If you did not make this change, please contact support immediately.</p>
+          <p>Best regards,<br>MedGenix Team</p>
+        </div>
+      `
+    };
+    await sgMail.send(msg);
+
+    return res.json({ 
+      success: true, 
+      message: "Password reset successfully" 
+    });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    console.error('Reset password error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: "Failed to reset password",
+      error: error.response ? error.response.body : error.message
+    });
   }
 };
 
@@ -340,6 +508,64 @@ export const verifyMobileOtp = async (req, res) => {
     }
   } catch (error) {
     console.error(error);
+    res.status(500).json({ 
+      success: false, 
+      message: "Server error",
+      error: error.message 
+    });
+  }
+};
+
+export const login = async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res
+      .status(400)
+      .json({ success: false, message: "All fields are required" });
+  }
+
+  try {
+    const user = await userModel.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Invalid email or password" 
+      });
+    }
+
+    const isPasswordMatch = await bcrypt.compare(password, user.password);
+    if (!isPasswordMatch) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Invalid email or password" 
+      });
+    }
+
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    });
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+
+    return res.json({
+      success: true,
+      message: "Login successful",
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        isEmailVerified: user.isEmailVerified
+      },
+      token // Include token in response for header auth
+    });
+  } catch (error) {
+    console.error('Login error:', error);
     res.status(500).json({ 
       success: false, 
       message: "Server error",
