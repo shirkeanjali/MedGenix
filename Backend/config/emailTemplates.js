@@ -3,7 +3,7 @@ export const WELCOME_EMAIL_TEMPLATE = `
 <html xmlns="http://www.w3.org/1999/xhtml">
 
 <head>
-  <title>Welcome to Our Platform</title>
+  <title>Welcome to MedGenix</title>
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,7 +13,7 @@ export const WELCOME_EMAIL_TEMPLATE = `
       margin: 0;
       padding: 0;
       font-family: 'Open Sans', sans-serif;
-      background: #E5E5E5;
+      background: #ffffff;
     }
 
     table, td {
@@ -41,13 +41,26 @@ export const WELCOME_EMAIL_TEMPLATE = `
 
     .button {
       display: inline-block;
-      background: #22D172;
+      background: #008080;
       text-decoration: none;
       padding: 12px 20px;
       color: #fff;
       font-size: 14px;
       font-weight: bold;
       border-radius: 7px;
+    }
+
+    .header {
+      background: #008080;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      border-radius: 8px 8px 0 0;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 24px;
     }
 
     @media only screen and (max-width: 480px) {
@@ -63,40 +76,45 @@ export const WELCOME_EMAIL_TEMPLATE = `
 </head>
 
 <body>
-  <table width="100%" cellspacing="0" cellpadding="0" border="0" align="center" bgcolor="#F6FAFB">
+  <table width="100%" cellspacing="0" cellpadding="0" border="0" align="center" bgcolor="#ffffff">
     <tbody>
       <tr>
         <td valign="top" align="center">
           <table class="container" width="500" cellspacing="0" cellpadding="0" border="0">
             <tbody>
               <tr>
+                <td class="header">
+                  <h1>Welcome to MedGenix</h1>
+                </td>
+              </tr>
+              <tr>
                 <td class="main-content">
                   <table width="100%" cellspacing="0" cellpadding="0" border="0">
                     <tbody>
                       <tr>
                         <td style="padding: 0 0 24px; font-size: 18px; line-height: 150%; font-weight: bold;">
-                          Welcome to Our Platform, {{name}}!
+                          Welcome {{name}}!
                         </td>
                       </tr>
                       <tr>
                         <td style="padding: 0 0 10px; font-size: 14px; line-height: 150%;">
-                          We're excited to have you on board. Get ready to explore all the amazing features we have to offer.
+                          Thank you for joining MedGenix - your trusted platform for OCR scanning and generic medicine recommendations.
                         </td>
                       </tr>
                       <tr>
                         <td style="padding: 0 0 16px; font-size: 14px; line-height: 150%; font-weight: 700;">
-                          Click the button below to get started.
+                          To get started, please verify your email address and mobile number.
                         </td>
                       </tr>
                       <tr>
                         <td class="button-container">
-                          <a href="{{welcome_link}}" class="button">Get Started</a>
+                          <a href="{{welcome_link}}" class="button">Verify Your Account</a>
                         </td>
                       </tr>
                       <tr>
                         <td style="padding: 20px 0 10px; font-size: 14px; line-height: 150%;">
                           <strong>Your login credentials are:</strong><br>
-                          📧 Email: {{email}} <br>
+                          📧 Email: {{email}}<br>
                           🔑 Password: {{password}}
                         </td>
                       </tr>
@@ -125,7 +143,7 @@ export const EMAIL_VERIFY_TEMPLATE = `
 <html xmlns="http://www.w3.org/1999/xhtml">
 
 <head>
-  <title>Email Verify</title>
+  <title>Verify Your MedGenix Account</title>
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -135,7 +153,7 @@ export const EMAIL_VERIFY_TEMPLATE = `
       margin: 0;
       padding: 0;
       font-family: 'Open Sans', sans-serif;
-      background: #E5E5E5;
+      background: #ffffff;
     }
 
     table, td {
@@ -145,8 +163,10 @@ export const EMAIL_VERIFY_TEMPLATE = `
     .container {
       width: 100%;
       max-width: 500px;
-      margin: 70px 0px;
+      margin: 70px auto;
       background-color: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
     }
 
     .main-content {
@@ -154,65 +174,82 @@ export const EMAIL_VERIFY_TEMPLATE = `
       color: #000000;
     }
 
-    .button {
-      width: 100%;
-      background: #22D172;
-      text-decoration: none;
-      display: inline-block;
-      padding: 10px 0;
-      color: #fff;
-      font-size: 14px;
+    .header {
+      background: #008080;
+      color: white;
+      padding: 20px;
       text-align: center;
+      border-radius: 8px 8px 0 0;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .otp-box {
+      background: #f5f5f5;
+      padding: 20px;
+      text-align: center;
+      font-size: 24px;
       font-weight: bold;
+      color: #008080;
       border-radius: 7px;
+      margin: 20px 0;
     }
 
     @media only screen and (max-width: 480px) {
       .container {
-        width: 80% !important;
-      }
-
-      .button {
-        width: 50% !important;
+        width: 90% !important;
       }
     }
   </style>
 </head>
 
 <body>
-  <table width="100%" cellspacing="0" cellpadding="0" border="0" align="center" bgcolor="#F6FAFB">
+  <table width="100%" cellspacing="0" cellpadding="0" border="0" align="center" bgcolor="#ffffff">
     <tbody>
       <tr>
         <td valign="top" align="center">
-          <table class="container" width="600" cellspacing="0" cellpadding="0" border="0">
+          <table class="container" width="500" cellspacing="0" cellpadding="0" border="0">
             <tbody>
+              <tr>
+                <td class="header">
+                  <h1>Verify Your Email</h1>
+                </td>
+              </tr>
               <tr>
                 <td class="main-content">
                   <table width="100%" cellspacing="0" cellpadding="0" border="0">
                     <tbody>
                       <tr>
                         <td style="padding: 0 0 24px; font-size: 18px; line-height: 150%; font-weight: bold;">
-                          Verify your email
+                          Hello!
                         </td>
                       </tr>
                       <tr>
                         <td style="padding: 0 0 10px; font-size: 14px; line-height: 150%;">
-                          You are just one step away to verify your account for this email: <span style="color: #4C83EE;">{{email}}</span>.
+                          Thank you for registering with MedGenix. To complete your registration, please verify your email address: <span style="color: #008080;">{{email}}</span>
                         </td>
                       </tr>
                       <tr>
                         <td style="padding: 0 0 16px; font-size: 14px; line-height: 150%; font-weight: 700;">
-                          Use below OTP to verify your account.
+                          Use the verification code below to verify your account:
                         </td>
                       </tr>
                       <tr>
-                        <td style="padding: 0 0 24px;">
-                          <p class="button" >{{otp}}</p>
+                        <td class="otp-box">
+                          {{otp}}
                         </td>
                       </tr>
                       <tr>
                         <td style="padding: 0 0 10px; font-size: 14px; line-height: 150%;">
-                          This OTP is valid for 24 hours.
+                          This code will expire in 24 hours.
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding: 20px 0 10px; font-size: 14px; line-height: 150%;">
+                          If you didn't request this verification, please ignore this email.
                         </td>
                       </tr>
                     </tbody>
@@ -231,12 +268,11 @@ export const EMAIL_VERIFY_TEMPLATE = `
 `
 
 export const PASSWORD_RESET_TEMPLATE = `
-
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 
 <head>
-  <title>Password Reset</title>
+  <title>Reset Your MedGenix Password</title>
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -246,7 +282,7 @@ export const PASSWORD_RESET_TEMPLATE = `
       margin: 0;
       padding: 0;
       font-family: 'Open Sans', sans-serif;
-      background: #E5E5E5;
+      background: #ffffff;
     }
 
     table, td {
@@ -256,8 +292,10 @@ export const PASSWORD_RESET_TEMPLATE = `
     .container {
       width: 100%;
       max-width: 500px;
-      margin: 70px 0px;
+      margin: 70px auto;
       background-color: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
     }
 
     .main-content {
@@ -265,65 +303,82 @@ export const PASSWORD_RESET_TEMPLATE = `
       color: #000000;
     }
 
-    .button {
-      width: 100%;
-      background: #22D172;
-      text-decoration: none;
-      display: inline-block;
-      padding: 10px 0;
-      color: #fff;
-      font-size: 14px;
+    .header {
+      background: #008080;
+      color: white;
+      padding: 20px;
       text-align: center;
+      border-radius: 8px 8px 0 0;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .otp-box {
+      background: #f5f5f5;
+      padding: 20px;
+      text-align: center;
+      font-size: 24px;
       font-weight: bold;
+      color: #008080;
       border-radius: 7px;
+      margin: 20px 0;
     }
 
     @media only screen and (max-width: 480px) {
       .container {
-        width: 80% !important;
-      }
-
-      .button {
-        width: 50% !important;
+        width: 90% !important;
       }
     }
   </style>
 </head>
 
 <body>
-  <table width="100%" cellspacing="0" cellpadding="0" border="0" align="center" bgcolor="#F6FAFB">
+  <table width="100%" cellspacing="0" cellpadding="0" border="0" align="center" bgcolor="#ffffff">
     <tbody>
       <tr>
         <td valign="top" align="center">
-          <table class="container" width="600" cellspacing="0" cellpadding="0" border="0">
+          <table class="container" width="500" cellspacing="0" cellpadding="0" border="0">
             <tbody>
+              <tr>
+                <td class="header">
+                  <h1>Reset Your Password</h1>
+                </td>
+              </tr>
               <tr>
                 <td class="main-content">
                   <table width="100%" cellspacing="0" cellpadding="0" border="0">
                     <tbody>
                       <tr>
                         <td style="padding: 0 0 24px; font-size: 18px; line-height: 150%; font-weight: bold;">
-                          Forgot your password?
+                          Hello!
                         </td>
                       </tr>
                       <tr>
                         <td style="padding: 0 0 10px; font-size: 14px; line-height: 150%;">
-                          We received a password reset request for your account: <span style="color: #4C83EE;">{{email}}</span>.
+                          We received a password reset request for your MedGenix account: <span style="color: #008080;">{{email}}</span>
                         </td>
                       </tr>
                       <tr>
                         <td style="padding: 0 0 16px; font-size: 14px; line-height: 150%; font-weight: 700;">
-                          Use the OTP below to reset the password.
+                          Use the verification code below to reset your password:
                         </td>
                       </tr>
                       <tr>
-                        <td style="padding: 0 0 24px;">
-                          <p class="button" >{{otp}}</p>
+                        <td class="otp-box">
+                          {{otp}}
                         </td>
                       </tr>
                       <tr>
                         <td style="padding: 0 0 10px; font-size: 14px; line-height: 150%;">
-                          The password reset otp is only valid for the next 15 minutes.
+                          This code will expire in 15 minutes.
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding: 20px 0 10px; font-size: 14px; line-height: 150%;">
+                          If you didn't request this password reset, please ignore this email.
                         </td>
                       </tr>
                     </tbody>
