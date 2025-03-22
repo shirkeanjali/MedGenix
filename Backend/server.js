@@ -1,5 +1,5 @@
 import express from 'express';
-// import cors from 'cors';
+import cors from 'cors';
 import 'dotenv/config';
 import cookieParser from 'cookie-parser';
 import connectDB from './config/mongodb.js';
@@ -15,10 +15,10 @@ const PORT = process.env.PORT || 8000;
 connectDB();
 
 // CORS Configuration
-// app.use(cors({
-//   origin: process.env.FRONTEND_URL,
-//   credentials: true
-// }));
+app.use(cors({
+  origin: process.env.FRONTEND_URL,
+  credentials: true
+}));
 
 // Session Middleware
 app.use(
@@ -38,7 +38,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 // Explicitly handle OPTIONS requests for preflight
-// app.options('*', cors());
+app.options('*', cors());
 
 // Initialize Passport
 // app.use(passport.initialize());
