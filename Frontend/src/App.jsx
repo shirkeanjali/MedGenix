@@ -16,6 +16,7 @@ import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Dashboard from './pages/Dashboard';
 import EmailVerifyPage from './pages/EmailVerifyPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
 
 // Create a theme with teal as the primary color
 const theme = createTheme({
@@ -175,7 +176,7 @@ function App() {
               <Route path="/signup" element={<SignUpPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/verify-email" element={<EmailVerifyPage />} />
-              <Route path="/forgot-password" element={<EmailVerificationPage />} />
+              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
               <Route path="/otp-verification" element={<OtpVerificationPage />} />
               <Route path="/reset-password" element={<ResetPasswordPage />} />
               <Route

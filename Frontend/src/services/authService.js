@@ -77,17 +77,23 @@ export const sendPasswordResetOTP = async (email) => {
     const response = await api.post('/auth/send-reset-otp', { email });
     return response.data;
   } catch (error) {
-    throw error.response?.data || { success: false, message: 'Network error' };
+    console.error('Send OTP error:', error);
+    throw new Error(error.response?.data?.message || 'Failed to send OTP');
   }
 };
 
 // Reset password with OTP
-export const resetPassword = async (data) => {
+export const resetPassword = async (email, otp, newPassword) => {
   try {
-    const response = await api.post('/auth/reset-password', data);
+    const response = await api.post('/auth/reset-password', {
+      email,
+      otp,
+      newPassword
+    });
     return response.data;
   } catch (error) {
-    throw error.response?.data || { success: false, message: 'Network error' };
+    console.error('Reset password error:', error);
+    throw new Error(error.response?.data?.message || 'Failed to reset password');
   }
 };
 
@@ -108,6 +114,9 @@ export const checkAuth = async () => {
     const response = await api.get('/auth/is-authenticated');
     return response.data;
   } catch (error) {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token'); // Clear invalid token
+    }
     throw error.response?.data || { success: false, message: 'Network error' };
   }
 };

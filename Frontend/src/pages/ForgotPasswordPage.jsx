@@ -18,7 +18,6 @@ import {
   Email, 
   MedicalServices
 } from '@mui/icons-material';
-import { motion } from 'framer-motion';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
@@ -60,7 +59,7 @@ const StyledDivider = styled(Divider)(({ theme }) => ({
   },
 }));
 
-const EmailVerificationPage = () => {
+const ForgotPasswordPage = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
@@ -105,7 +104,7 @@ const EmailVerificationPage = () => {
       if (response.success) {
         // Store email in sessionStorage
         sessionStorage.setItem('resetEmail', email);
-        enqueueSnackbar('Verification code sent successfully!', { variant: 'success' });
+        enqueueSnackbar('Reset code sent successfully!', { variant: 'success' });
         
         // Set cooldown
         setCooldown(120); // 2 minutes cooldown
@@ -113,12 +112,12 @@ const EmailVerificationPage = () => {
         // Navigate to OTP verification page
         navigate('/otp-verification');
       } else {
-        enqueueSnackbar(response.message || 'Failed to send verification code', { variant: 'error' });
+        enqueueSnackbar(response.message || 'Failed to send reset code', { variant: 'error' });
       }
     } catch (error) {
       console.error('Send OTP error:', error);
-      enqueueSnackbar(error.message || 'Failed to send verification code', { variant: 'error' });
-      setEmailError(error.message || 'Failed to send verification code');
+      enqueueSnackbar(error.message || 'Failed to send reset code', { variant: 'error' });
+      setEmailError(error.message || 'Failed to send reset code');
     } finally {
       setLoading(false);
     }
@@ -146,10 +145,12 @@ const EmailVerificationPage = () => {
         }}
       >
         <Container maxWidth="sm">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+          <Box
+            sx={{
+              opacity: 1,
+              transform: 'translateY(0)',
+              transition: 'opacity 0.5s, transform 0.5s',
+            }}
           >
             <StyledPaper component="form" onSubmit={handleSendOTP}>
               <Typography
@@ -225,9 +226,9 @@ const EmailVerificationPage = () => {
                 disabled={loading || cooldown > 0}
                 startIcon={loading && <CircularProgress size={20} color="inherit" />}
               >
-                {loading ? 'Sending Verification Code...' : 
+                {loading ? 'Sending Reset Code...' : 
                  cooldown > 0 ? `Wait ${cooldown}s to resend` : 
-                 'Send Verification Code'}
+                 'Send Reset Code'}
               </ActionButton>
 
               <StyledDivider>
@@ -256,7 +257,7 @@ const EmailVerificationPage = () => {
                 </Typography>
               </Box>
             </StyledPaper>
-          </motion.div>
+          </Box>
         </Container>
       </Box>
       <Footer />
@@ -264,4 +265,4 @@ const EmailVerificationPage = () => {
   );
 };
 
-export default EmailVerificationPage; 
+export default ForgotPasswordPage; 

@@ -1,176 +1,146 @@
-import { useState, useEffect } from 'react';
-import { 
-  Box, 
-  Container, 
-  Paper, 
-  Typography, 
-  Button, 
-  Grid, 
-  Link, 
-  InputAdornment, 
-  IconButton, 
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
+import {
+  Box,
+  Container,
+  Typography,
+  TextField,
+  Button,
+  Link,
   Divider,
-  OutlinedInput,
-  FormControl,
-  InputLabel,
-  FormHelperText,
   CircularProgress,
-  Avatar
+  Alert,
+  IconButton,
+  InputAdornment
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { 
-  Visibility, 
-  VisibilityOff, 
-  Lock,
-  MedicalServices,
-  KeyboardBackspace,
-  CheckCircle
-} from '@mui/icons-material';
-import { motion } from 'framer-motion';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { KeyboardBackspace, Visibility, VisibilityOff } from '@mui/icons-material';
+import { useSnackbar } from 'notistack';
+import { resetPassword } from '../services/authService';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
 
 // Styled components
-const StyledPaper = styled(Paper)(({ theme }) => ({
-  padding: theme.spacing(5),
-  borderRadius: '16px',
+const StyledPaper = styled(Box)(({ theme }) => ({
+  backgroundColor: 'rgba(255, 255, 255, 0.9)',
+  backdropFilter: 'blur(10px)',
+  borderRadius: theme.shape.borderRadius * 2,
+  padding: theme.spacing(4),
   boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-  backdropFilter: 'blur(8px)',
-  background: 'rgba(255, 255, 255, 0.9)',
-  border: '1px solid rgba(255, 255, 255, 0.18)',
-  [theme.breakpoints.up('md')]: {
-    padding: theme.spacing(6),
-  },
+  width: '100%',
+  maxWidth: '500px',
+  margin: 'auto',
 }));
 
 const ActionButton = styled(Button)(({ theme }) => ({
-  padding: theme.spacing(1.5),
-  marginTop: theme.spacing(3),
-  borderRadius: '8px',
-  fontSize: '1rem',
-  fontWeight: 600,
+  borderRadius: theme.shape.borderRadius * 1.5,
+  padding: theme.spacing(1.5, 4),
   textTransform: 'none',
-  boxShadow: '0 4px 12px rgba(0, 128, 128, 0.2)',
-  transition: 'all 0.3s ease',
+  fontWeight: 600,
+  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
   '&:hover': {
-    transform: 'translateY(-2px)',
-    boxShadow: '0 6px 16px rgba(0, 128, 128, 0.3)',
+    boxShadow: '0 6px 16px rgba(0, 0, 0, 0.2)',
   },
 }));
 
 const StyledDivider = styled(Divider)(({ theme }) => ({
   margin: theme.spacing(3, 0),
   '&::before, &::after': {
-    borderColor: 'rgba(0, 128, 128, 0.2)',
+    borderColor: 'rgba(0, 0, 0, 0.1)',
   },
 }));
 
 const ResetPasswordPage = () => {
-  // State management
   const [loading, setLoading] = useState(false);
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [passwordReset, setPasswordReset] = useState(false);
-  const navigate = useNavigate();
-  
-  // Form values
-  const [formValues, setFormValues] = useState({
-    password: '',
-    confirmPassword: ''
-  });
-  
-  // Form errors
-  const [formErrors, setFormErrors] = useState({
-    password: '',
-    confirmPassword: ''
-  });
-
+  const [error, setError] = useState('');
   const [email, setEmail] = useState('');
+  const [otp, setOtp] = useState('');
+  const navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
-    // Get email from session storage
+    // Get email and OTP from session storage
     const storedEmail = sessionStorage.getItem('resetEmail');
-    if (!storedEmail) {
-      // Redirect to email verification page if email is not in session storage
+    const storedOtp = sessionStorage.getItem('resetOtp');
+    
+    if (!storedEmail || !storedOtp) {
       navigate('/forgot-password');
       return;
     }
+    
     setEmail(storedEmail);
+    setOtp(storedOtp);
   }, [navigate]);
 
-  // Event handlers
+  const handlePasswordChange = (event) => {
+    setPassword(event.target.value);
+    if (error) setError('');
+  };
+
+  const handleConfirmPasswordChange = (event) => {
+    setConfirmPassword(event.target.value);
+    if (error) setError('');
+  };
+
   const togglePasswordVisibility = () => {
-    setShowPassword((prev) => !prev);
+    setShowPassword(!showPassword);
   };
 
   const toggleConfirmPasswordVisibility = () => {
-    setShowConfirmPassword((prev) => !prev);
-  };
-
-  const handleFormChange = (event) => {
-    const { name, value } = event.target;
-    setFormValues({
-      ...formValues,
-      [name]: value,
-    });
-    
-    // Clear errors when typing
-    if (formErrors[name]) {
-      setFormErrors({
-        ...formErrors,
-        [name]: '',
-      });
-    }
+    setShowConfirmPassword(!showConfirmPassword);
   };
 
   const handleBack = () => {
     navigate('/otp-verification');
   };
 
-  const handleResetPassword = (event) => {
+  const handleResetPassword = async (event) => {
     event.preventDefault();
     
-    // Validate form
-    let isValid = true;
-    const errors = {};
-    
-    if (!formValues.password) {
-      errors.password = 'Password is required';
-      isValid = false;
-    } else if (formValues.password.length < 8) {
-      errors.password = 'Password must be at least 8 characters';
-      isValid = false;
+    // Validate password
+    if (!password) {
+      setError('Password is required');
+      return;
     }
     
-    if (!formValues.confirmPassword) {
-      errors.confirmPassword = 'Please confirm your password';
-      isValid = false;
-    } else if (formValues.password !== formValues.confirmPassword) {
-      errors.confirmPassword = 'Passwords do not match';
-      isValid = false;
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters long');
+      return;
     }
     
-    if (!isValid) {
-      setFormErrors(errors);
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
       return;
     }
     
     setLoading(true);
-    
-    // Simulate password reset
-    setTimeout(() => {
+    try {
+      const response = await resetPassword(email, otp, password);
+      
+      if (response.success) {
+        enqueueSnackbar('Password reset successful!', { variant: 'success' });
+        // Clear session storage
+        sessionStorage.removeItem('resetEmail');
+        sessionStorage.removeItem('resetOtp');
+        // Redirect to login after 2 seconds
+        setTimeout(() => {
+          navigate('/login');
+        }, 2000);
+      } else {
+        setError(response.message || 'Failed to reset password');
+      }
+    } catch (error) {
+      console.error('Reset password error:', error);
+      setError(error.message || 'Failed to reset password');
+      enqueueSnackbar(error.message || 'Failed to reset password', { variant: 'error' });
+    } finally {
       setLoading(false);
-      setPasswordReset(true);
-      
-      // Clear session storage
-      sessionStorage.removeItem('resetEmail');
-      
-      // Redirect to login page after 3 seconds
-      setTimeout(() => {
-        navigate('/login');
-      }, 3000);
-    }, 1500);
+    }
   };
 
   return (
@@ -195,190 +165,145 @@ const ResetPasswordPage = () => {
         }}
       >
         <Container maxWidth="sm">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+          <Box
+            sx={{
+              opacity: 1,
+              transform: 'translateY(0)',
+              transition: 'opacity 0.5s, transform 0.5s',
+            }}
           >
             <StyledPaper component="form" onSubmit={handleResetPassword}>
-              {!passwordReset ? (
-                <>
-                  <Typography
-                    variant="h5"
-                    component="h2"
-                    align="center"
-                    gutterBottom
-                    sx={{ 
-                      fontWeight: 600, 
-                      color: 'primary.dark',
-                      mb: 3
-                    }}
-                  >
-                    Reset Password
-                  </Typography>
+              <Typography
+                variant="h5"
+                component="h2"
+                align="center"
+                gutterBottom
+                sx={{ 
+                  fontWeight: 600, 
+                  color: 'primary.dark',
+                  mb: 3
+                }}
+              >
+                Reset Password
+              </Typography>
 
-                  <Box sx={{ mb: 4, textAlign: 'center' }}>
-                    <Typography variant="body1" color="text.secondary" sx={{ mb: 1 }}>
-                      Step 3 of 3: Create New Password
-                    </Typography>
-                    <Box sx={{ 
-                      width: '100%', 
-                      display: 'flex', 
-                      position: 'relative',
-                      height: '4px',
-                      backgroundColor: 'rgba(0, 128, 128, 0.1)',
-                      borderRadius: '2px',
-                      mb: 3
-                    }}>
-                      <Box sx={{ 
-                        width: '100%', 
-                        backgroundColor: 'primary.main',
-                        borderRadius: '2px'
-                      }} />
-                    </Box>
-                  </Box>
+              <Box sx={{ mb: 4, textAlign: 'center' }}>
+                <Typography variant="body1" color="text.secondary" sx={{ mb: 1 }}>
+                  Step 3 of 3: Set New Password
+                </Typography>
+                <Box sx={{ 
+                  width: '100%', 
+                  display: 'flex', 
+                  position: 'relative',
+                  height: '4px',
+                  backgroundColor: 'rgba(0, 128, 128, 0.1)',
+                  borderRadius: '2px',
+                  mb: 3
+                }}>
+                  <Box sx={{ 
+                    width: '100%', 
+                    backgroundColor: 'primary.main',
+                    borderRadius: '2px'
+                  }} />
+                </Box>
+              </Box>
 
-                  <Grid container spacing={2}>
-                    <Grid item xs={12}>
-                      <Typography variant="body2" sx={{ mb: 2 }}>
-                        Create a new password for your account with email {email && `${email}`}.
-                      </Typography>
-                      <FormControl fullWidth variant="outlined" error={!!formErrors.password} sx={{ mb: 2 }}>
-                        <InputLabel htmlFor="password">New Password</InputLabel>
-                        <OutlinedInput
-                          id="password"
-                          name="password"
-                          type={showPassword ? 'text' : 'password'}
-                          value={formValues.password}
-                          onChange={handleFormChange}
-                          startAdornment={
-                            <InputAdornment position="start">
-                              <Lock color="primary" />
-                            </InputAdornment>
-                          }
-                          endAdornment={
-                            <InputAdornment position="end">
-                              <IconButton
-                                aria-label="toggle password visibility"
-                                onClick={togglePasswordVisibility}
-                                edge="end"
-                              >
-                                {showPassword ? <VisibilityOff /> : <Visibility />}
-                              </IconButton>
-                            </InputAdornment>
-                          }
-                          label="New Password"
-                        />
-                        {formErrors.password && (
-                          <FormHelperText>{formErrors.password}</FormHelperText>
-                        )}
-                      </FormControl>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <FormControl fullWidth variant="outlined" error={!!formErrors.confirmPassword}>
-                        <InputLabel htmlFor="confirmPassword">Confirm New Password</InputLabel>
-                        <OutlinedInput
-                          id="confirmPassword"
-                          name="confirmPassword"
-                          type={showConfirmPassword ? 'text' : 'password'}
-                          value={formValues.confirmPassword}
-                          onChange={handleFormChange}
-                          startAdornment={
-                            <InputAdornment position="start">
-                              <Lock color="primary" />
-                            </InputAdornment>
-                          }
-                          endAdornment={
-                            <InputAdornment position="end">
-                              <IconButton
-                                aria-label="toggle confirm password visibility"
-                                onClick={toggleConfirmPasswordVisibility}
-                                edge="end"
-                              >
-                                {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
-                              </IconButton>
-                            </InputAdornment>
-                          }
-                          label="Confirm New Password"
-                        />
-                        {formErrors.confirmPassword && (
-                          <FormHelperText>{formErrors.confirmPassword}</FormHelperText>
-                        )}
-                      </FormControl>
-                    </Grid>
-                  </Grid>
+              {error && (
+                <Alert severity="error" sx={{ mb: 2 }}>
+                  {error}
+                </Alert>
+              )}
 
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
-                    <Button
-                      startIcon={<KeyboardBackspace />}
-                      onClick={handleBack}
-                      sx={{ textTransform: 'none' }}
-                    >
-                      Back
-                    </Button>
-                    <Box sx={{ flex: '1 1 auto' }} />
-                    <ActionButton
-                      type="submit"
-                      variant="contained"
-                      color="primary"
-                      disabled={loading}
-                      startIcon={loading && <CircularProgress size={20} color="inherit" />}
-                    >
-                      {loading ? 'Resetting Password...' : 'Reset Password'}
-                    </ActionButton>
-                  </Box>
-                </>
-              ) : (
-                <Box sx={{ textAlign: 'center', py: 4 }}>
-                  <CheckCircle color="success" sx={{ fontSize: 60, mb: 2 }} />
-                  <Typography variant="h5" gutterBottom>
-                    Password Reset Successful!
-                  </Typography>
-                  <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-                    Your password has been successfully reset. You will be redirected to the login page in a few seconds.
-                  </Typography>
-                  <Button 
-                    variant="contained" 
-                    color="primary"
+              <TextField
+                fullWidth
+                label="New Password"
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={handlePasswordChange}
+                margin="normal"
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="toggle password visibility"
+                        onClick={togglePasswordVisibility}
+                        edge="end"
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+
+              <TextField
+                fullWidth
+                label="Confirm Password"
+                type={showConfirmPassword ? 'text' : 'password'}
+                value={confirmPassword}
+                onChange={handleConfirmPasswordChange}
+                margin="normal"
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="toggle confirm password visibility"
+                        onClick={toggleConfirmPasswordVisibility}
+                        edge="end"
+                      >
+                        {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
+                <Button
+                  startIcon={<KeyboardBackspace />}
+                  onClick={handleBack}
+                  sx={{ textTransform: 'none' }}
+                >
+                  Back
+                </Button>
+                <ActionButton
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                  disabled={loading}
+                  startIcon={loading && <CircularProgress size={20} color="inherit" />}
+                >
+                  {loading ? 'Resetting...' : 'Reset Password'}
+                </ActionButton>
+              </Box>
+
+              <StyledDivider>
+                <Typography variant="body2" color="text.secondary">
+                  OR
+                </Typography>
+              </StyledDivider>
+
+              <Box sx={{ textAlign: 'center' }}>
+                <Typography variant="body2" color="text.secondary">
+                  Remember your password?{' '}
+                  <Link 
                     component={RouterLink}
                     to="/login"
+                    underline="hover"
+                    sx={{ 
+                      fontWeight: 600,
+                      color: 'primary.main',
+                      '&:hover': {
+                        color: 'primary.dark'
+                      }
+                    }}
                   >
-                    Go to Login
-                  </Button>
-                </Box>
-              )}
-
-              {!passwordReset && (
-                <>
-                  <StyledDivider>
-                    <Typography variant="body2" color="text.secondary">
-                      OR
-                    </Typography>
-                  </StyledDivider>
-
-                  <Box sx={{ textAlign: 'center' }}>
-                    <Typography variant="body2" color="text.secondary">
-                      Remember your password?{' '}
-                      <Link 
-                        component={RouterLink}
-                        to="/login"
-                        underline="hover"
-                        sx={{ 
-                          fontWeight: 600,
-                          color: 'primary.main',
-                          '&:hover': {
-                            color: 'primary.dark'
-                          }
-                        }}
-                      >
-                        Log In
-                      </Link>
-                    </Typography>
-                  </Box>
-                </>
-              )}
+                    Log In
+                  </Link>
+                </Typography>
+              </Box>
             </StyledPaper>
-          </motion.div>
+          </Box>
         </Container>
       </Box>
       <Footer />
