@@ -22,7 +22,6 @@ import PharmacyLocatePage from './pages/PharmacyLocatePage';
 import HowItWorksPage from './pages/HowItWorksPage';
 import FAQPage from './pages/FAQPage';
 import PrescriptionScannerPage from './pages/PrescriptionScannerPage';
-import PrescriptionPage from './pages/PrescriptionPage';
 
 // Create a theme with teal as the primary color
 const theme = createTheme({
@@ -202,7 +201,6 @@ function App() {
               <Route path="/pharmacy-locate" element={<PharmacyLocatePage />} />
               <Route path="/how-it-works" element={<HowItWorksPage />} />
               <Route path="/faq" element={<FAQPage />} />
-              <Route path="/prescriptions" element={<PrescriptionPage />} />
             </Routes>
           </Box>
         </BrowserRouter>

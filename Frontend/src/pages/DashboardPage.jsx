@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Header from '../components/layout/Header';
+import Footer from '../components/layout/Footer';
 import { useAuth } from '../context/AuthContext';
 import {
   Box,
@@ -38,8 +40,6 @@ import {
 } from '@mui/icons-material';
 import axios from 'axios';
 import { formatDate } from '../utils/dateUtils';
-import Header from '../components/layout/Header';
-import Footer from '../components/layout/Footer';
 
 // Additional styles for medicine card flip effect
 import { createGlobalStyle } from 'styled-components';
@@ -182,7 +182,7 @@ const DashboardPage = () => {
     const fetchPrescriptions = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/prescriptions/user`, {
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/prescriptions/user`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setPrescriptions(response.data);
