@@ -14,6 +14,7 @@ load_dotenv()
 # Import our modules
 from app.ocr import extract_text_from_image
 from app.analysis.medication_extractor import extract_medications_with_llm
+from app.api.endpoints import generics
 
 # Define models
 class Medicine(BaseModel):
@@ -85,6 +86,8 @@ async def health_check():
 @app.on_event("startup")
 def startup_event():
     pass
+
+app.include_router(generics.router, prefix="/api", tags=["medications"])
 
 # Run the app
 if __name__ == "__main__":
