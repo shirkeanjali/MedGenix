@@ -8,15 +8,14 @@ from pydantic import BaseModel
 import os
 from dotenv import load_dotenv
 
-# Load environment variables
 load_dotenv()
 
-# Import our modules
+
 from app.ocr import extract_text_from_image
 from app.analysis.medication_extractor import extract_medications_with_llm
 from app.api.endpoints import generics
 
-# Define models
+
 class Medicine(BaseModel):
     brand_name: str
     dosage: Optional[str] = None
@@ -27,14 +26,14 @@ class PrescriptionResponse(BaseModel):
     original_text: str
     medicines: List[Medicine]
 
-# Initialize FastAPI
+
 app = FastAPI(
     title="Prescription Analyzer API",
     description="API for analyzing prescription images and extracting medication information",
     version="1.0.0"
 )
 
-# Enable CORS
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -55,17 +54,17 @@ async def process_prescription(file: UploadFile = File(...)):
     Returns structured information about medications from the prescription.
     """
     try:
-        # Read the image
+        
         contents = await file.read()
         image = Image.open(io.BytesIO(contents))
         
-        # Step 1: OCR Processing - Extract text using Llama Vision
+        
         ocr_text = await extract_text_from_image(image)
         
         if not ocr_text:
             raise HTTPException(status_code=422, detail="Could not extract text from the image")
         
-        # Step 2: LLM Analysis - Extract medication information
+        
         medicine_info = await extract_medications_with_llm(ocr_text)
         
         return PrescriptionResponse(
@@ -76,19 +75,19 @@ async def process_prescription(file: UploadFile = File(...)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error processing image: {str(e)}")
 
-# Endpoint to check API health
+
 @app.get("/health")
 async def health_check():
     """Check if the API is running"""
     return {"status": "healthy", "ocr_method": os.getenv("OCR_METHOD", "llama")}
 
-# Load medicine database at startup
+
 @app.on_event("startup")
 def startup_event():
     pass
 
 app.include_router(generics.router, prefix="/api", tags=["medications"])
 
-# Run the app
+
 if __name__ == "__main__":
     uvicorn.run("app.main:app", host="0.0.0.0", port=int(os.getenv("PORT", "8000")), reload=True) 
