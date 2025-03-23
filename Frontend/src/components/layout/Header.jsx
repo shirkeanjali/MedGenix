@@ -234,6 +234,7 @@ const Header = () => {
           fullWidth
           component={RouterLink}
           to="/signup"
+          className="signup-button"
           sx={{ 
             mb: 2,
             borderRadius: '8px',
@@ -243,7 +244,6 @@ const Header = () => {
             transition: 'all 0.3s ease',
             '&:hover': {
               backgroundColor: '#006666',
-              color: 'white',
               transform: 'translateY(-3px) scale(1.02)',
               boxShadow: '0 6px 15px rgba(0, 128, 128, 0.3)',
             }
@@ -537,6 +537,7 @@ const Header = () => {
                   color="primary"
                   component={RouterLink}
                   to="/signup"
+                  className="signup-button"
               sx={{
                     mr: 2,
                     borderRadius: '8px',
@@ -548,7 +549,6 @@ const Header = () => {
                     transition: 'all 0.3s ease',
                 '&:hover': {
                       backgroundColor: '#006666',
-                      color: 'white',
                       transform: 'translateY(-3px) scale(1.02)',
                       boxShadow: '0 6px 15px rgba(0, 128, 128, 0.3)'
                     }
@@ -678,6 +678,7 @@ const Header = () => {
                       color="primary"
                       component={RouterLink}
                       to="/signup"
+                      className="signup-button"
                       disableElevation
                       sx={{
                         px: 2,

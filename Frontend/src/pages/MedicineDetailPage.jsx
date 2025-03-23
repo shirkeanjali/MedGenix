@@ -130,17 +130,6 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
   },
 }));
 
-const VerifiedBadge = styled(Box)(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  backgroundColor: 'rgba(76, 175, 80, 0.1)',
-  borderRadius: '12px',
-  padding: theme.spacing(1, 2),
-  marginTop: theme.spacing(2),
-  marginBottom: theme.spacing(2),
-  border: '1px solid rgba(76, 175, 80, 0.3)',
-}));
-
 const SectionTitle = styled(Typography)(({ theme }) => ({
   fontWeight: 600,
   marginBottom: theme.spacing(2),
@@ -300,347 +289,330 @@ const MedicineDetailPage = () => {
   return (
     <>
       <Header />
-      <Container maxWidth="lg" sx={{ py: { xs: 4, md: 8 }, minHeight: '100vh' }}>
-        {/* Medicine Header */}
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={fadeInUp}
-        >
-          <Box 
-            sx={{ 
-              mb: 4, 
-              pb: 2, 
-              borderBottom: '1px solid rgba(0, 0, 0, 0.1)',
-              display: 'flex',
-              flexDirection: { xs: 'column', md: 'row' },
-              justifyContent: 'space-between',
-              alignItems: { xs: 'flex-start', md: 'center' }
-            }}
+      <Box
+        sx={{
+          position: 'relative',
+          background: 'linear-gradient(135deg, #f0f7f4 0%, #e7f5ed 100%)',
+          backgroundImage: 'none',
+          '&::before': {
+            content: 'none'
+          }
+        }}
+      >
+        <Container maxWidth="lg" sx={{ py: { xs: 4, md: 8 }, minHeight: '100vh', position: 'relative', zIndex: 1 }}>
+          {/* Medicine Header */}
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={fadeInUp}
           >
-            <Box>
-              <Typography variant="h3" component="h1" sx={{ fontWeight: 700, mb: 1 }}>
-                {medicine.name}
-              </Typography>
-              <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 1 }}>
-                <Chip 
-                  label={`By ${medicine.brand}`} 
-                  color="primary" 
-                  sx={{ fontWeight: 500 }}
-                />
-                <Chip 
-                  label={medicine.category} 
-                  variant="outlined" 
-                  color="primary" 
-                  sx={{ fontWeight: 500 }}
-                />
-                {selectedDosage && (
+            <Box 
+              sx={{ 
+                mb: 4, 
+                pb: 2, 
+                pt: 2,
+                px: 3,
+                borderRadius: "16px",
+                background: "linear-gradient(135deg, rgba(0, 128, 128, 0.15) 0%, rgba(103, 194, 124, 0.25) 100%)",
+                borderBottom: '1px solid rgba(0, 0, 0, 0.1)',
+                display: 'flex',
+                flexDirection: { xs: 'column', md: 'row' },
+                justifyContent: 'space-between',
+                alignItems: { xs: 'flex-start', md: 'center' },
+                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)'
+              }}
+            >
+              <Box>
+                <Typography variant="h3" component="h1" sx={{ fontWeight: 700, mb: 1 }}>
+                  {medicine.name}
+                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 1 }}>
                   <Chip 
-                    label={`₹${selectedDosage.price.toFixed(2)}`} 
-                    color="success" 
-                    variant="outlined"
-                    sx={{ fontWeight: 600 }}
+                    label={`By ${medicine.brand}`} 
+                    color="primary" 
+                    sx={{ fontWeight: 500 }}
                   />
-                )}
+                  <Chip 
+                    label={medicine.category} 
+                    variant="outlined" 
+                    color="primary" 
+                    sx={{ fontWeight: 500 }}
+                  />
+                  {selectedDosage && (
+                    <Chip 
+                      label={`₹${selectedDosage.price.toFixed(2)}`} 
+                      color="success" 
+                      variant="outlined"
+                      sx={{ fontWeight: 600 }}
+                    />
+                  )}
+                </Box>
               </Box>
+              <Button
+                variant="contained"
+                color="primary"
+                startIcon={<CompareArrows />}
+                onClick={handleNavigateToGeneric}
+                sx={{ 
+                  mt: { xs: 2, md: 0 }, 
+                  fontWeight: 600,
+                  px: 3,
+                  py: 1,
+                  fontSize: '1rem',
+                  bgcolor: '#008080',
+                  color: 'white',
+                  boxShadow: '0 4px 10px rgba(0, 128, 128, 0.5)',
+                  '&:hover': {
+                    bgcolor: '#006666',
+                    boxShadow: '0 6px 15px rgba(0, 128, 128, 0.7)',
+                    transform: 'translateY(-2px)'
+                  },
+                  transition: 'transform 0.3s, box-shadow 0.3s'
+                }}
+              >
+                View Generic Alternative
+              </Button>
             </Box>
-            <Button
-              variant="outlined"
-              color="success"
-              startIcon={<CompareArrows />}
-              onClick={handleNavigateToGeneric}
-              sx={{ mt: { xs: 2, md: 0 }, fontWeight: 600 }}
-            >
-              View Generic Alternative
-            </Button>
-          </Box>
-        </motion.div>
+          </motion.div>
 
-        <Grid container spacing={4}>
-          {/* Left Column */}
-          <Grid item xs={12} md={7}>
-            <motion.div 
-              initial="hidden"
-              animate="visible"
-              variants={staggerContainer}
-            >
-              {/* Overview Section */}
-              <motion.div variants={fadeInUp}>
-                <StyledPaper>
-                  <SectionTitle variant="h5">
-                    <MedicalServices /> Overview
-                  </SectionTitle>
-                  <Typography paragraph>{medicine.usageInfo}</Typography>
-                  <Typography variant="h6" sx={{ mt: 2, mb: 1, fontWeight: 600 }}>How it works</Typography>
-                  <Typography paragraph>{medicine.howItWorks}</Typography>
-                  
-                  <VerifiedBadge>
-                    <VerifiedUser color="success" sx={{ mr: 1 }} />
-                    <Box>
-                      <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-                        Verified by {medicine.doctorVerified.name}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {medicine.doctorVerified.specialty} • {medicine.doctorVerified.date}
-                      </Typography>
-                    </Box>
-                  </VerifiedBadge>
-                </StyledPaper>
-              </motion.div>
+          <Grid container spacing={4}>
+            {/* Left Column */}
+            <Grid item xs={12} md={7}>
+              <motion.div 
+                initial="hidden"
+                animate="visible"
+                variants={staggerContainer}
+              >
+                {/* Usage Section (renamed from Overview) */}
+                <motion.div variants={fadeInUp}>
+                  <StyledPaper>
+                    <SectionTitle variant="h5">
+                      <MedicalServices /> Usage
+                    </SectionTitle>
+                    <Typography paragraph>{medicine.usageInfo}</Typography>
+                    <Typography variant="h6" sx={{ mt: 2, mb: 1, fontWeight: 600 }}>How it works</Typography>
+                    <Typography paragraph>{medicine.howItWorks}</Typography>
+                  </StyledPaper>
+                </motion.div>
 
-              {/* Active Ingredients Section */}
-              <motion.div variants={fadeInUp}>
-                <StyledPaper sx={{ mt: 4 }}>
-                  <SectionTitle variant="h5">
-                    <Science /> Active Ingredients
-                  </SectionTitle>
-                  <Typography paragraph>{medicine.activeIngredients}</Typography>
-                  
-                  <Divider sx={{ my: 2 }} />
-                  
-                  <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>Available Dosages</Typography>
-                  <Grid container spacing={2}>
-                    {medicine.dosageOptions.map((dosage, index) => (
-                      <Grid item xs={6} sm={3} key={index}>
-                        <Card 
+                {/* Side Effects Section */}
+                <motion.div variants={fadeInUp}>
+                  <StyledPaper sx={{ mt: 4 }}>
+                    <SectionTitle variant="h5">
+                      <ErrorOutline /> Possible Side Effects
+                    </SectionTitle>
+                    
+                    <Box sx={{ 
+                      display: 'grid', 
+                      gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
+                      gap: 2,
+                      mb: 3
+                    }}>
+                      {[...medicine.sideEffects[0].effects, ...medicine.sideEffects[1].effects, ...medicine.sideEffects[2].effects].map((effect, index) => (
+                        <Box 
+                          key={index} 
                           sx={{ 
-                            borderRadius: '8px',
-                            border: selectedDosage && selectedDosage.strength === dosage.strength ? 
-                              '2px solid' : '1px solid',
-                            borderColor: selectedDosage && selectedDosage.strength === dosage.strength ? 
-                              'primary.main' : 'rgba(0, 0, 0, 0.12)',
-                            cursor: 'pointer',
-                            transition: 'all 0.3s ease',
-                            height: '100%',
+                            p: 2, 
+                            borderRadius: 2, 
+                            bgcolor: index < 4 ? 'rgba(103, 194, 124, 0.08)' : 
+                                    index < 8 ? 'rgba(0, 128, 128, 0.12)' : 
+                                    'rgba(0, 128, 128, 0.16)',
+                            border: '1px solid',
+                            borderColor: index < 4 ? 'rgba(103, 194, 124, 0.3)' : 
+                                        index < 8 ? 'rgba(0, 128, 128, 0.3)' : 
+                                        'rgba(0, 128, 128, 0.4)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            transition: 'transform 0.2s, box-shadow 0.2s',
                             '&:hover': {
-                              borderColor: 'primary.main',
                               transform: 'translateY(-2px)',
-                              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
+                              boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
                             }
                           }}
-                          onClick={() => handleDosageChange(dosage)}
                         >
-                          <CardContent sx={{ textAlign: 'center', p: 2 }}>
-                            <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                              {dosage.strength}
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary">
-                              {dosage.form}
-                            </Typography>
-                            <Typography variant="subtitle1" color="primary" sx={{ mt: 1, fontWeight: 600 }}>
-                              ₹{dosage.price.toFixed(2)}
-                            </Typography>
-                          </CardContent>
-                        </Card>
-                      </Grid>
-                    ))}
-                  </Grid>
-                </StyledPaper>
-              </motion.div>
+                          <Box 
+                            component="span" 
+                            sx={{ 
+                              width: 8, 
+                              height: 8, 
+                              borderRadius: '50%', 
+                              mr: 1.5,
+                              bgcolor: index < 4 ? '#67c27c' : 
+                                      index < 8 ? '#008080' : 
+                                      '#005f5f'
+                            }} 
+                          />
+                          <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                            {effect}
+                          </Typography>
+                        </Box>
+                      ))}
+                    </Box>
+                    
+                    <Box sx={{ 
+                      bgcolor: 'rgba(211, 47, 47, 0.15)', 
+                      p: 2, 
+                      borderRadius: 2,
+                      border: '1px solid rgba(211, 47, 47, 0.3)',
+                    }}>
+                      <Typography variant="body2" color="error.dark" sx={{ display: 'flex', alignItems: 'center', fontWeight: 500 }}>
+                        <InfoOutlined sx={{ fontSize: '1rem', mr: 0.5, verticalAlign: 'middle', color: 'error.main' }} />
+                        If you experience any severe or persistent side effects, contact your healthcare provider immediately.
+                      </Typography>
+                    </Box>
+                  </StyledPaper>
+                </motion.div>
 
-              {/* Side Effects Section */}
-              <motion.div variants={fadeInUp}>
-                <StyledPaper sx={{ mt: 4 }}>
-                  <SectionTitle variant="h5">
-                    <ErrorOutline /> Possible Side Effects
-                  </SectionTitle>
-                  
-                  {medicine.sideEffects.map((sideEffect, index) => (
-                    <Accordion 
-                      key={index} 
-                      sx={{ 
-                        mb: 2, 
-                        boxShadow: 'none', 
-                        border: '1px solid rgba(0, 0, 0, 0.12)',
-                        borderRadius: '8px',
-                        '&:before': { display: 'none' },
-                        overflow: 'hidden'
-                      }}
-                    >
-                      <AccordionSummary expandIcon={<ExpandMore />}>
-                        <Typography sx={{ fontWeight: 600 }}>
-                          {sideEffect.severity} Side Effects
-                        </Typography>
-                      </AccordionSummary>
-                      <AccordionDetails>
-                        <List disablePadding>
-                          {sideEffect.effects.map((effect, i) => (
-                            <ListItem key={i} sx={{ py: 0.5 }}>
-                              <ListItemIcon sx={{ minWidth: 36 }}>
-                                <KeyboardArrowRight color="primary" />
-                              </ListItemIcon>
-                              <ListItemText primary={effect} />
-                            </ListItem>
-                          ))}
-                        </List>
-                      </AccordionDetails>
-                    </Accordion>
-                  ))}
-                  
-                  <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-                    <InfoOutlined sx={{ fontSize: '1rem', mr: 0.5, verticalAlign: 'middle' }} />
-                    If you experience any severe or persistent side effects, contact your healthcare provider immediately.
-                  </Typography>
-                </StyledPaper>
-              </motion.div>
-            </motion.div>
-          </Grid>
-
-          {/* Right Column */}
-          <Grid item xs={12} md={5}>
-            <motion.div 
-              initial="hidden"
-              animate="visible"
-              variants={staggerContainer}
-            >
-              {/* Medicine Image Section */}
-              <motion.div variants={fadeInUp}>
-                <StyledPaper>
-                  <Box 
-                    sx={{ 
-                      display: 'flex',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      flexDirection: 'column',
-                      py: 2
-                    }}
-                  >
-                    {/* Placeholder for medicine image - would be a real image in a real app */}
-                    <motion.div
-                      animate={pulseAnimation}
-                    >
-                      <Avatar
-                        sx={{
-                          bgcolor: 'primary.light',
-                          width: 180,
-                          height: 180,
-                          mb: 2,
-                          boxShadow: '0 8px 32px rgba(0, 128, 128, 0.2)'
+                {/* Content Details Box */}
+                <motion.div variants={fadeInUp}>
+                  <StyledPaper sx={{ mt: 4 }}>
+                    <SectionTitle variant="h5">
+                      <MedicalServices /> Content Detaills
+                    </SectionTitle>
+                    
+                    <Box sx={{ 
+                      display: 'flex', 
+                      alignItems: 'flex-start', 
+                      mb: 2
+                    }}>
+                      <Avatar 
+                        sx={{ 
+                          bgcolor: 'primary.main', 
+                          width: 70, 
+                          height: 70,
+                          mr: 2
                         }}
                       >
-                        <MedicalServices sx={{ fontSize: 100 }} />
+                        AS
                       </Avatar>
-                    </motion.div>
-                    
-                    <Typography variant="h5" sx={{ fontWeight: 600, mb: 1 }}>
-                      {medicine.name} {selectedDosage?.strength}
-                    </Typography>
-                    <Typography variant="subtitle1" color="text.secondary">
-                      Manufactured by {medicine.brand}
-                    </Typography>
-                    
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      startIcon={<ShoppingCart />}
-                      sx={{ mt: 3, px: 4, py: 1.2, borderRadius: '12px', fontWeight: 600 }}
-                      component={motion.button}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      Purchase Now
-                    </Button>
-                    
-                    <Typography variant="body2" color="text.secondary" sx={{ mt: 2, textAlign: 'center' }}>
-                      <InfoOutlined sx={{ fontSize: '1rem', mr: 0.5, verticalAlign: 'middle' }} />
-                      Prescription required for purchase
-                    </Typography>
-                  </Box>
-                </StyledPaper>
-              </motion.div>
-
-              {/* Save Money Section */}
-              <motion.div variants={fadeInUp}>
-                <StyledPaper sx={{ mt: 4 }}>
-                  <SectionTitle variant="h5">
-                    <CompareArrows /> Save Money with Generic
-                  </SectionTitle>
-                  
-                  <Box sx={{ 
-                    bgcolor: 'success.light', 
-                    color: 'success.contrastText',
-                    p: 2,
-                    borderRadius: 2,
-                    mb: 3,
-                    display: 'flex',
-                    alignItems: 'center'
-                  }}>
-                    <CheckCircleOutline sx={{ mr: 1 }} />
-                    <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                      Save up to 75% with generic alternatives
-                    </Typography>
-                  </Box>
-                  
-                  <Box sx={{ textAlign: 'center', my: 2 }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mb: 2 }}>
-                      <Box sx={{ textAlign: 'center', px: 3 }}>
-                        <Typography variant="h6" sx={{ fontWeight: 700 }}>Brand</Typography>
-                        <Typography variant="h4" color="error" sx={{ fontWeight: 700 }}>
-                          ₹{selectedDosage?.price.toFixed(2)}
+                      <Box>
+                        <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                          Written By
                         </Typography>
-                      </Box>
-                      <CompareArrows sx={{ mx: 2 }} />
-                      <Box sx={{ textAlign: 'center', px: 3 }}>
-                        <Typography variant="h6" sx={{ fontWeight: 700 }}>Generic</Typography>
-                        <Typography variant="h4" color="success" sx={{ fontWeight: 700 }}>
-                          ₹{(selectedDosage?.price * 0.25).toFixed(2)}
+                        <Typography variant="h5" sx={{ fontWeight: 600, mt: 1 }}>
+                          Dr. Anuj Saini
+                        </Typography>
+                        <Typography variant="subtitle1" color="text.secondary" gutterBottom>
+                          MMST, MBBS
                         </Typography>
                       </Box>
                     </Box>
-                  </Box>
-                  
-                  <GenericButton
-                    variant="outlined"
-                    color="success"
-                    fullWidth
-                    startIcon={<AlternateEmail />}
-                    onClick={handleNavigateToGeneric}
-                    component={motion.button}
-                    whileHover={{ scale: 1.03 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    View Generic Alternative
-                  </GenericButton>
-                </StyledPaper>
+                  </StyledPaper>
+                </motion.div>
               </motion.div>
+            </Grid>
 
-              {/* Patient Testimonials */}
-              <motion.div variants={fadeInUp}>
-                <StyledPaper sx={{ mt: 4 }}>
-                  <SectionTitle variant="h5">
-                    <InfoOutlined /> Patient Testimonials
-                  </SectionTitle>
-                  
-                  {medicine.patientTestimonials.map((testimonial, index) => (
-                    <TestimonialCard key={index}>
-                      <CardContent>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                          <Box>
-                            <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                              {testimonial.name}
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary">
-                              Age: {testimonial.age}
-                            </Typography>
-                          </Box>
-                          <StarRating>
-                            {[...Array(5)].map((_, i) => (
-                              <Star key={i} filled={i < testimonial.rating} />
-                            ))}
-                          </StarRating>
-                        </Box>
-                        <Typography variant="body2" paragraph sx={{ mt: 2, fontStyle: 'italic' }}>
-                          "{testimonial.testimonial}"
-                        </Typography>
-                      </CardContent>
-                    </TestimonialCard>
-                  ))}
-                </StyledPaper>
+            {/* Right Column */}
+            <Grid item xs={12} md={5}>
+              <motion.div 
+                initial="hidden"
+                animate="visible"
+                variants={staggerContainer}
+              >
+                {/* Save Money Section */}
+                <motion.div variants={fadeInUp}>
+                  <StyledPaper>
+                    <SectionTitle variant="h5">
+                      <CompareArrows /> Save Money with Generic
+                    </SectionTitle>
+                    
+                    <Box sx={{ 
+                      bgcolor: 'rgba(122, 186, 90, 0.85)', 
+                      color: 'white',
+                      p: 2,
+                      borderRadius: 2,
+                      mb: 3,
+                      display: 'flex',
+                      alignItems: 'center',
+                      boxShadow: '0 2px 8px rgba(122, 186, 90, 0.3)'
+                    }}>
+                      <CheckCircleOutline sx={{ mr: 1 }} />
+                      <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                        Save up to 75% with generic alternatives
+                      </Typography>
+                    </Box>
+                    
+                    <GenericButton
+                      variant="contained"
+                      color="primary"
+                      fullWidth
+                      startIcon={<AlternateEmail />}
+                      onClick={handleNavigateToGeneric}
+                      component={motion.button}
+                      whileHover={{ scale: 1.03 }}
+                      whileTap={{ scale: 0.98 }}
+                      sx={{
+                        bgcolor: '#008080',
+                        color: 'white',
+                        boxShadow: '0 4px 14px rgba(0, 128, 128, 0.7)',
+                        '&:hover': {
+                          bgcolor: '#006666',
+                          boxShadow: '0 6px 20px rgba(0, 128, 128, 0.9)',
+                        },
+                        fontSize: '1.1rem',
+                        py: 1.5
+                      }}
+                    >
+                      View Generic Alternative
+                    </GenericButton>
+                  </StyledPaper>
+                </motion.div>
+
+                {/* Why Choose Generic Medicines Section */}
+                <motion.div variants={fadeInUp}>
+                  <StyledPaper sx={{ mt: 4 }}>
+                    <SectionTitle variant="h5">
+                      <CheckCircleOutline /> Why Choose Generic Medicines?
+                    </SectionTitle>
+                    
+                    <List disablePadding>
+                      <ListItem alignItems="flex-start" sx={{ py: 1.5 }}>
+                        <ListItemIcon sx={{ minWidth: 36 }}>
+                          <Typography variant="h6" sx={{ fontWeight: 700, color: 'primary.main' }}>1</Typography>
+                        </ListItemIcon>
+                        <ListItemText 
+                          primary={<Typography variant="subtitle1" sx={{ fontWeight: 600 }}>Same Active Ingredients</Typography>}
+                          secondary="Generic medicines contain the same active ingredients as brand-name drugs, ensuring the same effectiveness."
+                        />
+                      </ListItem>
+                      
+                      <ListItem alignItems="flex-start" sx={{ py: 1.5 }}>
+                        <ListItemIcon sx={{ minWidth: 36 }}>
+                          <Typography variant="h6" sx={{ fontWeight: 700, color: 'primary.main' }}>2</Typography>
+                        </ListItemIcon>
+                        <ListItemText 
+                          primary={<Typography variant="subtitle1" sx={{ fontWeight: 600 }}>More Affordable</Typography>}
+                          secondary="They cost up to 70% less than branded medicines, making healthcare more accessible."
+                        />
+                      </ListItem>
+                      
+                      <ListItem alignItems="flex-start" sx={{ py: 1.5 }}>
+                        <ListItemIcon sx={{ minWidth: 36 }}>
+                          <Typography variant="h6" sx={{ fontWeight: 700, color: 'primary.main' }}>3</Typography>
+                        </ListItemIcon>
+                        <ListItemText 
+                          primary={<Typography variant="subtitle1" sx={{ fontWeight: 600 }}>FDA & Doctor Approved</Typography>}
+                          secondary="Generics undergo strict quality checks and are verified for safety and efficacy."
+                        />
+                      </ListItem>
+                      
+                      <ListItem alignItems="flex-start" sx={{ py: 1.5 }}>
+                        <ListItemIcon sx={{ minWidth: 36 }}>
+                          <Typography variant="h6" sx={{ fontWeight: 700, color: 'primary.main' }}>4</Typography>
+                        </ListItemIcon>
+                        <ListItemText 
+                          primary={<Typography variant="subtitle1" sx={{ fontWeight: 600 }}>Trusted by Millions</Typography>}
+                          secondary="Many doctors and healthcare professionals recommend generics for cost-effective treatment."
+                        />
+                      </ListItem>
+                    </List>
+                  </StyledPaper>
+                </motion.div>
               </motion.div>
-            </motion.div>
+            </Grid>
           </Grid>
-        </Grid>
-      </Container>
+        </Container>
+      </Box>
       <Footer />
     </>
   );

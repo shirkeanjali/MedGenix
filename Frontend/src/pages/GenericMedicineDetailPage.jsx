@@ -178,17 +178,6 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
   },
 }));
 
-const VerifiedBadge = styled(Box)(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  backgroundColor: 'rgba(76, 175, 80, 0.1)',
-  borderRadius: '12px',
-  padding: theme.spacing(1, 2),
-  marginTop: theme.spacing(2),
-  marginBottom: theme.spacing(2),
-  border: '1px solid rgba(76, 175, 80, 0.3)',
-}));
-
 const SectionTitle = styled(Typography)(({ theme }) => ({
   fontWeight: 600,
   marginBottom: theme.spacing(2),
@@ -201,7 +190,6 @@ const SectionTitle = styled(Typography)(({ theme }) => ({
 }));
 
 const FindPharmacyButton = styled(Button)(({ theme }) => ({
-  marginTop: theme.spacing(4),
   padding: theme.spacing(1.5, 3),
   borderRadius: '12px',
   fontSize: '1.1rem',
@@ -348,629 +336,666 @@ const GenericMedicineDetailPage = () => {
   return (
     <>
       <Header />
-      <Container maxWidth="lg" sx={{ py: { xs: 4, md: 8 }, minHeight: '100vh' }}>
-        {/* Medicine Header */}
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={fadeInUp}
-        >
-          <Box 
-            sx={{ 
-              mb: 4, 
-              pb: 2, 
-              borderBottom: '1px solid rgba(0, 0, 0, 0.1)',
-              display: 'flex',
-              flexDirection: { xs: 'column', md: 'row' },
-              justifyContent: 'space-between',
-              alignItems: { xs: 'flex-start', md: 'center' }
-            }}
+      <Box
+        sx={{
+          position: 'relative',
+          background: 'linear-gradient(135deg, #f0f7f4 0%, #e7f5ed 100%)',
+          backgroundImage: 'none',
+          '&::before': {
+            content: 'none'
+          }
+        }}
+      >
+        <Container maxWidth="lg" sx={{ py: { xs: 4, md: 8 }, minHeight: '100vh', position: 'relative', zIndex: 1 }}>
+          {/* Generic Medicine Header */}
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={fadeInUp}
           >
-            <Box>
-              <Typography variant="h3" component="h1" sx={{ fontWeight: 700, mb: 1 }}>
-                {medicine.name}
-              </Typography>
-              <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 1 }}>
-                <Chip 
-                  label="Generic" 
-                  color="secondary" 
-                  icon={<Science />} 
-                  sx={{ fontWeight: 500 }}
-                />
-                <Chip 
-                  label={medicine.category} 
-                  variant="outlined" 
-                  color="primary" 
-                  sx={{ fontWeight: 500 }}
-                />
-                <Chip 
-                  label={`₹${medicine.price.toFixed(2)}`} 
-                  color="success" 
-                  variant="outlined"
-                  sx={{ fontWeight: 600 }}
-                />
+            <Box sx={{ 
+              display: 'flex', 
+              flexDirection: { xs: 'column', md: 'row' }, 
+              alignItems: { xs: 'center', md: 'flex-start' }, 
+              justifyContent: 'space-between',
+              mb: 4,
+              pb: 2, 
+              pt: 2,
+              px: 3,
+              borderRadius: "16px",
+              background: "linear-gradient(135deg, rgba(0, 128, 128, 0.15) 0%, rgba(103, 194, 124, 0.25) 100%)",
+              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)'
+            }}>
+              <Box>
+                <Typography variant="h3" component="h1" sx={{ fontWeight: 700, mb: 1 }}>
+                  {medicine.name}
+                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 1 }}>
+                  <Chip 
+                    label="Generic" 
+                    color="secondary" 
+                    icon={<Science />} 
+                    sx={{ fontWeight: 500 }}
+                  />
+                  <Chip 
+                    label={medicine.category} 
+                    variant="outlined" 
+                    color="primary" 
+                    sx={{ fontWeight: 500 }}
+                  />
+                  <Chip 
+                    label={`₹${medicine.price.toFixed(2)}`} 
+                    color="success" 
+                    variant="outlined"
+                    sx={{ fontWeight: 600 }}
+                  />
+                </Box>
+              </Box>
+              <Box sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                mt: { xs: 2, md: 0 }, 
+                alignSelf: { md: 'center' }
+              }}>
+                <FindPharmacyButton
+                  variant="contained"
+                  color="primary"
+                  startIcon={<Store />}
+                  component={motion.button}
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  Find Nearby Pharmacies
+                </FindPharmacyButton>
               </Box>
             </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', mt: { xs: 2, md: 0 }, gap: 2 }}>
-              <FindPharmacyButton
-                variant="contained"
-                color="primary"
-                startIcon={<Store />}
-                component={motion.button}
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.98 }}
+          </motion.div>
+
+          <Grid container spacing={4}>
+            {/* Left Column */}
+            <Grid item xs={12} md={7}>
+              <motion.div 
+                initial="hidden"
+                animate="visible"
+                variants={staggerContainer}
               >
-                Find Nearby Pharmacies
-              </FindPharmacyButton>
-            </Box>
-          </Box>
-        </motion.div>
+                {/* Uses Section (Previously Overview) */}
+                <motion.div variants={fadeInUp}>
+                  <StyledPaper>
+                    <SectionTitle variant="h5">
+                      <MedicalInformation /> Uses
+                    </SectionTitle>
+                    <Typography paragraph>{medicine.usageInfo}</Typography>
+                    <Typography variant="h6" sx={{ mt: 2, mb: 1, fontWeight: 600 }}>How it works</Typography>
+                    <Typography paragraph>{medicine.howItWorks}</Typography>
+                  </StyledPaper>
+                </motion.div>
 
-        <Grid container spacing={4}>
-          {/* Left Column */}
-          <Grid item xs={12} md={7}>
-            <motion.div 
-              initial="hidden"
-              animate="visible"
-              variants={staggerContainer}
-            >
-              {/* Uses Section (Previously Overview) */}
-              <motion.div variants={fadeInUp}>
-                <StyledPaper>
-                  <SectionTitle variant="h5">
-                    <MedicalInformation /> Uses
-                  </SectionTitle>
-                  <Typography paragraph>{medicine.usageInfo}</Typography>
-                  <Typography variant="h6" sx={{ mt: 2, mb: 1, fontWeight: 600 }}>How it works</Typography>
-                  <Typography paragraph>{medicine.howItWorks}</Typography>
-                  
-                  <VerifiedBadge>
-                    <VerifiedUser color="success" sx={{ mr: 1 }} />
-                    <Box>
-                      <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-                        Verified by {medicine.doctorVerified.name}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {medicine.doctorVerified.specialty} • {medicine.doctorVerified.date}
-                      </Typography>
-                    </Box>
-                  </VerifiedBadge>
-                </StyledPaper>
-              </motion.div>
-
-              {/* Side Effects Section - Changed to paragraphs */}
-              <motion.div variants={fadeInUp}>
-                <StyledPaper sx={{ mt: 4 }}>
-                  <SectionTitle variant="h5">
-                    <ErrorOutline /> Possible Side Effects
-                  </SectionTitle>
-                  
-                  <Typography variant="h6" color="error.main" sx={{ mb: 1, fontWeight: 600 }}>Common Side Effects</Typography>
-                  <Typography paragraph>
-                    {medicine.sideEffects[0].effects.join(', ')}. These side effects are generally mild and may go away during treatment as your body adjusts to the medicine.
-                  </Typography>
-                  
-                  <Typography variant="h6" color="warning.main" sx={{ mb: 1, fontWeight: 600 }}>Less Common Side Effects</Typography>
-                  <Typography paragraph>
-                    {medicine.sideEffects[1].effects.join(', ')}. If you experience any of these side effects, consult your doctor but do not stop taking the medication without medical advice.
-                  </Typography>
-                  
-                  <Typography variant="h6" color="error.dark" sx={{ mb: 1, fontWeight: 600 }}>Rare but Serious Side Effects</Typography>
-                  <Typography paragraph>
-                    {medicine.sideEffects[2].effects.join(', ')}. If you experience any of these serious side effects, seek immediate medical attention.
-                  </Typography>
-                  
-                  <Box sx={{ 
-                    bgcolor: 'rgba(211, 47, 47, 0.1)', 
-                    p: 2, 
-                    borderRadius: 2,
-                    border: '1px solid rgba(211, 47, 47, 0.3)',
-                    mt: 2 
-                  }}>
-                    <Typography variant="body2" color="error.main" sx={{ display: 'flex', alignItems: 'center' }}>
-                      <InfoOutlined sx={{ fontSize: '1rem', mr: 0.5, verticalAlign: 'middle' }} />
-                      If you experience any severe or persistent side effects, contact your healthcare provider immediately.
-                    </Typography>
-                  </Box>
-                </StyledPaper>
-              </motion.div>
-
-              {/* Expert Advice Section - Revised with provided text */}
-              <motion.div variants={fadeInUp}>
-                <StyledPaper sx={{ mt: 4 }}>
-                  <SectionTitle variant="h5">
-                    <MedicalServices /> Expert Advice
-                  </SectionTitle>
-                  
-                  <Box sx={{ 
-                    display: 'flex', 
-                    alignItems: 'flex-start', 
-                    mb: 3,
-                    pb: 3,
-                    borderBottom: '1px dashed rgba(0, 0, 0, 0.1)'
-                  }}>
-                    <Avatar 
-                      sx={{ 
-                        bgcolor: 'primary.main', 
-                        width: 70, 
-                        height: 70,
-                        mr: 2
-                      }}
-                    >
-                      AS
-                    </Avatar>
-                    <Box>
-                      <Typography variant="h5" sx={{ fontWeight: 600 }}>
-                        Dr. Anuj Saini
-                      </Typography>
-                      <Typography variant="subtitle1" color="text.secondary" gutterBottom>
-                        MMST, MBBS
-                      </Typography>
-                      <Typography variant="body2" color="primary.main">
-                        Expert Opinion
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic', mt: 1 }}>
-                        CONTENT DETAILS
-                      </Typography>
-                    </Box>
-                  </Box>
-                  
-                  <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-                    Expert advice for the medicine
-                  </Typography>
-                  
-                  <Typography paragraph>
-                    In general, Atorvastatin is safe. It may cause diarrhea, gas or an upset stomach. If any of these happen to you, take it with food.
-                  </Typography>
-                  
-                  <Typography paragraph>
-                    Inform your doctor if you experience fatigue, muscle weakness or muscle pain.
-                  </Typography>
-                  
-                  <Typography paragraph>
-                    Your doctor may check your liver function before starting the treatment and regularly thereafter. Inform your doctor if you notice signs of liver problems such as stomach pains, unusually dark urine or yellowing of skin or eyes.
-                  </Typography>
-                  
-                  <Typography paragraph>
-                    Inform your doctor if you have kidney disease, liver disease or diabetes before starting treatment with this medicine. If you are diabetic, monitor your blood sugar level regularly as Atorvastatin may cause an increase in your blood sugar level.
-                  </Typography>
-                  
-                  <Typography paragraph>
-                    Do not take Atorvastatin if you are pregnant, planning a pregnancy or breastfeeding.
-                  </Typography>
-                  
-                  <Typography paragraph>
-                    Atorvastatin treats high cholesterol by lowering "bad" cholesterol (LDL) and triglycerides (fats). It should be taken in addition to regular exercise and low-fat diet.
-                  </Typography>
-                  
-                  <Typography paragraph>
-                    It also reduces the risk of heart attack and stroke.
-                  </Typography>
-                  
-                  <Typography paragraph>
-                    In general, Atorvastatin is safe. It may cause diarrhea, gas or an upset stomach. If any of these happen to you, take it with food.
-                  </Typography>
-                  
-                  <Typography paragraph>
-                    Inform your doctor if you experience fatigue, muscle weakness or muscle pain.
-                  </Typography>
-                  
-                  <Typography paragraph>
-                    Your doctor may check your liver function before starting the treatment and regularly thereafter. Inform your doctor if you notice signs of liver problems such as stomach pains, unusually dark urine or yellowing of skin or eyes.
-                  </Typography>
-                  
-                  <Typography paragraph>
-                    Inform your doctor if you have kidney disease, liver disease or diabetes before starting treatment with this medicine. If you are diabetic, monitor your blood sugar level regularly as Atorvastatin may cause an increase in your blood sugar level.
-                  </Typography>
-                  
-                  <Typography paragraph>
-                    Do not take Atorvastatin if you are pregnant, planning a pregnancy or breastfeeding.
-                  </Typography>
-                </StyledPaper>
-              </motion.div>
-            </motion.div>
-          </Grid>
-
-          {/* Right Column */}
-          <Grid item xs={12} md={5}>
-            <motion.div 
-              initial="hidden"
-              animate="visible"
-              variants={staggerContainer}
-            >
-              {/* Price Comparison Section - Enhanced with logos and brand names */}
-              <motion.div variants={fadeInUp}>
-                <StyledPaper>
-                  <SectionTitle variant="h5">
-                    <Compare /> Price Comparison
-                  </SectionTitle>
-                  
-                  {lowestPrice && (
-                    <Box 
-                      sx={{ 
-                        bgcolor: 'success.main', 
-                        color: 'white',
-                        p: 3,
-                        borderRadius: 2,
-                        mb: 3,
-                        textAlign: 'center'
-                      }}
-                    >
-                      <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
-                        Best Price Available
-                      </Typography>
-                      <Typography variant="h3" sx={{ fontWeight: 700 }}>
-                        ₹{lowestPrice.price.toFixed(2)}
-                      </Typography>
-                      <Typography variant="subtitle1" sx={{ mt: 1 }}>
-                        at {lowestPrice.platform} with {lowestPrice.discount}
-                      </Typography>
-                    </Box>
-                  )}
-                  
-                  <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600 }}>
-                    Generic {medicine.name} ({medicine.category}) Price Comparison
-                  </Typography>
-                  
-                  <Grid container spacing={2}>
-                    {medicine.priceComparison.map((platform, index) => (
-                      <Grid item xs={12} key={index}>
-                        <Paper 
-                          elevation={platform.platform === lowestPrice?.platform ? 2 : 0}
+                {/* Side Effects Section - Changed to paragraphs */}
+                <motion.div variants={fadeInUp}>
+                  <StyledPaper sx={{ mt: 4 }}>
+                    <SectionTitle variant="h5">
+                      <ErrorOutline /> Possible Side Effects
+                    </SectionTitle>
+                    
+                    <Box sx={{ 
+                      display: 'grid', 
+                      gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
+                      gap: 2,
+                      mb: 3
+                    }}>
+                      {[...medicine.sideEffects[0].effects, ...medicine.sideEffects[1].effects, ...medicine.sideEffects[2].effects].map((effect, index) => (
+                        <Box 
+                          key={index} 
                           sx={{ 
                             p: 2, 
+                            borderRadius: 2, 
+                            bgcolor: index < 4 ? 'rgba(103, 194, 124, 0.08)' : 
+                                    index < 8 ? 'rgba(0, 128, 128, 0.12)' : 
+                                    'rgba(0, 128, 128, 0.16)',
                             border: '1px solid',
-                            borderColor: platform.platform === lowestPrice?.platform 
-                              ? 'success.main' 
-                              : 'rgba(0, 0, 0, 0.12)',
-                            borderRadius: 2,
-                            bgcolor: platform.platform === lowestPrice?.platform 
-                              ? 'rgba(76, 175, 80, 0.05)' 
-                              : 'transparent',
+                            borderColor: index < 4 ? 'rgba(103, 194, 124, 0.3)' : 
+                                        index < 8 ? 'rgba(0, 128, 128, 0.3)' : 
+                                        'rgba(0, 128, 128, 0.4)',
                             display: 'flex',
                             alignItems: 'center',
-                            transition: 'transform 0.2s',
+                            transition: 'transform 0.2s, box-shadow 0.2s',
                             '&:hover': {
-                              transform: 'translateY(-4px)',
-                              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
+                              transform: 'translateY(-2px)',
+                              boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
                             }
                           }}
                         >
                           <Box 
+                            component="span" 
                             sx={{ 
-                              bgcolor: 'primary.light', 
-                              width: 50, 
-                              height: 50, 
-                              borderRadius: '50%',
+                              width: 8, 
+                              height: 8, 
+                              borderRadius: '50%', 
+                              mr: 1.5,
+                              bgcolor: index < 4 ? '#67c27c' : 
+                                      index < 8 ? '#008080' : 
+                                      '#005f5f'
+                            }} 
+                          />
+                          <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                            {effect}
+                          </Typography>
+                        </Box>
+                      ))}
+                    </Box>
+                    
+                    <Box sx={{ 
+                      bgcolor: 'rgba(211, 47, 47, 0.15)', 
+                      p: 2, 
+                      borderRadius: 2,
+                      border: '1px solid rgba(211, 47, 47, 0.3)',
+                    }}>
+                      <Typography variant="body2" color="error.dark" sx={{ display: 'flex', alignItems: 'center', fontWeight: 500 }}>
+                        <InfoOutlined sx={{ fontSize: '1rem', mr: 0.5, verticalAlign: 'middle', color: 'error.main' }} />
+                        If you experience any severe or persistent side effects, contact your healthcare provider immediately.
+                      </Typography>
+                    </Box>
+                  </StyledPaper>
+                </motion.div>
+
+                {/* Expert Advice Section - Revised with provided text */}
+                <motion.div variants={fadeInUp}>
+                  <StyledPaper sx={{ mt: 4 }}>
+                    <SectionTitle variant="h5">
+                      <MedicalServices /> Expert Advice
+                    </SectionTitle>
+                    
+                    <Box sx={{ 
+                      display: 'flex', 
+                      alignItems: 'flex-start', 
+                      mb: 3,
+                      pb: 3,
+                      borderBottom: '1px dashed rgba(0, 0, 0, 0.1)'
+                    }}>
+                      <Avatar 
+                        sx={{ 
+                          bgcolor: 'primary.main', 
+                          width: 70, 
+                          height: 70,
+                          mr: 2
+                        }}
+                      >
+                        AS
+                      </Avatar>
+                      <Box>
+                        <Typography variant="h5" sx={{ fontWeight: 600 }}>
+                          Dr. Anuj Saini
+                        </Typography>
+                        <Typography variant="subtitle1" color="text.secondary" gutterBottom>
+                          MMST, MBBS
+                        </Typography>
+                        <Typography variant="body2" color="primary.main">
+                          Expert Opinion
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic', mt: 1 }}>
+                          CONTENT DETAILS
+                        </Typography>
+                      </Box>
+                    </Box>
+                    
+                    <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                      Expert advice for the medicine
+                    </Typography>
+                    
+                    <Typography paragraph>
+                      In general, Atorvastatin is safe. It may cause diarrhea, gas or an upset stomach. If any of these happen to you, take it with food.
+                    </Typography>
+                    
+                    <Typography paragraph>
+                      Inform your doctor if you experience fatigue, muscle weakness or muscle pain.
+                    </Typography>
+                    
+                    <Typography paragraph>
+                      Your doctor may check your liver function before starting the treatment and regularly thereafter. Inform your doctor if you notice signs of liver problems such as stomach pains, unusually dark urine or yellowing of skin or eyes.
+                    </Typography>
+                    
+                    <Typography paragraph>
+                      Inform your doctor if you have kidney disease, liver disease or diabetes before starting treatment with this medicine. If you are diabetic, monitor your blood sugar level regularly as Atorvastatin may cause an increase in your blood sugar level.
+                    </Typography>
+                    
+                    <Typography paragraph>
+                      Do not take Atorvastatin if you are pregnant, planning a pregnancy or breastfeeding.
+                    </Typography>
+                    
+                    <Typography paragraph>
+                      Atorvastatin treats high cholesterol by lowering "bad" cholesterol (LDL) and triglycerides (fats). It should be taken in addition to regular exercise and low-fat diet.
+                    </Typography>
+                    
+                    <Typography paragraph>
+                      It also reduces the risk of heart attack and stroke.
+                    </Typography>
+                    
+                    <Typography paragraph>
+                      In general, Atorvastatin is safe. It may cause diarrhea, gas or an upset stomach. If any of these happen to you, take it with food.
+                    </Typography>
+                    
+                    <Typography paragraph>
+                      Inform your doctor if you experience fatigue, muscle weakness or muscle pain.
+                    </Typography>
+                    
+                    <Typography paragraph>
+                      Your doctor may check your liver function before starting the treatment and regularly thereafter. Inform your doctor if you notice signs of liver problems such as stomach pains, unusually dark urine or yellowing of skin or eyes.
+                    </Typography>
+                    
+                    <Typography paragraph>
+                      Inform your doctor if you have kidney disease, liver disease or diabetes before starting treatment with this medicine. If you are diabetic, monitor your blood sugar level regularly as Atorvastatin may cause an increase in your blood sugar level.
+                    </Typography>
+                    
+                    <Typography paragraph>
+                      Do not take Atorvastatin if you are pregnant, planning a pregnancy or breastfeeding.
+                    </Typography>
+                  </StyledPaper>
+                </motion.div>
+              </motion.div>
+            </Grid>
+
+            {/* Right Column */}
+            <Grid item xs={12} md={5}>
+              <motion.div 
+                initial="hidden"
+                animate="visible"
+                variants={staggerContainer}
+              >
+                {/* Price Comparison Section - Enhanced with logos and brand names */}
+                <motion.div variants={fadeInUp}>
+                  <StyledPaper>
+                    <SectionTitle variant="h5">
+                      <Compare /> Price Comparison
+                    </SectionTitle>
+                    
+                    {lowestPrice && (
+                      <Box 
+                        sx={{ 
+                          bgcolor: 'success.main', 
+                          color: 'white',
+                          p: 3,
+                          borderRadius: 2,
+                          mb: 3,
+                          textAlign: 'center'
+                        }}
+                      >
+                        <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
+                          Best Price Available
+                        </Typography>
+                        <Typography variant="h3" sx={{ fontWeight: 700 }}>
+                          ₹{lowestPrice.price.toFixed(2)}
+                        </Typography>
+                        <Typography variant="subtitle1" sx={{ mt: 1 }}>
+                          at {lowestPrice.platform} with {lowestPrice.discount}
+                        </Typography>
+                      </Box>
+                    )}
+                    
+                    <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600 }}>
+                      Generic {medicine.name} ({medicine.category}) Price Comparison
+                    </Typography>
+                    
+                    <Grid container spacing={2}>
+                      {medicine.priceComparison.map((platform, index) => (
+                        <Grid item xs={12} key={index}>
+                          <Paper 
+                            elevation={platform.platform === lowestPrice?.platform ? 2 : 0}
+                            sx={{ 
+                              p: 2, 
+                              border: '1px solid',
+                              borderColor: platform.platform === lowestPrice?.platform 
+                                ? 'success.main' 
+                                : 'rgba(0, 0, 0, 0.12)',
+                              borderRadius: 2,
+                              bgcolor: platform.platform === lowestPrice?.platform 
+                                ? 'rgba(76, 175, 80, 0.05)' 
+                                : 'transparent',
                               display: 'flex',
                               alignItems: 'center',
-                              justifyContent: 'center',
-                              color: 'primary.contrastText',
-                              fontWeight: 700,
-                              mr: 2,
-                              fontSize: '1rem'
+                              transition: 'transform 0.2s',
+                              '&:hover': {
+                                transform: 'translateY(-4px)',
+                                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
+                              }
                             }}
                           >
-                            {platform.platform.slice(0, 2).toUpperCase()}
-                          </Box>
-                          <Box sx={{ flex: 1 }}>
-                            <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                              {platform.platform}
-                              {platform.platform === lowestPrice?.platform && (
-                                <Chip
-                                  label="BEST DEAL"
-                                  color="success"
-                                  size="small"
-                                  sx={{ ml: 1, fontWeight: 600, fontSize: '0.65rem' }}
-                                />
-                              )}
-                            </Typography>
-                          </Box>
-                          <Box sx={{ textAlign: 'right' }}>
-                            <Typography variant="h6" color="primary.main" sx={{ fontWeight: 700 }}>
-                              ₹{platform.price.toFixed(2)}
-                            </Typography>
-                            <Chip 
-                              label={platform.discount} 
-                              color="secondary" 
-                              size="small"
-                              sx={{ fontWeight: 500 }}
-                            />
-                          </Box>
-                        </Paper>
-                      </Grid>
-                    ))}
-                  </Grid>
-                  
-                  <Typography variant="body2" color="text.secondary" sx={{ mt: 2, textAlign: 'center' }}>
-                    <InfoOutlined sx={{ fontSize: '1rem', mr: 0.5, verticalAlign: 'middle' }} />
-                    Prices and availability may vary. Last updated: Today
-                  </Typography>
-                </StyledPaper>
-              </motion.div>
+                            <Box 
+                              sx={{ 
+                                bgcolor: 'primary.light', 
+                                width: 50, 
+                                height: 50, 
+                                borderRadius: '50%',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                color: 'primary.contrastText',
+                                fontWeight: 700,
+                                mr: 2,
+                                fontSize: '1rem'
+                              }}
+                            >
+                              {platform.platform.slice(0, 2).toUpperCase()}
+                            </Box>
+                            <Box sx={{ flex: 1 }}>
+                              <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                                {platform.platform}
+                                {platform.platform === lowestPrice?.platform && (
+                                  <Chip
+                                    label="BEST DEAL"
+                                    color="success"
+                                    size="small"
+                                    sx={{ ml: 1, fontWeight: 600, fontSize: '0.65rem' }}
+                                  />
+                                )}
+                              </Typography>
+                            </Box>
+                            <Box sx={{ textAlign: 'right' }}>
+                              <Typography variant="h6" color="primary.main" sx={{ fontWeight: 700 }}>
+                                ₹{platform.price.toFixed(2)}
+                              </Typography>
+                              <Chip 
+                                label={platform.discount} 
+                                color="secondary" 
+                                size="small"
+                                sx={{ fontWeight: 500 }}
+                              />
+                            </Box>
+                          </Paper>
+                        </Grid>
+                      ))}
+                    </Grid>
+                    
+                    <Typography variant="body2" color="text.secondary" sx={{ mt: 2, textAlign: 'center' }}>
+                      <InfoOutlined sx={{ fontSize: '1rem', mr: 0.5, verticalAlign: 'middle' }} />
+                      Prices and availability may vary. Last updated: Today
+                    </Typography>
+                  </StyledPaper>
+                </motion.div>
 
-              {/* Expanded FAQs Section */}
-              <motion.div variants={fadeInUp}>
-                <StyledPaper sx={{ mt: 4 }}>
-                  <SectionTitle variant="h5">
-                    <QuestionAnswer /> Frequently Asked Questions
-                  </SectionTitle>
-                  
-                  <Typography variant="subtitle1" sx={{ mb: 3 }}>
-                    Important information about Atorvastatin that patients commonly ask about
-                  </Typography>
-                  
-                  {/* Existing FAQs */}
-                  <Accordion 
-                    expanded={activeFaq === 0}
-                    onChange={() => setActiveFaq(activeFaq === 0 ? null : 0)}
-                    sx={{ 
-                      mb: 2, 
-                      boxShadow: 'none', 
-                      border: '1px solid rgba(0, 0, 0, 0.12)',
-                      borderRadius: '8px',
-                      '&:before': { display: 'none' },
-                      overflow: 'hidden'
-                    }}
-                  >
-                    <AccordionSummary expandIcon={<ExpandMore />}>
-                      <Typography sx={{ fontWeight: 600 }}>
-                        Is generic atorvastatin as effective as the brand-name version?
-                      </Typography>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      <Typography paragraph>
-                        Yes, generic atorvastatin contains the same active ingredient and is required by law to be as safe and effective as the brand-name version. The FDA ensures that generic medications provide the same clinical benefits.
-                      </Typography>
-                    </AccordionDetails>
-                  </Accordion>
-                  
-                  <Accordion 
-                    expanded={activeFaq === 1}
-                    onChange={() => setActiveFaq(activeFaq === 1 ? null : 1)}
-                    sx={{ 
-                      mb: 2, 
-                      boxShadow: 'none', 
-                      border: '1px solid rgba(0, 0, 0, 0.12)',
-                      borderRadius: '8px',
-                      '&:before': { display: 'none' },
-                      overflow: 'hidden'
-                    }}
-                  >
-                    <AccordionSummary expandIcon={<ExpandMore />}>
-                      <Typography sx={{ fontWeight: 600 }}>
-                        Can I switch between brand and generic versions?
-                      </Typography>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      <Typography paragraph>
-                        Yes, you can switch between brand and generic versions of atorvastatin. However, it's recommended to consult with your healthcare provider before making any changes to your medication.
-                      </Typography>
-                    </AccordionDetails>
-                  </Accordion>
-                  
-                  <Accordion 
-                    expanded={activeFaq === 2}
-                    onChange={() => setActiveFaq(activeFaq === 2 ? null : 2)}
-                    sx={{ 
-                      mb: 2, 
-                      boxShadow: 'none', 
-                      border: '1px solid rgba(0, 0, 0, 0.12)',
-                      borderRadius: '8px',
-                      '&:before': { display: 'none' },
-                      overflow: 'hidden'
-                    }}
-                  >
-                    <AccordionSummary expandIcon={<ExpandMore />}>
-                      <Typography sx={{ fontWeight: 600 }}>
-                        Are there any differences in side effects between generic and brand?
-                      </Typography>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      <Typography paragraph>
-                        Generic and brand-name atorvastatin share the same potential side effects. Any differences are typically related to inactive ingredients, which rarely cause issues for most patients.
-                      </Typography>
-                    </AccordionDetails>
-                  </Accordion>
-                  
-                  <Accordion 
-                    expanded={activeFaq === 3}
-                    onChange={() => setActiveFaq(activeFaq === 3 ? null : 3)}
-                    sx={{ 
-                      mb: 2, 
-                      boxShadow: 'none', 
-                      border: '1px solid rgba(0, 0, 0, 0.12)',
-                      borderRadius: '8px',
-                      '&:before': { display: 'none' },
-                      overflow: 'hidden'
-                    }}
-                  >
-                    <AccordionSummary expandIcon={<ExpandMore />}>
-                      <Typography sx={{ fontWeight: 600 }}>
-                        Why is generic atorvastatin less expensive?
-                      </Typography>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      <Typography paragraph>
-                        Generic medications are less expensive because manufacturers don't have to repeat costly clinical trials that the brand-name manufacturers conducted. Additionally, competition among multiple generic manufacturers helps lower the price.
-                      </Typography>
-                    </AccordionDetails>
-                  </Accordion>
-                  
-                  {/* Additional FAQs */}
-                  <Accordion 
-                    expanded={activeFaq === 4}
-                    onChange={() => setActiveFaq(activeFaq === 4 ? null : 4)}
-                    sx={{ 
-                      mb: 2, 
-                      boxShadow: 'none', 
-                      border: '1px solid rgba(0, 0, 0, 0.12)',
-                      borderRadius: '8px',
-                      '&:before': { display: 'none' },
-                      overflow: 'hidden'
-                    }}
-                  >
-                    <AccordionSummary expandIcon={<ExpandMore />}>
-                      <Typography sx={{ fontWeight: 600 }}>
-                        When should I take Atorvastatin – morning or evening?
-                      </Typography>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      <Typography paragraph>
-                        Atorvastatin is usually taken once a day in the evening or at bedtime. This is because the body makes more cholesterol at night than during the day. Taking it in the evening ensures it works most effectively.
-                      </Typography>
-                    </AccordionDetails>
-                  </Accordion>
-                  
-                  <Accordion 
-                    expanded={activeFaq === 5}
-                    onChange={() => setActiveFaq(activeFaq === 5 ? null : 5)}
-                    sx={{ 
-                      mb: 2, 
-                      boxShadow: 'none', 
-                      border: '1px solid rgba(0, 0, 0, 0.12)',
-                      borderRadius: '8px',
-                      '&:before': { display: 'none' },
-                      overflow: 'hidden'
-                    }}
-                  >
-                    <AccordionSummary expandIcon={<ExpandMore />}>
-                      <Typography sx={{ fontWeight: 600 }}>
-                        Can I drink alcohol while taking Atorvastatin?
-                      </Typography>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      <Typography paragraph>
-                        Drinking alcohol while taking Atorvastatin can increase the risk of liver damage. It's recommended to limit alcohol consumption and discuss this with your doctor if you regularly drink alcohol.
-                      </Typography>
-                    </AccordionDetails>
-                  </Accordion>
-                  
-                  <Accordion 
-                    expanded={activeFaq === 6}
-                    onChange={() => setActiveFaq(activeFaq === 6 ? null : 6)}
-                    sx={{ 
-                      mb: 2, 
-                      boxShadow: 'none', 
-                      border: '1px solid rgba(0, 0, 0, 0.12)',
-                      borderRadius: '8px',
-                      '&:before': { display: 'none' },
-                      overflow: 'hidden'
-                    }}
-                  >
-                    <AccordionSummary expandIcon={<ExpandMore />}>
-                      <Typography sx={{ fontWeight: 600 }}>
-                        How long does it take for Atorvastatin to start working?
-                      </Typography>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      <Typography paragraph>
-                        Atorvastatin starts working within 1-2 weeks, but the full effect on cholesterol levels may take up to 4-6 weeks. Regular blood tests will help your doctor monitor how well it's working for you.
-                      </Typography>
-                    </AccordionDetails>
-                  </Accordion>
-                  
-                  <Accordion 
-                    expanded={activeFaq === 7}
-                    onChange={() => setActiveFaq(activeFaq === 7 ? null : 7)}
-                    sx={{ 
-                      mb: 2, 
-                      boxShadow: 'none', 
-                      border: '1px solid rgba(0, 0, 0, 0.12)',
-                      borderRadius: '8px',
-                      '&:before': { display: 'none' },
-                      overflow: 'hidden'
-                    }}
-                  >
-                    <AccordionSummary expandIcon={<ExpandMore />}>
-                      <Typography sx={{ fontWeight: 600 }}>
-                        What foods should I avoid while taking Atorvastatin?
-                      </Typography>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      <Typography paragraph>
-                        Avoid grapefruit and grapefruit juice as they can increase the concentration of Atorvastatin in your blood, potentially increasing side effects. Also limit foods high in cholesterol and saturated fats, like fatty meats, full-fat dairy products, and fried foods.
-                      </Typography>
-                    </AccordionDetails>
-                  </Accordion>
-                  
-                  <Accordion 
-                    expanded={activeFaq === 8}
-                    onChange={() => setActiveFaq(activeFaq === 8 ? null : 8)}
-                    sx={{ 
-                      mb: 2, 
-                      boxShadow: 'none', 
-                      border: '1px solid rgba(0, 0, 0, 0.12)',
-                      borderRadius: '8px',
-                      '&:before': { display: 'none' },
-                      overflow: 'hidden'
-                    }}
-                  >
-                    <AccordionSummary expandIcon={<ExpandMore />}>
-                      <Typography sx={{ fontWeight: 600 }}>
-                        What should I do if I miss a dose?
-                      </Typography>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      <Typography paragraph>
-                        If you miss a dose, take it as soon as you remember unless it's almost time for your next dose. In that case, skip the missed dose and continue with your regular schedule. Do not take a double dose to make up for a missed one.
-                      </Typography>
-                    </AccordionDetails>
-                  </Accordion>
-                  
-                  <Accordion 
-                    expanded={activeFaq === 9}
-                    onChange={() => setActiveFaq(activeFaq === 9 ? null : 9)}
-                    sx={{ 
-                      mb: 2, 
-                      boxShadow: 'none', 
-                      border: '1px solid rgba(0, 0, 0, 0.12)',
-                      borderRadius: '8px',
-                      '&:before': { display: 'none' },
-                      overflow: 'hidden'
-                    }}
-                  >
-                    <AccordionSummary expandIcon={<ExpandMore />}>
-                      <Typography sx={{ fontWeight: 600 }}>
-                        Do I need to follow a special diet while taking Atorvastatin?
-                      </Typography>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      <Typography paragraph>
-                        Yes, Atorvastatin works best when combined with a heart-healthy diet. This includes reducing saturated fats, trans fats, and cholesterol in your diet. Focus on fruits, vegetables, whole grains, lean proteins, and healthy fats like those found in olive oil and nuts.
-                      </Typography>
-                    </AccordionDetails>
-                  </Accordion>
-                  
-                  <Accordion 
-                    expanded={activeFaq === 10}
-                    onChange={() => setActiveFaq(activeFaq === 10 ? null : 10)}
-                    sx={{ 
-                      mb: 2, 
-                      boxShadow: 'none', 
-                      border: '1px solid rgba(0, 0, 0, 0.12)',
-                      borderRadius: '8px',
-                      '&:before': { display: 'none' },
-                      overflow: 'hidden'
-                    }}
-                  >
-                    <AccordionSummary expandIcon={<ExpandMore />}>
-                      <Typography sx={{ fontWeight: 600 }}>
-                        Can I stop taking Atorvastatin once my cholesterol levels are normal?
-                      </Typography>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      <Typography paragraph>
-                        No, you should not stop taking Atorvastatin without consulting your doctor, even if your cholesterol levels return to normal. Atorvastatin helps maintain healthy cholesterol levels, and discontinuing it could cause your cholesterol to rise again.
-                      </Typography>
-                    </AccordionDetails>
-                  </Accordion>
-                </StyledPaper>
+                {/* Expanded FAQs Section */}
+                <motion.div variants={fadeInUp}>
+                  <StyledPaper sx={{ mt: 4 }}>
+                    <SectionTitle variant="h5">
+                      <QuestionAnswer /> Frequently Asked Questions
+                    </SectionTitle>
+                    
+                    <Typography variant="subtitle1" sx={{ mb: 3 }}>
+                      Important information about Atorvastatin that patients commonly ask about
+                    </Typography>
+                    
+                    {/* Existing FAQs */}
+                    <Accordion 
+                      expanded={activeFaq === 0}
+                      onChange={() => setActiveFaq(activeFaq === 0 ? null : 0)}
+                      sx={{ 
+                        mb: 2, 
+                        boxShadow: 'none', 
+                        border: '1px solid rgba(0, 0, 0, 0.12)',
+                        borderRadius: '8px',
+                        '&:before': { display: 'none' },
+                        overflow: 'hidden'
+                      }}
+                    >
+                      <AccordionSummary expandIcon={<ExpandMore />}>
+                        <Typography sx={{ fontWeight: 600 }}>
+                          Is generic atorvastatin as effective as the brand-name version?
+                        </Typography>
+                      </AccordionSummary>
+                      <AccordionDetails>
+                        <Typography paragraph>
+                          Yes, generic atorvastatin contains the same active ingredient and is required by law to be as safe and effective as the brand-name version. The FDA ensures that generic medications provide the same clinical benefits.
+                        </Typography>
+                      </AccordionDetails>
+                    </Accordion>
+                    
+                    <Accordion 
+                      expanded={activeFaq === 1}
+                      onChange={() => setActiveFaq(activeFaq === 1 ? null : 1)}
+                      sx={{ 
+                        mb: 2, 
+                        boxShadow: 'none', 
+                        border: '1px solid rgba(0, 0, 0, 0.12)',
+                        borderRadius: '8px',
+                        '&:before': { display: 'none' },
+                        overflow: 'hidden'
+                      }}
+                    >
+                      <AccordionSummary expandIcon={<ExpandMore />}>
+                        <Typography sx={{ fontWeight: 600 }}>
+                          Can I switch between brand and generic versions?
+                        </Typography>
+                      </AccordionSummary>
+                      <AccordionDetails>
+                        <Typography paragraph>
+                          Yes, you can switch between brand and generic versions of atorvastatin. However, it's recommended to consult with your healthcare provider before making any changes to your medication.
+                        </Typography>
+                      </AccordionDetails>
+                    </Accordion>
+                    
+                    <Accordion 
+                      expanded={activeFaq === 2}
+                      onChange={() => setActiveFaq(activeFaq === 2 ? null : 2)}
+                      sx={{ 
+                        mb: 2, 
+                        boxShadow: 'none', 
+                        border: '1px solid rgba(0, 0, 0, 0.12)',
+                        borderRadius: '8px',
+                        '&:before': { display: 'none' },
+                        overflow: 'hidden'
+                      }}
+                    >
+                      <AccordionSummary expandIcon={<ExpandMore />}>
+                        <Typography sx={{ fontWeight: 600 }}>
+                          Are there any differences in side effects between generic and brand?
+                        </Typography>
+                      </AccordionSummary>
+                      <AccordionDetails>
+                        <Typography paragraph>
+                          Generic and brand-name atorvastatin share the same potential side effects. Any differences are typically related to inactive ingredients, which rarely cause issues for most patients.
+                        </Typography>
+                      </AccordionDetails>
+                    </Accordion>
+                    
+                    <Accordion 
+                      expanded={activeFaq === 3}
+                      onChange={() => setActiveFaq(activeFaq === 3 ? null : 3)}
+                      sx={{ 
+                        mb: 2, 
+                        boxShadow: 'none', 
+                        border: '1px solid rgba(0, 0, 0, 0.12)',
+                        borderRadius: '8px',
+                        '&:before': { display: 'none' },
+                        overflow: 'hidden'
+                      }}
+                    >
+                      <AccordionSummary expandIcon={<ExpandMore />}>
+                        <Typography sx={{ fontWeight: 600 }}>
+                          Why is generic atorvastatin less expensive?
+                        </Typography>
+                      </AccordionSummary>
+                      <AccordionDetails>
+                        <Typography paragraph>
+                          Generic medications are less expensive because manufacturers don't have to repeat costly clinical trials that the brand-name manufacturers conducted. Additionally, competition among multiple generic manufacturers helps lower the price.
+                        </Typography>
+                      </AccordionDetails>
+                    </Accordion>
+                    
+                    {/* Additional FAQs */}
+                    <Accordion 
+                      expanded={activeFaq === 4}
+                      onChange={() => setActiveFaq(activeFaq === 4 ? null : 4)}
+                      sx={{ 
+                        mb: 2, 
+                        boxShadow: 'none', 
+                        border: '1px solid rgba(0, 0, 0, 0.12)',
+                        borderRadius: '8px',
+                        '&:before': { display: 'none' },
+                        overflow: 'hidden'
+                      }}
+                    >
+                      <AccordionSummary expandIcon={<ExpandMore />}>
+                        <Typography sx={{ fontWeight: 600 }}>
+                          When should I take Atorvastatin – morning or evening?
+                        </Typography>
+                      </AccordionSummary>
+                      <AccordionDetails>
+                        <Typography paragraph>
+                          Atorvastatin is usually taken once a day in the evening or at bedtime. This is because the body makes more cholesterol at night than during the day. Taking it in the evening ensures it works most effectively.
+                        </Typography>
+                      </AccordionDetails>
+                    </Accordion>
+                    
+                    <Accordion 
+                      expanded={activeFaq === 5}
+                      onChange={() => setActiveFaq(activeFaq === 5 ? null : 5)}
+                      sx={{ 
+                        mb: 2, 
+                        boxShadow: 'none', 
+                        border: '1px solid rgba(0, 0, 0, 0.12)',
+                        borderRadius: '8px',
+                        '&:before': { display: 'none' },
+                        overflow: 'hidden'
+                      }}
+                    >
+                      <AccordionSummary expandIcon={<ExpandMore />}>
+                        <Typography sx={{ fontWeight: 600 }}>
+                          Can I drink alcohol while taking Atorvastatin?
+                        </Typography>
+                      </AccordionSummary>
+                      <AccordionDetails>
+                        <Typography paragraph>
+                          Drinking alcohol while taking Atorvastatin can increase the risk of liver damage. It's recommended to limit alcohol consumption and discuss this with your doctor if you regularly drink alcohol.
+                        </Typography>
+                      </AccordionDetails>
+                    </Accordion>
+                    
+                    <Accordion 
+                      expanded={activeFaq === 6}
+                      onChange={() => setActiveFaq(activeFaq === 6 ? null : 6)}
+                      sx={{ 
+                        mb: 2, 
+                        boxShadow: 'none', 
+                        border: '1px solid rgba(0, 0, 0, 0.12)',
+                        borderRadius: '8px',
+                        '&:before': { display: 'none' },
+                        overflow: 'hidden'
+                      }}
+                    >
+                      <AccordionSummary expandIcon={<ExpandMore />}>
+                        <Typography sx={{ fontWeight: 600 }}>
+                          How long does it take for Atorvastatin to start working?
+                        </Typography>
+                      </AccordionSummary>
+                      <AccordionDetails>
+                        <Typography paragraph>
+                          Atorvastatin starts working within 1-2 weeks, but the full effect on cholesterol levels may take up to 4-6 weeks. Regular blood tests will help your doctor monitor how well it's working for you.
+                        </Typography>
+                      </AccordionDetails>
+                    </Accordion>
+                    
+                    <Accordion 
+                      expanded={activeFaq === 7}
+                      onChange={() => setActiveFaq(activeFaq === 7 ? null : 7)}
+                      sx={{ 
+                        mb: 2, 
+                        boxShadow: 'none', 
+                        border: '1px solid rgba(0, 0, 0, 0.12)',
+                        borderRadius: '8px',
+                        '&:before': { display: 'none' },
+                        overflow: 'hidden'
+                      }}
+                    >
+                      <AccordionSummary expandIcon={<ExpandMore />}>
+                        <Typography sx={{ fontWeight: 600 }}>
+                          What foods should I avoid while taking Atorvastatin?
+                        </Typography>
+                      </AccordionSummary>
+                      <AccordionDetails>
+                        <Typography paragraph>
+                          Avoid grapefruit and grapefruit juice as they can increase the concentration of Atorvastatin in your blood, potentially increasing side effects. Also limit foods high in cholesterol and saturated fats, like fatty meats, full-fat dairy products, and fried foods.
+                        </Typography>
+                      </AccordionDetails>
+                    </Accordion>
+                    
+                    <Accordion 
+                      expanded={activeFaq === 8}
+                      onChange={() => setActiveFaq(activeFaq === 8 ? null : 8)}
+                      sx={{ 
+                        mb: 2, 
+                        boxShadow: 'none', 
+                        border: '1px solid rgba(0, 0, 0, 0.12)',
+                        borderRadius: '8px',
+                        '&:before': { display: 'none' },
+                        overflow: 'hidden'
+                      }}
+                    >
+                      <AccordionSummary expandIcon={<ExpandMore />}>
+                        <Typography sx={{ fontWeight: 600 }}>
+                          What should I do if I miss a dose?
+                        </Typography>
+                      </AccordionSummary>
+                      <AccordionDetails>
+                        <Typography paragraph>
+                          If you miss a dose, take it as soon as you remember unless it's almost time for your next dose. In that case, skip the missed dose and continue with your regular schedule. Do not take a double dose to make up for a missed one.
+                        </Typography>
+                      </AccordionDetails>
+                    </Accordion>
+                    
+                    <Accordion 
+                      expanded={activeFaq === 9}
+                      onChange={() => setActiveFaq(activeFaq === 9 ? null : 9)}
+                      sx={{ 
+                        mb: 2, 
+                        boxShadow: 'none', 
+                        border: '1px solid rgba(0, 0, 0, 0.12)',
+                        borderRadius: '8px',
+                        '&:before': { display: 'none' },
+                        overflow: 'hidden'
+                      }}
+                    >
+                      <AccordionSummary expandIcon={<ExpandMore />}>
+                        <Typography sx={{ fontWeight: 600 }}>
+                          Do I need to follow a special diet while taking Atorvastatin?
+                        </Typography>
+                      </AccordionSummary>
+                      <AccordionDetails>
+                        <Typography paragraph>
+                          Yes, Atorvastatin works best when combined with a heart-healthy diet. This includes reducing saturated fats, trans fats, and cholesterol in your diet. Focus on fruits, vegetables, whole grains, lean proteins, and healthy fats like those found in olive oil and nuts.
+                        </Typography>
+                      </AccordionDetails>
+                    </Accordion>
+                    
+                    <Accordion 
+                      expanded={activeFaq === 10}
+                      onChange={() => setActiveFaq(activeFaq === 10 ? null : 10)}
+                      sx={{ 
+                        mb: 2, 
+                        boxShadow: 'none', 
+                        border: '1px solid rgba(0, 0, 0, 0.12)',
+                        borderRadius: '8px',
+                        '&:before': { display: 'none' },
+                        overflow: 'hidden'
+                      }}
+                    >
+                      <AccordionSummary expandIcon={<ExpandMore />}>
+                        <Typography sx={{ fontWeight: 600 }}>
+                          Can I stop taking Atorvastatin once my cholesterol levels are normal?
+                        </Typography>
+                      </AccordionSummary>
+                      <AccordionDetails>
+                        <Typography paragraph>
+                          No, you should not stop taking Atorvastatin without consulting your doctor, even if your cholesterol levels return to normal. Atorvastatin helps maintain healthy cholesterol levels, and discontinuing it could cause your cholesterol to rise again.
+                        </Typography>
+                      </AccordionDetails>
+                    </Accordion>
+                  </StyledPaper>
+                </motion.div>
               </motion.div>
-            </motion.div>
+            </Grid>
           </Grid>
-        </Grid>
-      </Container>
+        </Container>
+      </Box>
       <Footer />
     </>
   );

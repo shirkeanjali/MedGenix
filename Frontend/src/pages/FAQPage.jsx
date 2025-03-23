@@ -92,7 +92,7 @@ const FAQPage = () => {
             left: 0,
             right: 0,
             bottom: 0,
-            backgroundColor: 'rgba(255, 255, 255, 0.68)',
+            backgroundColor: 'rgba(255, 255, 255, 0.55)',
             backdropFilter: 'blur(1px)',
             zIndex: 0
           }
@@ -250,7 +250,7 @@ const FAQPage = () => {
               mb: { xs: 6, md: 8 }, 
               p: 4, 
               borderRadius: '16px',
-              backgroundColor: 'rgba(103, 194, 124, 0.08)',
+              backgroundColor: 'rgba(0,128,128, 0.15)',
             }}
             component={motion.div}
             initial={{ opacity: 0, y: 30 }}
