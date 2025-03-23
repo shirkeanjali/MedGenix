@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
@@ -26,9 +26,18 @@ import {
   Grid,
   Divider,
   CircularProgress,
+  Tabs,
+  Tab,
+  Card,
+  CardContent,
+  CardActions,
+  Badge,
+  useTheme,
+  SvgIcon
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { motion } from 'framer-motion';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
 import {
   CalendarMonth,
   Medication,
@@ -37,6 +46,28 @@ import {
   Edit,
   Add,
   InfoOutlined,
+  ContentPaste,
+  Person,
+  DocumentScanner,
+  LocalPharmacy,
+  PictureAsPdf,
+  Share,
+  KeyboardArrowRight,
+  Search,
+  FileCopy,
+  Money,
+  TrendingUp,
+  Notifications,
+  Storage,
+  NotificationsActive,
+  MoreVert,
+  Close,
+  ArrowForward,
+  Apartment,
+  TimerOutlined,
+  ChangeCircle,
+  SavingsOutlined,
+  Receipt
 } from '@mui/icons-material';
 import axios from 'axios';
 import { formatDate } from '../utils/dateUtils';
@@ -177,6 +208,25 @@ const DashboardPage = () => {
   const [loading, setLoading] = useState(true);
   const [selectedPrescription, setSelectedPrescription] = useState(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  
+  // Add missing state variables
+  const [totalSavings, setTotalSavings] = useState(1250);
+  const [totalPrescriptions, setTotalPrescriptions] = useState(0);
+  const [totalMedicines, setTotalMedicines] = useState(0);
+  const [savingsData, setSavingsData] = useState([
+    { month: 'Jan', savings: 200 },
+    { month: 'Feb', savings: 300 },
+    { month: 'Mar', savings: 250 },
+    { month: 'Apr', savings: 380 },
+    { month: 'May', savings: 400 },
+    { month: 'Jun', savings: 500 },
+    { month: 'Jul', savings: 450 },
+    { month: 'Aug', savings: 480 },
+    { month: 'Sep', savings: 600 },
+    { month: 'Oct', savings: 750 },
+    { month: 'Nov', savings: 800 },
+    { month: 'Dec', savings: 1250 }
+  ]);
 
   useEffect(() => {
     const fetchPrescriptions = async () => {
@@ -186,6 +236,14 @@ const DashboardPage = () => {
           headers: { Authorization: `Bearer ${token}` }
         });
         setPrescriptions(response.data);
+        setTotalPrescriptions(response.data.length);
+        
+        // Calculate total medicines from prescriptions
+        let medicineCount = 0;
+        response.data.forEach(prescription => {
+          medicineCount += prescription.medicines?.length || 0;
+        });
+        setTotalMedicines(medicineCount);
       } catch (error) {
         console.error('Error fetching prescriptions:', error);
       } finally {
@@ -322,7 +380,6 @@ const DashboardPage = () => {
                     <ActionButton
                       variant="contained"
                       color="primary"
-                      startIcon={<Add />}
                       onClick={handleScanPrescription}
                       sx={{ 
                         mr: 2,
@@ -338,7 +395,6 @@ const DashboardPage = () => {
                         },
                         transition: 'all 0.3s ease',
                       }}
-                      startIcon={<Add />}
                     >
                       Scan New Prescription
                     </ActionButton>
@@ -480,8 +536,13 @@ const DashboardPage = () => {
                 >
                   <StyledStatCard>
                     <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                      <StyledIconAvatar>
-                        <Savings />
+                      <StyledIconAvatar
+                        sx={{ 
+                          bgcolor: 'rgba(0, 128, 128, 0.1)',
+                          color: 'primary.main'
+                        }}
+                      >
+                        <SavingsOutlined />
                       </StyledIconAvatar>
                       <Box sx={{ ml: 2 }}>
                         <Typography variant="body2" color="text.secondary">
@@ -520,7 +581,7 @@ const DashboardPage = () => {
                           borderRadius: 1,
                         }}
                       >
-                        <ArrowUpward fontSize="small" sx={{ mr: 0.5, fontSize: '1rem' }} />
+                        <ArrowForward fontSize="small" sx={{ mr: 0.5, fontSize: '1rem' }} />
                         <Typography variant="body2" fontWeight={500}>
                           15.3%
                         </Typography>
@@ -583,7 +644,7 @@ const DashboardPage = () => {
                           borderRadius: 1,
                         }}
                       >
-                        <ArrowUpward fontSize="small" sx={{ mr: 0.5, fontSize: '1rem' }} />
+                        <ArrowForward fontSize="small" sx={{ mr: 0.5, fontSize: '1rem' }} />
                         <Typography variant="body2" fontWeight={500}>
                           3 New
                         </Typography>
@@ -646,7 +707,7 @@ const DashboardPage = () => {
                           borderRadius: 1,
                         }}
                       >
-                        <ArrowUpward fontSize="small" sx={{ mr: 0.5, fontSize: '1rem' }} />
+                        <ArrowForward fontSize="small" sx={{ mr: 0.5, fontSize: '1rem' }} />
                         <Typography variant="body2" fontWeight={500}>
                           6 New
                         </Typography>

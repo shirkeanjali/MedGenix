@@ -18,6 +18,7 @@ import {
   Email, 
   MedicalServices
 } from '@mui/icons-material';
+import { motion } from 'framer-motion';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
@@ -59,7 +60,7 @@ const StyledDivider = styled(Divider)(({ theme }) => ({
   },
 }));
 
-const ForgotPasswordPage = () => {
+const EmailVerificationPage = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
@@ -104,7 +105,7 @@ const ForgotPasswordPage = () => {
       if (response.success) {
         // Store email in sessionStorage
         sessionStorage.setItem('resetEmail', email);
-        enqueueSnackbar('Reset code sent successfully!', { variant: 'success' });
+        enqueueSnackbar('Verification code sent successfully!', { variant: 'success' });
         
         // Set cooldown
         setCooldown(120); // 2 minutes cooldown
@@ -112,12 +113,12 @@ const ForgotPasswordPage = () => {
         // Navigate to OTP verification page
         navigate('/otp-verification');
       } else {
-        enqueueSnackbar(response.message || 'Failed to send reset code', { variant: 'error' });
+        enqueueSnackbar(response.message || 'Failed to send verification code', { variant: 'error' });
       }
     } catch (error) {
       console.error('Send OTP error:', error);
-      enqueueSnackbar(error.message || 'Failed to send reset code', { variant: 'error' });
-      setEmailError(error.message || 'Failed to send reset code');
+      enqueueSnackbar(error.message || 'Failed to send verification code', { variant: 'error' });
+      setEmailError(error.message || 'Failed to send verification code');
     } finally {
       setLoading(false);
     }
@@ -131,7 +132,7 @@ const ForgotPasswordPage = () => {
         flexDirection: 'column',
         position: 'relative',
         overflow: 'hidden',
-        background: 'white',
+        background: 'linear-gradient(135deg, #006666 0%, #008080 50%, #00a0a0 100%)',
       }}
     >
       <Header />
@@ -142,30 +143,13 @@ const ForgotPasswordPage = () => {
           alignItems: 'center',
           justifyContent: 'center',
           py: { xs: 4, md: 8 },
-          position: 'relative',
-          backgroundImage: 'url("https://thumbs.dreamstime.com/b/pharmacist-black-woman-medicine-counter-pharmacy-druggist-stands-opposite-shelves-medicines-points-to-drug-flat-78490316.jpg")',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          '&::before': {
-            content: '""',
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: 'white',
-            opacity: 0.4,
-            zIndex: 1,
-          }
         }}
       >
-        <Container maxWidth="sm" sx={{ position: 'relative', zIndex: 2 }}>
-          <Box
-            sx={{
-              opacity: 1,
-              transform: 'translateY(0)',
-              transition: 'opacity 0.5s, transform 0.5s',
-            }}
+        <Container maxWidth="sm">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
           >
             <StyledPaper component="form" onSubmit={handleSendOTP}>
               <Typography
@@ -241,9 +225,9 @@ const ForgotPasswordPage = () => {
                 disabled={loading || cooldown > 0}
                 startIcon={loading && <CircularProgress size={20} color="inherit" />}
               >
-                {loading ? 'Sending Reset Code...' : 
+                {loading ? 'Sending Verification Code...' : 
                  cooldown > 0 ? `Wait ${cooldown}s to resend` : 
-                 'Send Reset Code'}
+                 'Send Verification Code'}
               </ActionButton>
 
               <StyledDivider>
@@ -272,7 +256,7 @@ const ForgotPasswordPage = () => {
                 </Typography>
               </Box>
             </StyledPaper>
-          </Box>
+          </motion.div>
         </Container>
       </Box>
       <Box sx={{ background: 'rgba(255, 255, 255, 0.9)' }}>
@@ -282,4 +266,4 @@ const ForgotPasswordPage = () => {
   );
 };
 
-export default ForgotPasswordPage; 
+export default EmailVerificationPage; 

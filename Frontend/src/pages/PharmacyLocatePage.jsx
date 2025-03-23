@@ -1,10 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
-import { Box, Container, Typography, Button, CircularProgress, Alert, Chip, Paper } from '@mui/material';
+import { Box, Container, Typography, Button, CircularProgress, Alert, Chip, Paper, Rating } from '@mui/material';
 import { LocationOn, Refresh, LocalPharmacy, Check } from '@mui/icons-material';
 import { AnimatePresence } from 'framer-motion';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
+import PharmacyMap from '../components/layout/PharmacyMap';
 import usePageLoading from '../hooks/usePageLoading';
+import { findNearbyPharmacies, identifyGenericPharmacy } from '../services/pharmacyService';
+import { transformPharmacyData } from '../services/transformPharmacyData';
 
 // Google Maps API key
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
@@ -79,6 +82,10 @@ const PharmacyLocatePage = () => {
   const [pharmacies, setPharmacies] = useState([]);
   const [selectedPharmacy, setSelectedPharmacy] = useState(null);
   const [showGenericOnly, setShowGenericOnly] = useState(false);
+  const [isLoadingPharmacies, setIsLoadingPharmacies] = useState(false);
+  const [isSimulated, setIsSimulated] = useState(false);
+  const [simulatedDataMessage, setSimulatedDataMessage] = useState('');
+  const [noPharmaciesFound, setNoPharmaciesFound] = useState(false);
   
   const mapContainerRef = useRef(null);
   const mapInstanceRef = useRef(null);
@@ -86,7 +93,6 @@ const PharmacyLocatePage = () => {
   const infoWindowRef = useRef(null);
   const apiLoadedRef = useRef(false);
   const mapInitializedRef = useRef(false);
-  const placesServiceRef = useRef(null);
   
   // Connect to the loading system
   usePageLoading(loading, 'pharmacy-locate-page');
@@ -96,16 +102,16 @@ const PharmacyLocatePage = () => {
     const initializeGoogleMaps = async () => {
       try {
         await loadGoogleMapsScript();
-        apiLoadedRef.current = true;
-        setMapStatus(prev => prev === 'loading' ? 'loading-complete' : prev);
+      apiLoadedRef.current = true;
+      setMapStatus(prev => prev === 'loading' ? 'loading-complete' : prev);
       } catch (error) {
         console.error('Failed to load Google Maps API:', error);
-        setError('Failed to load Google Maps. Please refresh the page.');
-        setMapStatus('error');
-        setLoading(false);
+      setError('Failed to load Google Maps. Please refresh the page.');
+      setMapStatus('error');
+      setLoading(false);
       }
     };
-
+    
     initializeGoogleMaps();
   }, []);
   
@@ -113,7 +119,7 @@ const PharmacyLocatePage = () => {
   useEffect(() => {
     if (userLocation) return; // Already have location
     
-    const getUserLocation = () => {
+    const getUserLocation = async () => {
       if (!navigator.geolocation) {
         setError('Geolocation is not supported by this browser.');
         setLoading(false);
@@ -121,7 +127,7 @@ const PharmacyLocatePage = () => {
       }
       
       const handleLocationError = (error) => {
-        console.error('Error getting location:', error);
+          console.error('Error getting location:', error);
         let errorMessage = 'Unable to access your location. ';
         
         switch (error.code) {
@@ -139,284 +145,121 @@ const PharmacyLocatePage = () => {
         }
         
         setError(errorMessage);
-        setLoading(false);
+          setLoading(false);
       };
       
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const userPos = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-          };
-          setUserLocation(userPos);
-        },
-        handleLocationError,
-        { 
-          enableHighAccuracy: true, 
-          timeout: 15000, 
-          maximumAge: 10000 
-        }
-      );
+      try {
+        const position = await new Promise((resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(
+            resolve,
+            reject,
+            { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+          );
+        });
+        
+        const userPos = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        };
+        
+        console.log('Got user location:', userPos);
+        setUserLocation(userPos);
+        
+        // Fetch pharmacies once we have the location
+        await fetchPharmacies(userPos);
+      } catch (err) {
+        console.error('Error getting location:', err);
+        setError('Unable to access your location. Please enable location services and try again.');
+        setLoading(false);
+      }
     };
     
     getUserLocation();
-  }, [userLocation]);
+  }, []);
   
-  // Function to check if a pharmacy is likely to be generic
-  const isGenericPharmacy = (pharmacy) => {
-    if (!pharmacy) return false;
-    
-    const nameAndVicinity = `${pharmacy.name} ${pharmacy.vicinity || ''} ${pharmacy.types?.join(' ') || ''}`.toLowerCase();
-    
-    // Check if any generic keywords are in the name or vicinity
-    return GENERIC_KEYWORDS.some(keyword => nameAndVicinity.includes(keyword.toLowerCase())) ||
-           // Check if rating is lower (often indicates more affordable options)
-           (pharmacy.rating && pharmacy.rating < 3.5) ||
-           // Check if it's a government pharmacy
-           (pharmacy.types && pharmacy.types.includes('health'));
-  };
-  
-  // Search for nearby pharmacies using Places API
-  const searchNearbyPharmacies = (map, location) => {
-    if (!window.google?.maps || !location) return;
-    
-    // Create Places service if it doesn't exist
-    if (!placesServiceRef.current) {
-      placesServiceRef.current = new window.google.maps.places.PlacesService(map);
-    }
-    
-    const request = {
-      location: location,
-      radius: 5000, // 5km radius
-      type: 'pharmacy',
-      keyword: 'pharmacy medical store drugstore'
-    };
-    
-    placesServiceRef.current.nearbySearch(request, (results, status) => {
-      if (status === window.google.maps.places.PlacesServiceStatus.OK) {
-        // Process results and identify generic pharmacies
-        const processedPharmacies = results.map(place => ({
-          ...place,
-          isGeneric: isGenericPharmacy(place)
-        }));
-        
-        setPharmacies(processedPharmacies);
-        setLoading(false);
+  // Fetch pharmacies using user's current location
+  const fetchPharmacies = async (userLoc) => {
+    try {
+      setIsLoadingPharmacies(true);
+      setError(null);
+      
+      // Validate the user location
+      if (!userLoc || !userLoc.lat || !userLoc.lng) {
+        console.error('Invalid user location provided:', userLoc);
+        setError('Could not determine your location. Please try again.');
+        setIsLoadingPharmacies(false);
+        return;
+      }
+      
+      console.log('Fetching pharmacies for location:', userLoc);
+      
+      // Call the service to get pharmacies
+      const response = await findNearbyPharmacies(userLoc.lat, userLoc.lng, 5000);
+      
+      if (!response) {
+        throw new Error('No response from pharmacy service');
+      }
+      
+      if (!response.pharmacies || !Array.isArray(response.pharmacies)) {
+        throw new Error('Invalid response from pharmacy service');
+      }
+      
+      // Check if we're using simulated data
+      if (response.note && response.note.includes('simulated')) {
+        console.warn('Using simulated data:', response.note);
+        setIsSimulated(true);
+        setSimulatedDataMessage(response.note);
       } else {
-        console.error('Error fetching nearby pharmacies:', status);
-        setError('Failed to find nearby pharmacies. Please try again.');
-        setLoading(false);
+        setIsSimulated(false);
+        setSimulatedDataMessage('');
       }
-    });
+      
+      // Transform pharmacy data for map display
+      const transformedPharmacies = transformPharmacyData(response.pharmacies);
+      console.log(`Transformed ${response.pharmacies.length} pharmacies to ${transformedPharmacies.length} map markers`, transformedPharmacies);
+      
+      // Check if we got any valid pharmacies after transformation
+      if (transformedPharmacies.length === 0) {
+        setNoPharmaciesFound(true);
+        } else {
+        setNoPharmaciesFound(false);
+        setPharmacies(transformedPharmacies);
+      }
+      
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching pharmacy data:', error);
+      setError(`Error fetching pharmacy data: ${error.message}`);
+      setPharmacies([]);
+      setLoading(false);
+    } finally {
+      setIsLoadingPharmacies(false);
+    }
   };
   
-  // Initialize map when container is ready, API is loaded, and we have user location
-  useEffect(() => {
-    // Only proceed if we have all requirements
-    if (!mapContainerRef.current || !userLocation || !window.google?.maps || mapInitializedRef.current) {
-      return;
+  // Handle refresh button click
+  const handleRefresh = async () => {
+    try {
+      if (!userLocation) {
+        // If we don't have user location, try to get it first
+        await getUserLocationPromise();
+      } else {
+        await fetchPharmacies(userLocation);
+      }
+    } catch (error) {
+      console.error('Error refreshing pharmacy data:', error);
+      setError(`Failed to fetch pharmacies: ${error.message}`);
     }
-    
-    const initializeMap = () => {
-      try {
-        // Clean up any existing map instance
-        if (mapInstanceRef.current) {
-          // Clear markers
-          if (markersRef.current.length > 0) {
-            markersRef.current.forEach(marker => {
-              if (marker) marker.setMap(null);
-            });
-            markersRef.current = [];
-          }
-        }
-        
-        // Create map
-        const mapOptions = {
-          center: userLocation,
-          zoom: 14,
-          mapTypeControl: false,
-          fullscreenControl: false,
-          streetViewControl: false,
-          zoomControl: true,
-        };
-        
-        // Create new map instance
-        const map = new window.google.maps.Map(
-          mapContainerRef.current,
-          mapOptions
-        );
-        mapInstanceRef.current = map;
-        
-        // Create a single info window to reuse
-        infoWindowRef.current = new window.google.maps.InfoWindow();
-        
-        // Add user marker
-        const userMarker = new window.google.maps.Marker({
-          position: userLocation,
-          map: map,
-          title: 'Your Location',
-          icon: {
-            path: window.google.maps.SymbolPath.CIRCLE,
-            scale: 10,
-            fillColor: '#4285F4',
-            fillOpacity: 1,
-            strokeColor: '#FFFFFF',
-            strokeWeight: 2,
-          },
-          zIndex: 1000, // Ensure user marker is on top
-        });
-        markersRef.current.push(userMarker);
-        
-        // Search for nearby pharmacies
-        searchNearbyPharmacies(map, userLocation);
-        
-        mapInitializedRef.current = true;
-        setMapStatus('ready');
-      } catch (error) {
-        console.error('Error initializing map:', error);
-        setError('Failed to initialize map. Please try again.');
-        setMapStatus('error');
-        setLoading(false);
-      }
-    };
-    
-    // Initialize map with a slight delay to ensure DOM is ready
-    setTimeout(initializeMap, 100);
-    
-    // Cleanup function
-    return () => {
-      if (markersRef.current.length > 0) {
-        markersRef.current.forEach(marker => {
-          if (marker) marker.setMap(null);
-        });
-        markersRef.current = [];
-      }
-      if (infoWindowRef.current) {
-        infoWindowRef.current.close();
-      }
-      mapInitializedRef.current = false;
-    };
-  }, [userLocation, mapStatus]);
+  };
   
-  // Update markers when pharmacies change or filter changes
-  useEffect(() => {
-    if (!mapInstanceRef.current || !pharmacies.length) return;
-    
-    // Clear existing pharmacy markers (keep user marker)
-    markersRef.current.slice(1).forEach(marker => {
-      if (marker) marker.setMap(null);
-    });
-    markersRef.current = [markersRef.current[0]]; // Keep only user marker
-    
-    // Filter pharmacies based on showGenericOnly
-    const filteredPharmacies = showGenericOnly 
-      ? pharmacies.filter(pharmacy => pharmacy.isGeneric)
-      : pharmacies;
-    
-    // Add pharmacy markers
-    filteredPharmacies.forEach(pharmacy => {
-      if (!pharmacy.geometry?.location) return;
+  // Get user location as a promise
+  const getUserLocationPromise = () => {
+    return new Promise((resolve, reject) => {
+      if (!navigator.geolocation) {
+        reject(new Error('Geolocation is not supported by this browser.'));
+        return;
+      }
       
-      const position = {
-        lat: pharmacy.geometry.location.lat(),
-        lng: pharmacy.geometry.location.lng()
-      };
-      
-      // Create marker
-      const marker = new window.google.maps.Marker({
-        position: position,
-        map: mapInstanceRef.current,
-        title: pharmacy.name,
-        animation: window.google.maps.Animation.DROP,
-        icon: {
-          url: pharmacy.isGeneric 
-            ? 'https://maps.google.com/mapfiles/ms/icons/green-dot.png' 
-            : 'https://maps.google.com/mapfiles/ms/icons/red-dot.png',
-          scaledSize: new window.google.maps.Size(32, 32),
-        },
-      });
-      
-      // Add click listener
-      marker.addListener('click', () => {
-        // Close any open info window
-        if (infoWindowRef.current) {
-          infoWindowRef.current.close();
-        }
-        
-        // Get additional details for the pharmacy
-        const getPlaceDetails = () => {
-          const request = {
-            placeId: pharmacy.place_id,
-            fields: ['name', 'formatted_address', 'formatted_phone_number', 'opening_hours', 'photos', 'rating', 'website']
-          };
-          
-          placesServiceRef.current.getDetails(request, (place, status) => {
-            if (status === window.google.maps.places.PlacesServiceStatus.OK) {
-              // Update selected pharmacy with details
-              setSelectedPharmacy({
-                ...pharmacy,
-                ...place,
-                photoUrl: place.photos && place.photos.length > 0 
-                  ? place.photos[0].getUrl({ maxWidth: 300, maxHeight: 200 })
-                  : null
-              });
-              
-              // Create info window content
-              const content = `
-                <div style="padding: 10px; max-width: 300px;">
-                  <h3 style="margin-top: 0; color: ${pharmacy.isGeneric ? '#2e7d32' : '#d32f2f'};">
-                    ${pharmacy.name} ${pharmacy.isGeneric ? '(Generic)' : ''}
-                  </h3>
-                  <p style="margin: 5px 0;">${pharmacy.vicinity || ''}</p>
-                  ${pharmacy.rating ? `<p style="margin: 5px 0;">Rating: ${pharmacy.rating} ⭐</p>` : ''}
-                  <p style="margin: 5px 0; font-size: 0.9em; color: #666;">Click for more details</p>
-                </div>
-              `;
-              
-              // Set info window content and open
-              infoWindowRef.current.setContent(content);
-              infoWindowRef.current.open(mapInstanceRef.current, marker);
-              
-              // Animate marker
-              if (marker.getAnimation() !== null) {
-                marker.setAnimation(null);
-              } else {
-                marker.setAnimation(window.google.maps.Animation.BOUNCE);
-                setTimeout(() => {
-                  marker.setAnimation(null);
-                }, 1500);
-              }
-            }
-          });
-        };
-        
-        getPlaceDetails();
-      });
-      
-      markersRef.current.push(marker);
-    });
-    
-  }, [pharmacies, showGenericOnly]);
-  
-  // Handle refresh to get new location
-  const handleRefresh = () => {
-    setLoading(true);
-    setError(null);
-    setMapStatus('loading');
-    setPharmacies([]);
-    setSelectedPharmacy(null);
-    mapInitializedRef.current = false;
-    
-    // Clear existing markers
-    if (markersRef.current.length > 0) {
-      markersRef.current.forEach(marker => {
-        if (marker) marker.setMap(null);
-      });
-      markersRef.current = [];
-    }
-    
-    // Get new location
-    if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const userPos = {
@@ -424,18 +267,15 @@ const PharmacyLocatePage = () => {
             lng: position.coords.longitude,
           };
           setUserLocation(userPos);
+          resolve(userPos);
         },
         (error) => {
           console.error('Error getting location:', error);
-          setError('Unable to access your location. Please enable location services and try again.');
-          setLoading(false);
+          reject(new Error('Unable to access your location. Please enable location services.'));
         },
         { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
       );
-    } else {
-      setError('Geolocation is not supported by this browser.');
-      setLoading(false);
-    }
+    });
   };
   
   // Toggle generic only filter
@@ -446,242 +286,185 @@ const PharmacyLocatePage = () => {
   return (
     <>
       <Header />
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        <Box sx={{ mb: 4 }}>
+          <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 700 }}>
+            <LocalPharmacy sx={{ mr: 1, verticalAlign: 'middle' }} />
+            Nearby Pharmacies
+          </Typography>
+          <Typography variant="subtitle1" color="text.secondary" gutterBottom>
+            Find pharmacies near you that offer generic medications at lower prices.
+          </Typography>
+        </Box>
+        
+        {/* Status and Controls */}
       <Box 
         sx={{ 
-          pt: 8, 
-          pb: 6,
           display: 'flex',
-          flexDirection: 'column',
-          minHeight: 'calc(100vh - 64px)',
-          bgcolor: 'background.default'
-        }}
-      >
-        <Container maxWidth="lg" sx={{ flexGrow: 1 }}>
-          <Box sx={{ mb: 4, textAlign: 'center' }}>
-            <Typography variant="h3" component="h1" gutterBottom sx={{ color: 'primary.main', fontWeight: 'bold' }}>
-              <LocationOn sx={{ mr: 1, verticalAlign: 'middle' }} />
-              Find Nearby Pharmacies
+            flexWrap: 'wrap',
+            justifyContent: 'space-between', 
+            alignItems: 'center',
+            mb: 3,
+            gap: 2
+          }}
+        >
+          <Box>
+            {userLocation && (
+              <Typography variant="body2" color="text.secondary">
+                <LocationOn fontSize="small" sx={{ verticalAlign: 'middle', mr: 0.5 }} />
+                Current location: {userLocation.lat.toFixed(6)}, {userLocation.lng.toFixed(6)}
             </Typography>
-            <Typography variant="subtitle1" sx={{ color: 'text.secondary', mb: 4 }}>
-              Locate pharmacies near your current location to find medications quickly.
-            </Typography>
-            
-            {error && (
-              <Alert 
-                severity="error" 
-                sx={{ mb: 3, mx: 'auto', maxWidth: 'md' }}
-                action={
-                  <Button color="inherit" size="small" onClick={handleRefresh}>
-                    Try Again
-                  </Button>
-                }
-              >
-                {error}
-              </Alert>
             )}
             
-            <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mb: 4 }}>
+            {isSimulated && (
+              <Alert severity="info" sx={{ mt: 1, mb: 2 }}>
+                {simulatedDataMessage || 'Using simulated pharmacy data.'}
+              </Alert>
+            )}
+          </Box>
+            
+          <Box sx={{ display: 'flex', gap: 2 }}>
               <Button
-                variant="contained"
+              variant="outlined"
                 color="primary"
                 startIcon={<Refresh />}
                 onClick={handleRefresh}
-                disabled={loading}
+              disabled={isLoadingPharmacies}
               >
-                Refresh Location
+              Refresh
               </Button>
               
               <Button
                 variant={showGenericOnly ? "contained" : "outlined"}
-                color={showGenericOnly ? "success" : "primary"}
-                startIcon={showGenericOnly ? <Check /> : <LocalPharmacy />}
+              color="success"
+              startIcon={showGenericOnly ? <Check /> : null}
                 onClick={toggleGenericFilter}
-                disabled={loading}
               >
-                {showGenericOnly ? "Showing Generic Only" : "Show Generic Pharmacies"}
+              Generic Only
               </Button>
+          </Box>
             </Box>
             
-            {pharmacies.length > 0 && (
-              <Box sx={{ mb: 3 }}>
-                <Typography variant="body2" sx={{ mb: 1 }}>
-                  Found {showGenericOnly 
-                    ? pharmacies.filter(p => p.isGeneric).length 
-                    : pharmacies.length} pharmacies nearby
-                </Typography>
-                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', justifyContent: 'center' }}>
-                  <Chip 
-                    icon={<LocalPharmacy />} 
-                    label="All Pharmacies" 
-                    color={!showGenericOnly ? "primary" : "default"}
-                    onClick={() => setShowGenericOnly(false)}
-                    sx={{ mb: 1 }}
-                  />
-                  <Chip 
-                    icon={<LocalPharmacy />} 
-                    label="Generic Pharmacies" 
-                    color={showGenericOnly ? "success" : "default"}
-                    onClick={() => setShowGenericOnly(true)}
-                    sx={{ mb: 1 }}
-                  />
-                </Box>
-              </Box>
-            )}
+        {/* Loading and Error States */}
+        {isLoadingPharmacies && (
+          <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
+            <CircularProgress />
           </Box>
-          
-          <Box 
+        )}
+        
+        {error && !isSimulated && (
+          <Alert severity="error" sx={{ mb: 3 }}>
+            {error}
+          </Alert>
+        )}
+        
+        {noPharmaciesFound && !isLoadingPharmacies && (
+          <Alert severity="warning" sx={{ mb: 3 }}>
+            No pharmacies found in your area. Try increasing the search radius or checking a different location.
+          </Alert>
+        )}
+        
+        {/* Map */}
+        {userLocation && (
+          <Paper 
+            elevation={3} 
             sx={{ 
-              height: '70vh', 
-              position: 'relative',
               borderRadius: 2,
               overflow: 'hidden',
-              boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
+              mb: 4 
             }}
           >
-            {/* Map container */}
-            <div 
-              ref={mapContainerRef}
-              style={{
-                height: '100%',
-                width: '100%',
-                borderRadius: '8px'
-              }}
+            <PharmacyMap 
+              userLocation={userLocation}
+              pharmacies={pharmacies}
+              selectedPharmacy={selectedPharmacy}
+              setSelectedPharmacy={setSelectedPharmacy}
+              showGenericOnly={showGenericOnly}
+              height={500}
             />
-            
-            {/* Loading overlay */}
-            {(mapStatus !== 'ready' || loading) && (
-              <Box 
-                sx={{ 
-                  display: 'flex', 
-                  flexDirection: 'column', 
-                  justifyContent: 'center', 
-                  alignItems: 'center',
-                  height: '100%',
-                  width: '100%',
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                  zIndex: 10,
-                }}
-              >
-                <CircularProgress size={60} sx={{ mb: 3, color: 'primary.main' }} />
-                <Typography variant="h6" sx={{ color: 'primary.main' }}>
-                  {!apiLoadedRef.current
-                    ? 'Loading Google Maps...'
-                    : !userLocation
-                      ? 'Getting your location...'
-                      : 'Finding nearby pharmacies...'}
-                </Typography>
-                <Typography variant="body2" sx={{ color: 'text.secondary', mt: 2, maxWidth: 'md', textAlign: 'center' }}>
-                  Please allow location access when prompted to see pharmacies near you.
-                </Typography>
-              </Box>
-            )}
-            
-            {/* Selected pharmacy details panel */}
+          </Paper>
+        )}
+        
+        {/* Pharmacy List */}
+        <Box sx={{ mt: 4 }}>
+          <Typography variant="h5" component="h2" gutterBottom>
+            Pharmacy List ({showGenericOnly ? 'Generic Only' : 'All'})
+          </Typography>
+          
+          {pharmacies.length === 0 && !isLoadingPharmacies ? (
+            <Typography variant="body1" color="text.secondary" sx={{ mt: 2 }}>
+              No pharmacies to display. Try refreshing or changing your search criteria.
+            </Typography>
+          ) : (
+            <Box sx={{ mt: 2 }}>
             <AnimatePresence>
-              {selectedPharmacy && (
+                {(showGenericOnly 
+                  ? pharmacies.filter(p => p.isGeneric) 
+                  : pharmacies
+                ).map((pharmacy, index) => (
                 <motion.div
+                    key={pharmacy.id || index}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 20 }}
-                  transition={{ duration: 0.3 }}
-                  style={{
-                    position: 'absolute',
-                    bottom: 20,
-                    left: 20,
-                    right: 20,
-                    zIndex: 20,
-                    maxWidth: '400px',
-                    margin: '0 auto'
-                  }}
-                >
-                  <Paper elevation={3} sx={{ p: 2, borderRadius: 2, bgcolor: 'rgba(255, 255, 255, 0.95)' }}>
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.3, delay: index * 0.05 }}
+                  >
+                    <Paper
+                      elevation={selectedPharmacy?.id === pharmacy.id ? 4 : 1}
+                      sx={{ 
+                        p: 2, 
+                        mb: 2, 
+                        borderRadius: 2,
+                        cursor: 'pointer',
+                        borderLeft: pharmacy.isGeneric ? '4px solid #4caf50' : '4px solid #f44336',
+                        ...(selectedPharmacy?.id === pharmacy.id ? {
+                          backgroundColor: 'rgba(0, 0, 0, 0.02)'
+                        } : {})
+                      }}
+                      onClick={() => setSelectedPharmacy(pharmacy)}
+                    >
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                      <Typography variant="h6" component="h3" sx={{ 
-                        color: selectedPharmacy.isGeneric ? 'success.main' : 'primary.main',
-                        fontWeight: 'bold'
-                      }}>
-                        {selectedPharmacy.name}
-                        {selectedPharmacy.isGeneric && (
+                        <Box>
+                          <Typography variant="h6" component="h3" sx={{ fontWeight: 600 }}>
+                            {pharmacy.name}
+                            {pharmacy.isGeneric && (
                           <Chip 
                             label="Generic" 
                             size="small" 
                             color="success" 
-                            sx={{ ml: 1, verticalAlign: 'middle' }}
+                                sx={{ ml: 1, height: 20 }}
                           />
                         )}
                       </Typography>
-                      <Button 
+                          <Typography variant="body2" color="text.secondary">
+                            {pharmacy.vicinity}
+                          </Typography>
+                          {pharmacy.rating && (
+                            <Box sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
+                              <Typography variant="body2" mr={1}>
+                                Rating: {pharmacy.rating}
+                              </Typography>
+                              <Rating 
+                                value={pharmacy.rating} 
+                                precision={0.5} 
                         size="small" 
-                        onClick={() => setSelectedPharmacy(null)}
-                      >
-                        Close
-                      </Button>
+                                readOnly 
+                              />
+                              <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
+                                ({pharmacy.userRatingsTotal})
+                              </Typography>
+                            </Box>
+                          )}
                     </Box>
-                    
-                    {selectedPharmacy.photoUrl && (
-                      <Box sx={{ mt: 1, mb: 2, borderRadius: 1, overflow: 'hidden' }}>
-                        <img 
-                          src={selectedPharmacy.photoUrl} 
-                          alt={selectedPharmacy.name}
-                          style={{ width: '100%', height: 'auto', maxHeight: '150px', objectFit: 'cover' }}
-                        />
                       </Box>
-                    )}
-                    
-                    <Typography variant="body2" sx={{ mb: 1 }}>
-                      {selectedPharmacy.formatted_address || selectedPharmacy.vicinity || 'Address not available'}
-                    </Typography>
-                    
-                    {selectedPharmacy.formatted_phone_number && (
-                      <Typography variant="body2" sx={{ mb: 1 }}>
-                        Phone: {selectedPharmacy.formatted_phone_number}
-                      </Typography>
-                    )}
-                    
-                    {selectedPharmacy.rating && (
-                      <Typography variant="body2" sx={{ mb: 1 }}>
-                        Rating: {selectedPharmacy.rating} ⭐ ({selectedPharmacy.user_ratings_total || 0} reviews)
-                      </Typography>
-                    )}
-                    
-                    {selectedPharmacy.opening_hours && (
-                      <Typography variant="body2" sx={{ mb: 1 }}>
-                        {selectedPharmacy.opening_hours.isOpen() ? 'Open now' : 'Closed now'}
-                      </Typography>
-                    )}
-                    
-                    {selectedPharmacy.website && (
-                      <Button 
-                        variant="outlined" 
-                        size="small" 
-                        color="primary"
-                        href={selectedPharmacy.website}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        sx={{ mt: 1 }}
-                      >
-                        Visit Website
-                      </Button>
-                    )}
                   </Paper>
                 </motion.div>
-              )}
+                ))}
             </AnimatePresence>
           </Box>
-          
-          <Box sx={{ mt: 4, textAlign: 'center' }}>
-            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-              This feature uses your device's location to find pharmacies within a 5km radius.
-            </Typography>
-            <Typography variant="body2" sx={{ color: 'text.secondary', mt: 1 }}>
-              <span style={{ color: '#2e7d32', fontWeight: 'bold' }}>Green markers</span> indicate pharmacies that may offer generic medicines.
-            </Typography>
+          )}
           </Box>
         </Container>
-      </Box>
       <Footer />
     </>
   );
