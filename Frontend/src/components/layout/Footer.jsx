@@ -17,8 +17,6 @@ import FacebookIcon from '@mui/icons-material/Facebook';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import InstagramIcon from '@mui/icons-material/Instagram';
-import MedicalServicesIcon from '@mui/icons-material/MedicalServices';
-import SendIcon from '@mui/icons-material/Send';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import PhoneIcon from '@mui/icons-material/Phone';
 import EmailIcon from '@mui/icons-material/Email';
@@ -33,11 +31,11 @@ const Footer = () => {
     {
       title: 'Quick Links',
       links: [
-        { name: 'Home', url: '#' },
-        { name: 'How It Works', url: '#' },
+        { name: 'Home', url: '/' },
+        { name: 'How It Works', url: '/how-it-works' },
         { name: 'About Us', url: '#' },
         { name: 'Blog', url: '#' },
-        { name: 'FAQ', url: '#' },
+        { name: 'FAQ', url: '/faq' },
         { name: 'Contact Us', url: '#' },
       ],
     },
@@ -77,8 +75,8 @@ const Footer = () => {
       component="footer"
       sx={{
         position: 'relative',
-        bgcolor: '#f1f1f1',
-        mt: 4,
+        bgcolor: 'rgba(0, 128, 128, 0.2)',
+        mt: 0,
         pt: { xs: 10, md: 15 },
         pb: { xs: 6, md: 8 },
         overflow: 'hidden',
@@ -103,16 +101,26 @@ const Footer = () => {
           <Grid item xs={12} md={5}>
             <Box sx={{ mb: 3 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <MedicalServicesIcon 
-                  color="primary" 
-                  sx={{ fontSize: 28, mr: 1.5 }} 
+                <Box
+                  component="img"
+                  src="/images/MedGenix Logo.png"
+                  alt="MedGenix Logo"
+                  sx={{ 
+                    height: 40,
+                    mr: 1.5,
+                    objectFit: 'contain'
+                  }}
                 />
                 <Typography 
                   variant="h5" 
                   component="div" 
                   sx={{ 
-                    fontWeight: 700, 
-                    color: 'primary.main',
+                    fontWeight: 700,
+                    fontSize: '1.6rem',
+                    backgroundImage: 'linear-gradient(to bottom, #67c27c, #008080)',
+                    backgroundClip: 'text',
+                    WebkitBackgroundClip: 'text',
+                    color: 'transparent',
                   }}
                 >
                   MedGenix
@@ -136,10 +144,10 @@ const Footer = () => {
                     aria-label={social.label}
                     color="primary"
                     sx={{ 
-                      bgcolor: 'rgba(0, 128, 128, 0.08)',
+                      bgcolor: 'rgba(103, 194, 124, 0.08)',
                       transition: 'all 0.2s',
                       '&:hover': {
-                        bgcolor: 'primary.main',
+                        background: 'linear-gradient(to bottom, #67c27c, #008080)',
                         color: 'white',
                       },
                     }}
@@ -170,7 +178,7 @@ const Footer = () => {
                     height: '2px',
                     bottom: '-8px',
                     left: 0,
-                    backgroundColor: 'primary.main',
+                    background: 'linear-gradient(to right, #67c27c, #008080)',
                   }
                 }}
               >
@@ -194,13 +202,16 @@ const Footer = () => {
                         display: 'inline-flex',
                         alignItems: 'center',
                         '&:hover': {
-                          color: 'primary.main',
+                          color: '#67c27c',
                         },
                         '&:before': {
                           content: '"•"',
                           display: 'inline-block',
                           marginRight: '8px',
-                          color: 'primary.main',
+                          background: 'linear-gradient(to bottom, #67c27c, #008080)',
+                          backgroundClip: 'text',
+                          WebkitBackgroundClip: 'text',
+                          color: 'transparent',
                           fontSize: '1.2rem',
                           opacity: 0.8
                         }
@@ -241,7 +252,12 @@ const Footer = () => {
               color="text.secondary"
               sx={{ 
                 fontSize: '0.8rem',
-                '&:hover': { color: 'primary.main' }
+                '&:hover': { 
+                  background: 'linear-gradient(to right, #67c27c, #008080)',
+                  backgroundClip: 'text',
+                  WebkitBackgroundClip: 'text',
+                  color: 'transparent',
+                }
               }}
             >
               Sitemap
@@ -252,7 +268,12 @@ const Footer = () => {
               color="text.secondary"
               sx={{ 
                 fontSize: '0.8rem',
-                '&:hover': { color: 'primary.main' }
+                '&:hover': { 
+                  background: 'linear-gradient(to right, #67c27c, #008080)',
+                  backgroundClip: 'text',
+                  WebkitBackgroundClip: 'text',
+                  color: 'transparent',
+                }
               }}
             >
               Accessibility
@@ -263,7 +284,12 @@ const Footer = () => {
               color="text.secondary"
               sx={{ 
                 fontSize: '0.8rem',
-                '&:hover': { color: 'primary.main' }
+                '&:hover': { 
+                  background: 'linear-gradient(to right, #67c27c, #008080)',
+                  backgroundClip: 'text',
+                  WebkitBackgroundClip: 'text',
+                  color: 'transparent',
+                }
               }}
             >
               Cookie Settings

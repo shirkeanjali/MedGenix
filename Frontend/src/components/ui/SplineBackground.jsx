@@ -40,7 +40,7 @@ const SplineBackground = () => {
         height: '100vh', 
         zIndex: 0,
         overflow: 'hidden',
-        backgroundColor: 'rgba(248, 249, 250, 0.3)', // More transparent background color
+        backgroundColor: 'rgba(248, 249, 250, 0.15)', // More transparent background color
       }}
     >
       {loading && (
@@ -91,7 +91,7 @@ const SplineBackground = () => {
           left: 0,
           width: '100%',
           height: '100vh',
-          background: 'radial-gradient(circle at center, rgba(255,255,255,0) 0%, rgba(255,255,255,0.2) 70%)',
+          background: 'radial-gradient(circle at center, rgba(255,255,255,0) 0%, rgba(255,255,255,0.1) 70%)',
           zIndex: 1,
           pointerEvents: 'none',
         }}

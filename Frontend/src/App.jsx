@@ -21,18 +21,23 @@ import DashboardPage from './pages/DashboardPage';
 import MedicineDetailPage from './pages/MedicineDetailPage';
 import GenericMedicineDetailPage from './pages/GenericMedicineDetailPage';
 import PharmacyLocatePage from './pages/PharmacyLocatePage';
+import HowItWorksPage from './pages/HowItWorksPage';
+import FAQPage from './pages/FAQPage';
 
 // Create a theme with teal as the primary color
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#008080', // Teal color as requested
-      dark: '#006666',
-      light: '#00a0a0',
+      main: '#008080', // Teal color
+      light: '#67c27c', // Light green from the gradient
+      dark: '#006666', // Darker teal
       contrastText: '#ffffff',
     },
     secondary: {
-      main: '#ffffff',
+      main: '#67c27c', // Light green from the gradient
+      light: '#8bd99e',
+      dark: '#4a9d5d',
+      contrastText: '#ffffff',
     },
     background: {
       default: '#ffffff',
@@ -41,6 +46,11 @@ const theme = createTheme({
     text: {
       primary: '#333333',
       secondary: '#666666',
+    },
+    success: {
+      main: '#67c27c', // Light green for success states
+      light: '#8bd99e',
+      dark: '#4a9d5d',
     },
   },
   typography: {
@@ -80,10 +90,13 @@ const theme = createTheme({
           fontWeight: 500,
           padding: '8px 16px',
         },
-        containedPrimary: {
-          boxShadow: '0 4px 14px rgba(0, 128, 128, 0.4)',
+       
+        outlinedPrimary: {
+          borderColor: '#008080',
+          color: '#008080',
           '&:hover': {
-            boxShadow: '0 6px 20px rgba(0, 128, 128, 0.5)',
+            borderColor: '#67c27c',
+            backgroundColor: 'rgba(103, 194, 124, 0.08)',
           },
         },
       },
@@ -140,16 +153,15 @@ const HomePage = () => {
         {/* Hero Section */}
         <HeroSection />
         
-        {/* Content after hero section - with white background */}
+        {/* Content after hero section */}
         <Box sx={{ 
           position: 'relative',
-          backgroundColor: '#ffffff',
-          boxShadow: '0px -10px 20px rgba(0, 0, 0, 0.05)',
-          borderTopLeftRadius: '20px',
-          borderTopRightRadius: '20px',
-          mt: -4, // Pull up slightly to create overlap
-          pb: 4,
-          zIndex: 2, // Ensure this is above the SplineBackground
+          backgroundColor: 'transparent',
+          zIndex: 2,
+          mt: 0, // Reset margin to 0 since we're controlling spacing in the Features component
+          pt: 0,
+          borderTop: 'none',
+          overflow: 'visible',
         }}>
           {/* Features Section */}
           <FeaturesSection />
@@ -187,6 +199,8 @@ function App() {
             <Route path="/medicine/:id" element={<MedicineDetailPage />} />
             <Route path="/generic/medicine/:id" element={<GenericMedicineDetailPage />} />
             <Route path="/pharmacy-locate" element={<PharmacyLocatePage />} />
+            <Route path="/how-it-works" element={<HowItWorksPage />} />
+            <Route path="/faq" element={<FAQPage />} />
           </Routes>
           </Box>
         </BrowserRouter>
