@@ -12,3 +12,4 @@ openai==0.28.0  # For fallback to GPT-4 Vision if needed
 fuzzywuzzy==0.18.0
 python-Levenshtein==0.21.1
 easyocr==1.7.0  # For fallback OCR
+groq
