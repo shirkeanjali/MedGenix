@@ -1,13 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
 import { Box, Container, Typography, Button, CircularProgress, Alert, Chip, Paper } from '@mui/material';
 import { LocationOn, Refresh, LocalPharmacy, Check } from '@mui/icons-material';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
 import usePageLoading from '../hooks/usePageLoading';
 
 // Google Maps API key
-const GOOGLE_MAPS_API_KEY = 'AIzaSyDHrONTX_PmQf0lT1_6rIZvnJ2zrpbQU40';
+const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
 // Keywords that might indicate a generic pharmacy
 const GENERIC_KEYWORDS = [
@@ -15,6 +15,61 @@ const GENERIC_KEYWORDS = [
   'cheap', 'inexpensive', 'economical', 'reasonable',
   'wholesale', 'bulk', 'public', 'government', 'subsidized'
 ];
+
+// Function to load Google Maps script
+const loadGoogleMapsScript = () => {
+  return new Promise((resolve, reject) => {
+    // If Google Maps is already loaded, resolve immediately
+    if (window.google?.maps) {
+      console.log('Google Maps already loaded');
+      resolve();
+      return;
+    }
+
+    // If we're already loading, wait for the existing load
+    if (window.isLoadingGoogleMaps) {
+      console.log('Waiting for existing Google Maps load');
+      const checkLoaded = setInterval(() => {
+        if (window.google?.maps) {
+          clearInterval(checkLoaded);
+          resolve();
+        }
+      }, 100);
+      return;
+    }
+
+    window.isLoadingGoogleMaps = true;
+    console.log('Loading Google Maps with key:', GOOGLE_MAPS_API_KEY);
+
+    // Create script element
+    const script = document.createElement('script');
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=places&v=weekly`;
+    script.async = true;
+    script.defer = true;
+
+    // Add error callback to window
+    window.gm_authFailure = () => {
+      console.error('Google Maps authentication failed');
+      reject(new Error('Google Maps authentication failed - please check your API key configuration'));
+    };
+
+    // Set up event handlers
+    script.onload = () => {
+      console.log('Google Maps script loaded successfully');
+      window.isLoadingGoogleMaps = false;
+      resolve();
+    };
+
+    script.onerror = (error) => {
+      console.error('Failed to load Google Maps script:', error);
+      window.isLoadingGoogleMaps = false;
+      reject(new Error('Failed to load Google Maps API - check console for details'));
+    };
+
+    // Add the script to the document
+    document.head.appendChild(script);
+  });
+};
 
 const PharmacyLocatePage = () => {
   const [userLocation, setUserLocation] = useState(null);
@@ -36,45 +91,22 @@ const PharmacyLocatePage = () => {
   // Connect to the loading system
   usePageLoading(loading, 'pharmacy-locate-page');
   
-  // Load Google Maps API once
+  // Load Google Maps API
   useEffect(() => {
-    // If Google Maps is already loaded, just set the flag
-    if (window.google?.maps) {
-      apiLoadedRef.current = true;
-      return;
-    }
-    
-    // If we're already loading, don't load again
-    if (window.isLoadingGoogleMaps) return;
-    
-    window.isLoadingGoogleMaps = true;
-    
-    // Create script element
-    const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=places`;
-    script.async = true;
-    script.defer = true;
-    
-    // Set up event handlers
-    script.onload = () => {
-      apiLoadedRef.current = true;
-      window.isLoadingGoogleMaps = false;
-      // Force a re-render
-      setMapStatus(prev => prev === 'loading' ? 'loading-complete' : prev);
+    const initializeGoogleMaps = async () => {
+      try {
+        await loadGoogleMapsScript();
+        apiLoadedRef.current = true;
+        setMapStatus(prev => prev === 'loading' ? 'loading-complete' : prev);
+      } catch (error) {
+        console.error('Failed to load Google Maps API:', error);
+        setError('Failed to load Google Maps. Please refresh the page.');
+        setMapStatus('error');
+        setLoading(false);
+      }
     };
-    
-    script.onerror = () => {
-      console.error('Failed to load Google Maps API');
-      setError('Failed to load Google Maps. Please refresh the page.');
-      setMapStatus('error');
-      setLoading(false);
-      window.isLoadingGoogleMaps = false;
-    };
-    
-    // Add the script to the document
-    document.head.appendChild(script);
-    
-    // No cleanup needed for API loading
+
+    initializeGoogleMaps();
   }, []);
   
   // Get user location
@@ -88,6 +120,28 @@ const PharmacyLocatePage = () => {
         return;
       }
       
+      const handleLocationError = (error) => {
+        console.error('Error getting location:', error);
+        let errorMessage = 'Unable to access your location. ';
+        
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage += 'Please enable location services in your browser settings.';
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMessage += 'Location information is unavailable. Please try again.';
+            break;
+          case error.TIMEOUT:
+            errorMessage += 'Request timed out. Please check your connection and try again.';
+            break;
+          default:
+            errorMessage += 'Please try again or enter your location manually.';
+        }
+        
+        setError(errorMessage);
+        setLoading(false);
+      };
+      
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const userPos = {
@@ -96,12 +150,12 @@ const PharmacyLocatePage = () => {
           };
           setUserLocation(userPos);
         },
-        (error) => {
-          console.error('Error getting location:', error);
-          setError('Unable to access your location. Please enable location services and try again.');
-          setLoading(false);
-        },
-        { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+        handleLocationError,
+        { 
+          enableHighAccuracy: true, 
+          timeout: 15000, 
+          maximumAge: 10000 
+        }
       );
     };
     

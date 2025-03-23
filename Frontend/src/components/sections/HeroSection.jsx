@@ -2,18 +2,22 @@ import {
   Box, 
   Container, 
   Typography, 
-  Button, 
-  useMediaQuery,
+  Button,
 } from '@mui/material';
-import { useState } from 'react';
-import { useTheme } from '@mui/material/styles';
-import { motion } from 'framer-motion';
 import DocumentScannerIcon from '@mui/icons-material/DocumentScanner';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import { useNavigate } from 'react-router-dom';
 
 const HeroSection = () => {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const navigate = useNavigate();
+
+  const handleScanClick = () => {
+    navigate('/upload-prescription');
+  };
+
+  const handleHowItWorksClick = () => {
+    navigate('/how-it-works');
+  };
 
   return (
     <Box 
@@ -53,10 +57,12 @@ const HeroSection = () => {
             mt: { xs: -10, md: 0 },
           }}
         >
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+          <Box
+            sx={{
+              opacity: 1,
+              transform: 'translateY(0)',
+              transition: 'opacity 0.6s, transform 0.6s',
+            }}
           >
             <Typography 
               variant="h2" 
@@ -106,6 +112,7 @@ const HeroSection = () => {
                 variant="contained" 
                 size="large"
                 startIcon={<DocumentScannerIcon sx={{ fontSize: '1.8rem' }} />}
+                onClick={handleScanClick}
                 sx={{ 
                   px: 3,
                   py: 1.5,
@@ -129,6 +136,7 @@ const HeroSection = () => {
                 variant="outlined" 
                 size="large" 
                 startIcon={<InfoOutlinedIcon sx={{ fontSize: '1.8rem' }} />}
+                onClick={handleHowItWorksClick}
                 sx={{
                   px: 3,
                   py: 1.5,
@@ -151,7 +159,7 @@ const HeroSection = () => {
                 How it Works
               </Button>
             </Box>
-          </motion.div>
+          </Box>
         </Box>
       </Container>
     </Box>
