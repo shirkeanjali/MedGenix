@@ -391,15 +391,18 @@ const GenericMedicineDetailPage = () => {
                 />
               </Box>
             </Box>
-            <Button
-              variant="outlined"
-              color="primary"
-              startIcon={<Compare />}
-              onClick={handleNavigateToBranded}
-              sx={{ mt: { xs: 2, md: 0 }, fontWeight: 600 }}
-            >
-              Compare with Branded Version
-            </Button>
+            <Box sx={{ display: 'flex', alignItems: 'center', mt: { xs: 2, md: 0 }, gap: 2 }}>
+              <FindPharmacyButton
+                variant="contained"
+                color="primary"
+                startIcon={<Store />}
+                component={motion.button}
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                Find Nearby Pharmacies
+              </FindPharmacyButton>
+            </Box>
           </Box>
         </motion.div>
 
@@ -411,11 +414,11 @@ const GenericMedicineDetailPage = () => {
               animate="visible"
               variants={staggerContainer}
             >
-              {/* Overview Section */}
+              {/* Uses Section (Previously Overview) */}
               <motion.div variants={fadeInUp}>
                 <StyledPaper>
                   <SectionTitle variant="h5">
-                    <MedicalInformation /> Overview
+                    <MedicalInformation /> Uses
                   </SectionTitle>
                   <Typography paragraph>{medicine.usageInfo}</Typography>
                   <Typography variant="h6" sx={{ mt: 2, mb: 1, fontWeight: 600 }}>How it works</Typography>
@@ -435,82 +438,133 @@ const GenericMedicineDetailPage = () => {
                 </StyledPaper>
               </motion.div>
 
-              {/* Side Effects Section */}
+              {/* Side Effects Section - Changed to paragraphs */}
               <motion.div variants={fadeInUp}>
                 <StyledPaper sx={{ mt: 4 }}>
                   <SectionTitle variant="h5">
                     <ErrorOutline /> Possible Side Effects
                   </SectionTitle>
                   
-                  {medicine.sideEffects.map((sideEffect, index) => (
-                    <Accordion 
-                      key={index} 
-                      sx={{ 
-                        mb: 2, 
-                        boxShadow: 'none', 
-                        border: '1px solid rgba(0, 0, 0, 0.12)',
-                        borderRadius: '8px',
-                        '&:before': { display: 'none' },
-                        overflow: 'hidden'
-                      }}
-                    >
-                      <AccordionSummary expandIcon={<ExpandMore />}>
-                        <Typography sx={{ fontWeight: 600 }}>
-                          {sideEffect.severity} Side Effects
-                        </Typography>
-                      </AccordionSummary>
-                      <AccordionDetails>
-                        <List disablePadding>
-                          {sideEffect.effects.map((effect, i) => (
-                            <ListItem key={i} sx={{ py: 0.5 }}>
-                              <ListItemIcon sx={{ minWidth: 36 }}>
-                                <KeyboardArrowRight color="primary" />
-                              </ListItemIcon>
-                              <ListItemText primary={effect} />
-                            </ListItem>
-                          ))}
-                        </List>
-                      </AccordionDetails>
-                    </Accordion>
-                  ))}
-                  
-                  <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-                    <InfoOutlined sx={{ fontSize: '1rem', mr: 0.5, verticalAlign: 'middle' }} />
-                    If you experience any severe or persistent side effects, contact your healthcare provider immediately.
+                  <Typography variant="h6" color="error.main" sx={{ mb: 1, fontWeight: 600 }}>Common Side Effects</Typography>
+                  <Typography paragraph>
+                    {medicine.sideEffects[0].effects.join(', ')}. These side effects are generally mild and may go away during treatment as your body adjusts to the medicine.
                   </Typography>
+                  
+                  <Typography variant="h6" color="warning.main" sx={{ mb: 1, fontWeight: 600 }}>Less Common Side Effects</Typography>
+                  <Typography paragraph>
+                    {medicine.sideEffects[1].effects.join(', ')}. If you experience any of these side effects, consult your doctor but do not stop taking the medication without medical advice.
+                  </Typography>
+                  
+                  <Typography variant="h6" color="error.dark" sx={{ mb: 1, fontWeight: 600 }}>Rare but Serious Side Effects</Typography>
+                  <Typography paragraph>
+                    {medicine.sideEffects[2].effects.join(', ')}. If you experience any of these serious side effects, seek immediate medical attention.
+                  </Typography>
+                  
+                  <Box sx={{ 
+                    bgcolor: 'rgba(211, 47, 47, 0.1)', 
+                    p: 2, 
+                    borderRadius: 2,
+                    border: '1px solid rgba(211, 47, 47, 0.3)',
+                    mt: 2 
+                  }}>
+                    <Typography variant="body2" color="error.main" sx={{ display: 'flex', alignItems: 'center' }}>
+                      <InfoOutlined sx={{ fontSize: '1rem', mr: 0.5, verticalAlign: 'middle' }} />
+                      If you experience any severe or persistent side effects, contact your healthcare provider immediately.
+                    </Typography>
+                  </Box>
                 </StyledPaper>
               </motion.div>
 
-              {/* Expert Advice Section */}
+              {/* Expert Advice Section - Revised with provided text */}
               <motion.div variants={fadeInUp}>
                 <StyledPaper sx={{ mt: 4 }}>
                   <SectionTitle variant="h5">
                     <MedicalServices /> Expert Advice
                   </SectionTitle>
                   
-                  <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 2 }}>
+                  <Box sx={{ 
+                    display: 'flex', 
+                    alignItems: 'flex-start', 
+                    mb: 3,
+                    pb: 3,
+                    borderBottom: '1px dashed rgba(0, 0, 0, 0.1)'
+                  }}>
                     <Avatar 
                       sx={{ 
                         bgcolor: 'primary.main', 
-                        width: 56, 
-                        height: 56,
+                        width: 70, 
+                        height: 70,
                         mr: 2
                       }}
                     >
-                      {medicine.expertAdvice.doctor.split(' ').map(name => name[0]).join('')}
+                      AS
                     </Avatar>
                     <Box>
-                      <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                        {medicine.expertAdvice.doctor}
+                      <Typography variant="h5" sx={{ fontWeight: 600 }}>
+                        Dr. Anuj Saini
                       </Typography>
-                      <Typography variant="body2" color="text.secondary" gutterBottom>
-                        {medicine.expertAdvice.qualification} • {medicine.expertAdvice.date}
+                      <Typography variant="subtitle1" color="text.secondary" gutterBottom>
+                        MMST, MBBS
+                      </Typography>
+                      <Typography variant="body2" color="primary.main">
+                        Expert Opinion
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic', mt: 1 }}>
+                        CONTENT DETAILS
                       </Typography>
                     </Box>
                   </Box>
                   
-                  <Typography paragraph sx={{ fontStyle: 'italic', pl: 2, borderLeft: '4px solid', borderColor: 'primary.main' }}>
-                    "{medicine.expertAdvice.advice}"
+                  <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                    Expert advice for the medicine
+                  </Typography>
+                  
+                  <Typography paragraph>
+                    In general, Atorvastatin is safe. It may cause diarrhea, gas or an upset stomach. If any of these happen to you, take it with food.
+                  </Typography>
+                  
+                  <Typography paragraph>
+                    Inform your doctor if you experience fatigue, muscle weakness or muscle pain.
+                  </Typography>
+                  
+                  <Typography paragraph>
+                    Your doctor may check your liver function before starting the treatment and regularly thereafter. Inform your doctor if you notice signs of liver problems such as stomach pains, unusually dark urine or yellowing of skin or eyes.
+                  </Typography>
+                  
+                  <Typography paragraph>
+                    Inform your doctor if you have kidney disease, liver disease or diabetes before starting treatment with this medicine. If you are diabetic, monitor your blood sugar level regularly as Atorvastatin may cause an increase in your blood sugar level.
+                  </Typography>
+                  
+                  <Typography paragraph>
+                    Do not take Atorvastatin if you are pregnant, planning a pregnancy or breastfeeding.
+                  </Typography>
+                  
+                  <Typography paragraph>
+                    Atorvastatin treats high cholesterol by lowering "bad" cholesterol (LDL) and triglycerides (fats). It should be taken in addition to regular exercise and low-fat diet.
+                  </Typography>
+                  
+                  <Typography paragraph>
+                    It also reduces the risk of heart attack and stroke.
+                  </Typography>
+                  
+                  <Typography paragraph>
+                    In general, Atorvastatin is safe. It may cause diarrhea, gas or an upset stomach. If any of these happen to you, take it with food.
+                  </Typography>
+                  
+                  <Typography paragraph>
+                    Inform your doctor if you experience fatigue, muscle weakness or muscle pain.
+                  </Typography>
+                  
+                  <Typography paragraph>
+                    Your doctor may check your liver function before starting the treatment and regularly thereafter. Inform your doctor if you notice signs of liver problems such as stomach pains, unusually dark urine or yellowing of skin or eyes.
+                  </Typography>
+                  
+                  <Typography paragraph>
+                    Inform your doctor if you have kidney disease, liver disease or diabetes before starting treatment with this medicine. If you are diabetic, monitor your blood sugar level regularly as Atorvastatin may cause an increase in your blood sugar level.
+                  </Typography>
+                  
+                  <Typography paragraph>
+                    Do not take Atorvastatin if you are pregnant, planning a pregnancy or breastfeeding.
                   </Typography>
                 </StyledPaper>
               </motion.div>
@@ -524,7 +578,7 @@ const GenericMedicineDetailPage = () => {
               animate="visible"
               variants={staggerContainer}
             >
-              {/* Price Comparison Section */}
+              {/* Price Comparison Section - Enhanced with logos and brand names */}
               <motion.div variants={fadeInUp}>
                 <StyledPaper>
                   <SectionTitle variant="h5">
@@ -534,218 +588,383 @@ const GenericMedicineDetailPage = () => {
                   {lowestPrice && (
                     <Box 
                       sx={{ 
-                        bgcolor: 'success.light', 
-                        color: 'success.contrastText',
-                        p: 2,
+                        bgcolor: 'success.main', 
+                        color: 'white',
+                        p: 3,
                         borderRadius: 2,
                         mb: 3,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between'
+                        textAlign: 'center'
                       }}
                     >
-                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        <CheckCircleOutline sx={{ mr: 1 }} />
-                        <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                          Best Price: ₹{lowestPrice.price.toFixed(2)} at {lowestPrice.platform}
-                        </Typography>
-                      </Box>
-                      <Chip 
-                        label={lowestPrice.discount} 
-                        color="primary" 
-                        size="small" 
-                        sx={{ fontWeight: 600 }}
-                      />
+                      <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
+                        Best Price Available
+                      </Typography>
+                      <Typography variant="h3" sx={{ fontWeight: 700 }}>
+                        ₹{lowestPrice.price.toFixed(2)}
+                      </Typography>
+                      <Typography variant="subtitle1" sx={{ mt: 1 }}>
+                        at {lowestPrice.platform} with {lowestPrice.discount}
+                      </Typography>
                     </Box>
                   )}
                   
-                  <TableContainer component={Paper} sx={{ boxShadow: 'none', border: '1px solid rgba(0, 0, 0, 0.12)' }}>
-                    <Table>
-                      <TableHead sx={{ bgcolor: 'primary.light' }}>
-                        <TableRow>
-                          <TableCell sx={{ fontWeight: 600 }}>Platform</TableCell>
-                          <TableCell sx={{ fontWeight: 600 }}>Price</TableCell>
-                          <TableCell sx={{ fontWeight: 600 }}>Discount</TableCell>
-                          <TableCell sx={{ fontWeight: 600 }}>Delivery</TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {medicine.priceComparison.map((platform, index) => (
-                          <PriceTableRow 
-                            key={index}
-                            isHighlighted={platform.platform === lowestPrice?.platform}
-                          >
-                            <TableCell>
-                              <PlatformLink href={platform.link} target="_blank" rel="noopener">
-                                {platform.platform} <RocketLaunch fontSize="small" />
-                              </PlatformLink>
-                            </TableCell>
-                            <TableCell sx={{ fontWeight: 500 }}>₹{platform.price.toFixed(2)}</TableCell>
-                            <TableCell>
-                              <Chip 
-                                label={platform.discount} 
-                                color="secondary" 
-                                size="small"
-                                sx={{ fontWeight: 500 }}
-                              />
-                            </TableCell>
-                            <TableCell>{platform.deliveryDays}</TableCell>
-                          </PriceTableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
+                  <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600 }}>
+                    Generic {medicine.name} ({medicine.category}) Price Comparison
+                  </Typography>
                   
-                  <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+                  <Grid container spacing={2}>
+                    {medicine.priceComparison.map((platform, index) => (
+                      <Grid item xs={12} key={index}>
+                        <Paper 
+                          elevation={platform.platform === lowestPrice?.platform ? 2 : 0}
+                          sx={{ 
+                            p: 2, 
+                            border: '1px solid',
+                            borderColor: platform.platform === lowestPrice?.platform 
+                              ? 'success.main' 
+                              : 'rgba(0, 0, 0, 0.12)',
+                            borderRadius: 2,
+                            bgcolor: platform.platform === lowestPrice?.platform 
+                              ? 'rgba(76, 175, 80, 0.05)' 
+                              : 'transparent',
+                            display: 'flex',
+                            alignItems: 'center',
+                            transition: 'transform 0.2s',
+                            '&:hover': {
+                              transform: 'translateY(-4px)',
+                              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
+                            }
+                          }}
+                        >
+                          <Box 
+                            sx={{ 
+                              bgcolor: 'primary.light', 
+                              width: 50, 
+                              height: 50, 
+                              borderRadius: '50%',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              color: 'primary.contrastText',
+                              fontWeight: 700,
+                              mr: 2,
+                              fontSize: '1rem'
+                            }}
+                          >
+                            {platform.platform.slice(0, 2).toUpperCase()}
+                          </Box>
+                          <Box sx={{ flex: 1 }}>
+                            <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                              {platform.platform}
+                              {platform.platform === lowestPrice?.platform && (
+                                <Chip
+                                  label="BEST DEAL"
+                                  color="success"
+                                  size="small"
+                                  sx={{ ml: 1, fontWeight: 600, fontSize: '0.65rem' }}
+                                />
+                              )}
+                            </Typography>
+                          </Box>
+                          <Box sx={{ textAlign: 'right' }}>
+                            <Typography variant="h6" color="primary.main" sx={{ fontWeight: 700 }}>
+                              ₹{platform.price.toFixed(2)}
+                            </Typography>
+                            <Chip 
+                              label={platform.discount} 
+                              color="secondary" 
+                              size="small"
+                              sx={{ fontWeight: 500 }}
+                            />
+                          </Box>
+                        </Paper>
+                      </Grid>
+                    ))}
+                  </Grid>
+                  
+                  <Typography variant="body2" color="text.secondary" sx={{ mt: 2, textAlign: 'center' }}>
                     <InfoOutlined sx={{ fontSize: '1rem', mr: 0.5, verticalAlign: 'middle' }} />
                     Prices and availability may vary. Last updated: Today
                   </Typography>
                 </StyledPaper>
               </motion.div>
 
-              {/* Brand vs Generic Comparison */}
+              {/* Expanded FAQs Section */}
               <motion.div variants={fadeInUp}>
                 <StyledPaper sx={{ mt: 4 }}>
                   <SectionTitle variant="h5">
-                    <Compare /> Brand vs Generic
+                    <QuestionAnswer /> Frequently Asked Questions
                   </SectionTitle>
                   
-                  <Grid container spacing={2}>
-                    <Grid item xs={12}>
-                      <Paper 
-                        elevation={0} 
-                        sx={{ 
-                          p: 2, 
-                          border: '1px solid rgba(0, 128, 128, 0.2)',
-                          borderRadius: 2,
-                          bgcolor: 'rgba(0, 128, 128, 0.05)'
-                        }}
-                      >
-                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>Efficacy</Typography>
-                        <Typography variant="body2">{medicine.brandComparison.efficacy}</Typography>
-                      </Paper>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <Paper 
-                        elevation={0} 
-                        sx={{ 
-                          p: 2, 
-                          border: '1px solid rgba(0, 128, 128, 0.2)',
-                          borderRadius: 2,
-                          bgcolor: 'rgba(0, 128, 128, 0.05)'
-                        }}
-                      >
-                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>Cost Savings</Typography>
-                        <Typography variant="body2">{medicine.brandComparison.cost}</Typography>
-                      </Paper>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <Paper 
-                        elevation={0} 
-                        sx={{ 
-                          p: 2, 
-                          border: '1px solid rgba(0, 128, 128, 0.2)',
-                          borderRadius: 2,
-                          bgcolor: 'rgba(0, 128, 128, 0.05)'
-                        }}
-                      >
-                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>Quality Assurance</Typography>
-                        <Typography variant="body2">{medicine.brandComparison.quality}</Typography>
-                      </Paper>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <Paper 
-                        elevation={0} 
-                        sx={{ 
-                          p: 2, 
-                          border: '1px solid rgba(0, 128, 128, 0.2)',
-                          borderRadius: 2,
-                          bgcolor: 'rgba(0, 128, 128, 0.05)'
-                        }}
-                      >
-                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>Availability</Typography>
-                        <Typography variant="body2">{medicine.brandComparison.availability}</Typography>
-                      </Paper>
-                    </Grid>
-                  </Grid>
-                </StyledPaper>
-              </motion.div>
-
-              {/* FAQs Section */}
-              <motion.div variants={fadeInUp}>
-                <StyledPaper sx={{ mt: 4 }}>
-                  <SectionTitle variant="h5">
-                    <QuestionAnswer /> FAQs
-                  </SectionTitle>
-                  
-                  {medicine.faqs.map((faq, index) => (
-                    <Accordion 
-                      key={index} 
-                      expanded={activeFaq === index}
-                      onChange={() => setActiveFaq(activeFaq === index ? null : index)}
-                      sx={{ 
-                        mb: 2, 
-                        boxShadow: 'none', 
-                        border: '1px solid rgba(0, 0, 0, 0.12)',
-                        borderRadius: '8px',
-                        '&:before': { display: 'none' },
-                        overflow: 'hidden'
-                      }}
-                    >
-                      <AccordionSummary expandIcon={<ExpandMore />}>
-                        <Typography sx={{ fontWeight: 600 }}>
-                          {faq.question}
-                        </Typography>
-                      </AccordionSummary>
-                      <AccordionDetails>
-                        <Typography>{faq.answer}</Typography>
-                      </AccordionDetails>
-                    </Accordion>
-                  ))}
-                </StyledPaper>
-              </motion.div>
-
-              {/* Find Pharmacy Section */}
-              <motion.div variants={fadeInUp}>
-                <StyledPaper sx={{ mt: 4 }}>
-                  <SectionTitle variant="h5">
-                    <LocationOn /> Find Nearby Pharmacies
-                  </SectionTitle>
-                  
-                  <Typography paragraph>
-                    Find pharmacies near you that stock {medicine.name} at affordable prices.
+                  <Typography variant="subtitle1" sx={{ mb: 3 }}>
+                    Important information about Atorvastatin that patients commonly ask about
                   </Typography>
                   
-                  {/* Placeholder for map - would be Google Maps in a real app */}
-                  <Box 
-                    ref={mapRef}
+                  {/* Existing FAQs */}
+                  <Accordion 
+                    expanded={activeFaq === 0}
+                    onChange={() => setActiveFaq(activeFaq === 0 ? null : 0)}
                     sx={{ 
-                      height: 200, 
-                      bgcolor: 'rgba(0, 0, 0, 0.05)', 
-                      borderRadius: 2,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      border: '1px dashed rgba(0, 0, 0, 0.2)',
-                      mb: 2
+                      mb: 2, 
+                      boxShadow: 'none', 
+                      border: '1px solid rgba(0, 0, 0, 0.12)',
+                      borderRadius: '8px',
+                      '&:before': { display: 'none' },
+                      overflow: 'hidden'
                     }}
                   >
-                    <Typography color="text.secondary" sx={{ display: 'flex', alignItems: 'center' }}>
-                      <LocationOn sx={{ mr: 1 }} /> Map view would appear here
-                    </Typography>
-                  </Box>
+                    <AccordionSummary expandIcon={<ExpandMore />}>
+                      <Typography sx={{ fontWeight: 600 }}>
+                        Is generic atorvastatin as effective as the brand-name version?
+                      </Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <Typography paragraph>
+                        Yes, generic atorvastatin contains the same active ingredient and is required by law to be as safe and effective as the brand-name version. The FDA ensures that generic medications provide the same clinical benefits.
+                      </Typography>
+                    </AccordionDetails>
+                  </Accordion>
                   
-                  <FindPharmacyButton
-                    variant="contained"
-                    color="primary"
-                    fullWidth
-                    startIcon={<Store />}
-                    component={motion.button}
-                    whileHover={{ scale: 1.03 }}
-                    whileTap={{ scale: 0.98 }}
+                  <Accordion 
+                    expanded={activeFaq === 1}
+                    onChange={() => setActiveFaq(activeFaq === 1 ? null : 1)}
+                    sx={{ 
+                      mb: 2, 
+                      boxShadow: 'none', 
+                      border: '1px solid rgba(0, 0, 0, 0.12)',
+                      borderRadius: '8px',
+                      '&:before': { display: 'none' },
+                      overflow: 'hidden'
+                    }}
                   >
-                    Find Nearby Pharmacies
-                  </FindPharmacyButton>
+                    <AccordionSummary expandIcon={<ExpandMore />}>
+                      <Typography sx={{ fontWeight: 600 }}>
+                        Can I switch between brand and generic versions?
+                      </Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <Typography paragraph>
+                        Yes, you can switch between brand and generic versions of atorvastatin. However, it's recommended to consult with your healthcare provider before making any changes to your medication.
+                      </Typography>
+                    </AccordionDetails>
+                  </Accordion>
+                  
+                  <Accordion 
+                    expanded={activeFaq === 2}
+                    onChange={() => setActiveFaq(activeFaq === 2 ? null : 2)}
+                    sx={{ 
+                      mb: 2, 
+                      boxShadow: 'none', 
+                      border: '1px solid rgba(0, 0, 0, 0.12)',
+                      borderRadius: '8px',
+                      '&:before': { display: 'none' },
+                      overflow: 'hidden'
+                    }}
+                  >
+                    <AccordionSummary expandIcon={<ExpandMore />}>
+                      <Typography sx={{ fontWeight: 600 }}>
+                        Are there any differences in side effects between generic and brand?
+                      </Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <Typography paragraph>
+                        Generic and brand-name atorvastatin share the same potential side effects. Any differences are typically related to inactive ingredients, which rarely cause issues for most patients.
+                      </Typography>
+                    </AccordionDetails>
+                  </Accordion>
+                  
+                  <Accordion 
+                    expanded={activeFaq === 3}
+                    onChange={() => setActiveFaq(activeFaq === 3 ? null : 3)}
+                    sx={{ 
+                      mb: 2, 
+                      boxShadow: 'none', 
+                      border: '1px solid rgba(0, 0, 0, 0.12)',
+                      borderRadius: '8px',
+                      '&:before': { display: 'none' },
+                      overflow: 'hidden'
+                    }}
+                  >
+                    <AccordionSummary expandIcon={<ExpandMore />}>
+                      <Typography sx={{ fontWeight: 600 }}>
+                        Why is generic atorvastatin less expensive?
+                      </Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <Typography paragraph>
+                        Generic medications are less expensive because manufacturers don't have to repeat costly clinical trials that the brand-name manufacturers conducted. Additionally, competition among multiple generic manufacturers helps lower the price.
+                      </Typography>
+                    </AccordionDetails>
+                  </Accordion>
+                  
+                  {/* Additional FAQs */}
+                  <Accordion 
+                    expanded={activeFaq === 4}
+                    onChange={() => setActiveFaq(activeFaq === 4 ? null : 4)}
+                    sx={{ 
+                      mb: 2, 
+                      boxShadow: 'none', 
+                      border: '1px solid rgba(0, 0, 0, 0.12)',
+                      borderRadius: '8px',
+                      '&:before': { display: 'none' },
+                      overflow: 'hidden'
+                    }}
+                  >
+                    <AccordionSummary expandIcon={<ExpandMore />}>
+                      <Typography sx={{ fontWeight: 600 }}>
+                        When should I take Atorvastatin – morning or evening?
+                      </Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <Typography paragraph>
+                        Atorvastatin is usually taken once a day in the evening or at bedtime. This is because the body makes more cholesterol at night than during the day. Taking it in the evening ensures it works most effectively.
+                      </Typography>
+                    </AccordionDetails>
+                  </Accordion>
+                  
+                  <Accordion 
+                    expanded={activeFaq === 5}
+                    onChange={() => setActiveFaq(activeFaq === 5 ? null : 5)}
+                    sx={{ 
+                      mb: 2, 
+                      boxShadow: 'none', 
+                      border: '1px solid rgba(0, 0, 0, 0.12)',
+                      borderRadius: '8px',
+                      '&:before': { display: 'none' },
+                      overflow: 'hidden'
+                    }}
+                  >
+                    <AccordionSummary expandIcon={<ExpandMore />}>
+                      <Typography sx={{ fontWeight: 600 }}>
+                        Can I drink alcohol while taking Atorvastatin?
+                      </Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <Typography paragraph>
+                        Drinking alcohol while taking Atorvastatin can increase the risk of liver damage. It's recommended to limit alcohol consumption and discuss this with your doctor if you regularly drink alcohol.
+                      </Typography>
+                    </AccordionDetails>
+                  </Accordion>
+                  
+                  <Accordion 
+                    expanded={activeFaq === 6}
+                    onChange={() => setActiveFaq(activeFaq === 6 ? null : 6)}
+                    sx={{ 
+                      mb: 2, 
+                      boxShadow: 'none', 
+                      border: '1px solid rgba(0, 0, 0, 0.12)',
+                      borderRadius: '8px',
+                      '&:before': { display: 'none' },
+                      overflow: 'hidden'
+                    }}
+                  >
+                    <AccordionSummary expandIcon={<ExpandMore />}>
+                      <Typography sx={{ fontWeight: 600 }}>
+                        How long does it take for Atorvastatin to start working?
+                      </Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <Typography paragraph>
+                        Atorvastatin starts working within 1-2 weeks, but the full effect on cholesterol levels may take up to 4-6 weeks. Regular blood tests will help your doctor monitor how well it's working for you.
+                      </Typography>
+                    </AccordionDetails>
+                  </Accordion>
+                  
+                  <Accordion 
+                    expanded={activeFaq === 7}
+                    onChange={() => setActiveFaq(activeFaq === 7 ? null : 7)}
+                    sx={{ 
+                      mb: 2, 
+                      boxShadow: 'none', 
+                      border: '1px solid rgba(0, 0, 0, 0.12)',
+                      borderRadius: '8px',
+                      '&:before': { display: 'none' },
+                      overflow: 'hidden'
+                    }}
+                  >
+                    <AccordionSummary expandIcon={<ExpandMore />}>
+                      <Typography sx={{ fontWeight: 600 }}>
+                        What foods should I avoid while taking Atorvastatin?
+                      </Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <Typography paragraph>
+                        Avoid grapefruit and grapefruit juice as they can increase the concentration of Atorvastatin in your blood, potentially increasing side effects. Also limit foods high in cholesterol and saturated fats, like fatty meats, full-fat dairy products, and fried foods.
+                      </Typography>
+                    </AccordionDetails>
+                  </Accordion>
+                  
+                  <Accordion 
+                    expanded={activeFaq === 8}
+                    onChange={() => setActiveFaq(activeFaq === 8 ? null : 8)}
+                    sx={{ 
+                      mb: 2, 
+                      boxShadow: 'none', 
+                      border: '1px solid rgba(0, 0, 0, 0.12)',
+                      borderRadius: '8px',
+                      '&:before': { display: 'none' },
+                      overflow: 'hidden'
+                    }}
+                  >
+                    <AccordionSummary expandIcon={<ExpandMore />}>
+                      <Typography sx={{ fontWeight: 600 }}>
+                        What should I do if I miss a dose?
+                      </Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <Typography paragraph>
+                        If you miss a dose, take it as soon as you remember unless it's almost time for your next dose. In that case, skip the missed dose and continue with your regular schedule. Do not take a double dose to make up for a missed one.
+                      </Typography>
+                    </AccordionDetails>
+                  </Accordion>
+                  
+                  <Accordion 
+                    expanded={activeFaq === 9}
+                    onChange={() => setActiveFaq(activeFaq === 9 ? null : 9)}
+                    sx={{ 
+                      mb: 2, 
+                      boxShadow: 'none', 
+                      border: '1px solid rgba(0, 0, 0, 0.12)',
+                      borderRadius: '8px',
+                      '&:before': { display: 'none' },
+                      overflow: 'hidden'
+                    }}
+                  >
+                    <AccordionSummary expandIcon={<ExpandMore />}>
+                      <Typography sx={{ fontWeight: 600 }}>
+                        Do I need to follow a special diet while taking Atorvastatin?
+                      </Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <Typography paragraph>
+                        Yes, Atorvastatin works best when combined with a heart-healthy diet. This includes reducing saturated fats, trans fats, and cholesterol in your diet. Focus on fruits, vegetables, whole grains, lean proteins, and healthy fats like those found in olive oil and nuts.
+                      </Typography>
+                    </AccordionDetails>
+                  </Accordion>
+                  
+                  <Accordion 
+                    expanded={activeFaq === 10}
+                    onChange={() => setActiveFaq(activeFaq === 10 ? null : 10)}
+                    sx={{ 
+                      mb: 2, 
+                      boxShadow: 'none', 
+                      border: '1px solid rgba(0, 0, 0, 0.12)',
+                      borderRadius: '8px',
+                      '&:before': { display: 'none' },
+                      overflow: 'hidden'
+                    }}
+                  >
+                    <AccordionSummary expandIcon={<ExpandMore />}>
+                      <Typography sx={{ fontWeight: 600 }}>
+                        Can I stop taking Atorvastatin once my cholesterol levels are normal?
+                      </Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <Typography paragraph>
+                        No, you should not stop taking Atorvastatin without consulting your doctor, even if your cholesterol levels return to normal. Atorvastatin helps maintain healthy cholesterol levels, and discontinuing it could cause your cholesterol to rise again.
+                      </Typography>
+                    </AccordionDetails>
+                  </Accordion>
                 </StyledPaper>
               </motion.div>
             </motion.div>

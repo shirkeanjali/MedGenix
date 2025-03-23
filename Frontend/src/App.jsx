@@ -15,6 +15,7 @@ import ResetPasswordPage from './pages/ResetPasswordPage';
 import DashboardPage from './pages/DashboardPage';
 import MedicineDetailPage from './pages/MedicineDetailPage';
 import GenericMedicineDetailPage from './pages/GenericMedicineDetailPage';
+import PharmacyLocatePage from './pages/PharmacyLocatePage';
 
 // Create a theme with teal as the primary color
 const theme = createTheme({
@@ -169,6 +170,7 @@ function App() {
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/medicine/:id" element={<MedicineDetailPage />} />
             <Route path="/generic/medicine/:id" element={<GenericMedicineDetailPage />} />
+            <Route path="/pharmacy-locate" element={<PharmacyLocatePage />} />
           </Routes>
         </Box>
       </BrowserRouter>
