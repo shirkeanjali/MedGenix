@@ -1,7 +1,7 @@
 import express from 'express';
 import userAuth from '../middleware/userAuth.js';
 import { getUserData, uploadUserPhoto } from '../controllers/userController.js';
-import upload from '../utils/fileUpload.js';
+import { upload } from '../config/cloudinary.js';
 
 const userRouter = express.Router();
 
