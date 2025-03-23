@@ -129,9 +129,9 @@ const Footer = () => {
               <Typography 
                 variant="body2" 
                 color="text.secondary"
-                sx={{ mb: 3, lineHeight: 1.7 }}
+                sx={{ mb: 3, maxWidth: '90%' }}
               >
-                MedGenix is committed to making healthcare more affordable by helping users find generic alternatives to their prescribed medications while ensuring the same quality and effectiveness.
+                Where Health Meets Affordability. MedGenix helps you find cost-effective alternatives to brand-name medications without compromising on quality or efficacy.
               </Typography>
               <Stack direction="row" spacing={1.5} sx={{ mb: 3 }}>
                 {socialLinks.map((social, index) => (
@@ -163,22 +163,21 @@ const Footer = () => {
           {footerLinks.map((column, index) => (
             <Grid item xs={6} sm={4} md={2} key={index}>
               <Typography 
-                variant="subtitle1" 
-                component="h6" 
+                variant="h6" 
+                component="h3" 
                 sx={{ 
                   fontWeight: 600, 
                   mb: 2,
-                  color: 'primary.dark',
+                  color: 'primary.main',
                   position: 'relative',
-                  display: 'inline-block',
                   '&:after': {
                     content: '""',
                     position: 'absolute',
-                    width: '30px',
-                    height: '2px',
                     bottom: '-8px',
                     left: 0,
-                    background: 'linear-gradient(to right, #67c27c, #008080)',
+                    width: '40px',
+                    height: '2px',
+                    backgroundColor: 'primary.main',
                   }
                 }}
               >
@@ -217,7 +216,9 @@ const Footer = () => {
                         }
                       }}
                     >
-                      {link.name}
+                      <Typography component="span">
+                        {link.name}
+                      </Typography>
                     </Link>
                   </Box>
                 ))}
@@ -260,7 +261,9 @@ const Footer = () => {
                 }
               }}
             >
-              Sitemap
+              <Typography variant="body2" color="text.secondary">
+                Sitemap
+              </Typography>
             </Link>
             <Link 
               href="#" 
@@ -276,7 +279,9 @@ const Footer = () => {
                 }
               }}
             >
-              Accessibility
+              <Typography variant="body2" color="text.secondary">
+                Accessibility
+              </Typography>
             </Link>
             <Link 
               href="#" 
@@ -292,7 +297,9 @@ const Footer = () => {
                 }
               }}
             >
-              Cookie Settings
+              <Typography variant="body2" color="text.secondary">
+                Cookie Settings
+              </Typography>
             </Link>
           </Stack>
         </Box>

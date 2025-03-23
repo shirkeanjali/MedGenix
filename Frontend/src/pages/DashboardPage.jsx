@@ -1375,12 +1375,34 @@ const DashboardPage = () => {
                               variant="h6" 
                               align="center"
                               fontWeight={600}
-                              sx={{ mb: 1 }}
+                              sx={{ 
+                                mb: 1,
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                display: '-webkit-box',
+                                WebkitLineClamp: 2,
+                                WebkitBoxOrient: 'vertical',
+                                lineHeight: 1.2,
+                                minHeight: '2.4em',
+                                wordBreak: 'break-word'
+                              }}
                             >
                               {medicine.name}
                             </Typography>
                             
-                            <Typography variant="body2" color="text.secondary" sx={{ mb: 1, textAlign: 'center' }}>
+                            <Typography 
+                              variant="body2" 
+                              color="text.secondary" 
+                              sx={{ 
+                                mb: 1, 
+                                textAlign: 'center',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                display: '-webkit-box',
+                                WebkitLineClamp: 1,
+                                WebkitBoxOrient: 'vertical'
+                              }}
+                            >
                               {medicine.category}
                             </Typography>
                             
@@ -1390,7 +1412,21 @@ const DashboardPage = () => {
                               <Typography variant="subtitle2" color="text.secondary">
                                 Generic Alternative:
                               </Typography>
-                              <Typography variant="body2" fontWeight={500} color="primary.main">
+                              <Typography 
+                                variant="body2" 
+                                fontWeight={500} 
+                                color="primary.main"
+                                sx={{
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis',
+                                  display: '-webkit-box',
+                                  WebkitLineClamp: 2,
+                                  WebkitBoxOrient: 'vertical',
+                                  lineHeight: 1.2,
+                                  minHeight: '2.4em',
+                                  wordBreak: 'break-word'
+                                }}
+                              >
                                 {medicine.generic}
                               </Typography>
                             </Box>

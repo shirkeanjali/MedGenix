@@ -13,6 +13,7 @@ import EmailVerificationPage from './pages/EmailVerificationPage';
 import OtpVerificationPage from './pages/OtpVerificationPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import { AuthProvider } from './context/AuthContext';
+import { LanguageProvider } from './context/LanguageContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Dashboard from './pages/Dashboard';
 import EmailVerifyPage from './pages/EmailVerifyPage';
@@ -179,31 +180,33 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <AuthProvider>
-        <BrowserRouter>
-          <Box sx={{ 
-            display: 'flex', 
-            flexDirection: 'column', 
-            minHeight: '100vh', 
-            position: 'relative',
-            overflowX: 'hidden',
-          }}>
-            <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/signup" element={<SignUpPage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/verify-email" element={<EmailVerifyPage />} />
-              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-              <Route path="/otp-verification" element={<OtpVerificationPage />} />
-              <Route path="/reset-password" element={<ResetPasswordPage />} />
-              <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/medicine/:id" element={<MedicineDetailPage />} />
-            <Route path="/generic/medicine/:id" element={<GenericMedicineDetailPage />} />
-            <Route path="/pharmacy-locate" element={<PharmacyLocatePage />} />
-            <Route path="/how-it-works" element={<HowItWorksPage />} />
-            <Route path="/faq" element={<FAQPage />} />
-          </Routes>
-          </Box>
-        </BrowserRouter>
+        <LanguageProvider>
+          <BrowserRouter>
+            <Box sx={{ 
+              display: 'flex', 
+              flexDirection: 'column', 
+              minHeight: '100vh', 
+              position: 'relative',
+              overflowX: 'hidden',
+            }}>
+              <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/signup" element={<SignUpPage />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/verify-email" element={<EmailVerifyPage />} />
+                <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                <Route path="/otp-verification" element={<OtpVerificationPage />} />
+                <Route path="/reset-password" element={<ResetPasswordPage />} />
+                <Route path="/dashboard" element={<DashboardPage />} />
+                <Route path="/medicine/:id" element={<MedicineDetailPage />} />
+                <Route path="/generic/medicine/:id" element={<GenericMedicineDetailPage />} />
+                <Route path="/pharmacy-locate" element={<PharmacyLocatePage />} />
+                <Route path="/how-it-works" element={<HowItWorksPage />} />
+                <Route path="/faq" element={<FAQPage />} />
+              </Routes>
+            </Box>
+          </BrowserRouter>
+        </LanguageProvider>
       </AuthProvider>
     </ThemeProvider>
   );

@@ -259,7 +259,9 @@ const EmailVerificationPage = () => {
           </motion.div>
         </Container>
       </Box>
-      <Footer />
+      <Box sx={{ background: 'rgba(255, 255, 255, 0.9)' }}>
+        <Footer />
+      </Box>
     </Box>
   );
 };

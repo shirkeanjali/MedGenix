@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import connectDB from './config/mongodb.js';
 import authRouter from './routes/authRoutes.js';
 import userRouter from './routes/userRoutes.js';
+import translationRouter from './routes/translationRoutes.js';
 import session from 'express-session';
 
 
@@ -49,6 +50,7 @@ app.get('/', (req, res) => {
 // Routes
 app.use('/api/auth', authRouter);
 app.use('/api/user', userRouter);
+app.use('/api/translation', translationRouter);
 
 // Error handling
 app.use((err, req, res, next) => {

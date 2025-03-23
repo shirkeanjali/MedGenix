@@ -16,6 +16,160 @@ const GENERIC_KEYWORDS = [
   'wholesale', 'bulk', 'public', 'government', 'subsidized'
 ];
 
+// Simulated pharmacy data generator
+const generatePharmacies = (userLocation) => {
+  if (!userLocation) return [];
+  
+  const pharmacies = [
+    {
+      id: 'pharmacy-1',
+      name: 'City Generic Pharmacy',
+      vicinity: '123 Main St, Downtown',
+      position: { 
+        lat: userLocation.lat + 0.008, 
+        lng: userLocation.lng + 0.005 
+      },
+      isGeneric: true,
+      rating: 4.2,
+      user_ratings_total: 156,
+      formatted_phone_number: '+91 98765 43210',
+      formatted_address: '123 Main St, Downtown Area, City Center',
+      opening_hours: { isOpen: () => true },
+      types: ['pharmacy', 'health', 'store'],
+      photoUrl: 'https://images.unsplash.com/photo-1586015555751-63c29b8cd2eb?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&h=200&q=80',
+      website: 'https://example.com/city-generic'
+    },
+    {
+      id: 'pharmacy-2',
+      name: 'MedPlus Pharmacy',
+      vicinity: '456 Oak Ave, Westside',
+      position: { 
+        lat: userLocation.lat - 0.006, 
+        lng: userLocation.lng + 0.009 
+      },
+      isGeneric: false,
+      rating: 4.7,
+      user_ratings_total: 203,
+      formatted_phone_number: '+91 98765 12345',
+      formatted_address: '456 Oak Avenue, Westside District, City',
+      opening_hours: { isOpen: () => true },
+      types: ['pharmacy', 'store', 'health'],
+      photoUrl: 'https://images.unsplash.com/photo-1576602976047-174e57a47881?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&h=200&q=80',
+      website: 'https://example.com/medplus'
+    },
+    {
+      id: 'pharmacy-3',
+      name: 'Discount Medical Supplies',
+      vicinity: '789 Pine Blvd, Eastside',
+      position: { 
+        lat: userLocation.lat + 0.012, 
+        lng: userLocation.lng - 0.007 
+      },
+      isGeneric: true,
+      rating: 3.9,
+      user_ratings_total: 89,
+      formatted_phone_number: '+91 98765 98765',
+      formatted_address: '789 Pine Boulevard, Eastside Area, City',
+      opening_hours: { isOpen: () => false },
+      types: ['pharmacy', 'store', 'health'],
+      photoUrl: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&h=200&q=80',
+      website: 'https://example.com/discount-medical'
+    },
+    {
+      id: 'pharmacy-4',
+      name: 'Wellness Pharmacy',
+      vicinity: '321 Elm St, Northside',
+      position: { 
+        lat: userLocation.lat - 0.009, 
+        lng: userLocation.lng - 0.008 
+      },
+      isGeneric: false,
+      rating: 4.5,
+      user_ratings_total: 178,
+      formatted_phone_number: '+91 98765 56789',
+      formatted_address: '321 Elm Street, Northside District, City',
+      opening_hours: { isOpen: () => true },
+      types: ['pharmacy', 'health', 'store'],
+      photoUrl: 'https://images.unsplash.com/photo-1563453392212-326f5e854473?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&h=200&q=80',
+      website: 'https://example.com/wellness'
+    },
+    {
+      id: 'pharmacy-5',
+      name: 'Government Medical Store',
+      vicinity: '555 Public Rd, Central District',
+      position: { 
+        lat: userLocation.lat + 0.003, 
+        lng: userLocation.lng + 0.015 
+      },
+      isGeneric: true,
+      rating: 3.5,
+      user_ratings_total: 112,
+      formatted_phone_number: '+91 98765 11111',
+      formatted_address: '555 Public Road, Central District, City',
+      opening_hours: { isOpen: () => true },
+      types: ['pharmacy', 'health', 'government'],
+      photoUrl: 'https://images.unsplash.com/photo-1583912267550-d6cc57ba3abb?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&h=200&q=80',
+      website: 'https://example.com/govt-medical'
+    },
+    {
+      id: 'pharmacy-6',
+      name: 'Apollo Pharmacy',
+      vicinity: '777 Market St, Business District',
+      position: { 
+        lat: userLocation.lat - 0.015, 
+        lng: userLocation.lng + 0.002 
+      },
+      isGeneric: false,
+      rating: 4.8,
+      user_ratings_total: 256,
+      formatted_phone_number: '+91 98765 22222',
+      formatted_address: '777 Market Street, Business District, City',
+      opening_hours: { isOpen: () => true },
+      types: ['pharmacy', 'health', 'store'],
+      photoUrl: 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&h=200&q=80',
+      website: 'https://example.com/apollo'
+    },
+    {
+      id: 'pharmacy-7',
+      name: 'Affordable Meds',
+      vicinity: '888 Economy Lane, Suburb',
+      position: { 
+        lat: userLocation.lat + 0.018, 
+        lng: userLocation.lng - 0.012 
+      },
+      isGeneric: true,
+      rating: 4.0,
+      user_ratings_total: 67,
+      formatted_phone_number: '+91 98765 33333',
+      formatted_address: '888 Economy Lane, Suburban Area, City',
+      opening_hours: { isOpen: () => true },
+      types: ['pharmacy', 'health', 'store'],
+      photoUrl: 'https://images.unsplash.com/photo-1583912267220-e1a2a5c4da52?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&h=200&q=80',
+      website: 'https://example.com/affordable-meds'
+    },
+    {
+      id: 'pharmacy-8',
+      name: 'Premium Health Center',
+      vicinity: '999 Luxury Ave, Uptown',
+      position: { 
+        lat: userLocation.lat - 0.012, 
+        lng: userLocation.lng - 0.018 
+      },
+      isGeneric: false,
+      rating: 4.9,
+      user_ratings_total: 312,
+      formatted_phone_number: '+91 98765 44444',
+      formatted_address: '999 Luxury Avenue, Uptown District, City',
+      opening_hours: { isOpen: () => true },
+      types: ['pharmacy', 'health', 'store'],
+      photoUrl: 'https://images.unsplash.com/photo-1631549916768-4119b4123a21?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&h=200&q=80',
+      website: 'https://example.com/premium-health'
+    }
+  ];
+  
+  return pharmacies;
+};
+
 const PharmacyLocatePage = () => {
   const [userLocation, setUserLocation] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -31,7 +185,6 @@ const PharmacyLocatePage = () => {
   const infoWindowRef = useRef(null);
   const apiLoadedRef = useRef(false);
   const mapInitializedRef = useRef(false);
-  const placesServiceRef = useRef(null);
   
   // Connect to the loading system
   usePageLoading(loading, 'pharmacy-locate-page');
@@ -51,7 +204,7 @@ const PharmacyLocatePage = () => {
     
     // Create script element
     const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=places`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}`;
     script.async = true;
     script.defer = true;
     
@@ -108,53 +261,15 @@ const PharmacyLocatePage = () => {
     getUserLocation();
   }, [userLocation]);
   
-  // Function to check if a pharmacy is likely to be generic
-  const isGenericPharmacy = (pharmacy) => {
-    if (!pharmacy) return false;
+  // Generate simulated pharmacy data when user location changes
+  useEffect(() => {
+    if (!userLocation) return;
     
-    const nameAndVicinity = `${pharmacy.name} ${pharmacy.vicinity || ''} ${pharmacy.types?.join(' ') || ''}`.toLowerCase();
-    
-    // Check if any generic keywords are in the name or vicinity
-    return GENERIC_KEYWORDS.some(keyword => nameAndVicinity.includes(keyword.toLowerCase())) ||
-           // Check if rating is lower (often indicates more affordable options)
-           (pharmacy.rating && pharmacy.rating < 3.5) ||
-           // Check if it's a government pharmacy
-           (pharmacy.types && pharmacy.types.includes('health'));
-  };
-  
-  // Search for nearby pharmacies using Places API
-  const searchNearbyPharmacies = (map, location) => {
-    if (!window.google?.maps || !location) return;
-    
-    // Create Places service if it doesn't exist
-    if (!placesServiceRef.current) {
-      placesServiceRef.current = new window.google.maps.places.PlacesService(map);
-    }
-    
-    const request = {
-      location: location,
-      radius: 5000, // 5km radius
-      type: 'pharmacy',
-      keyword: 'pharmacy medical store drugstore'
-    };
-    
-    placesServiceRef.current.nearbySearch(request, (results, status) => {
-      if (status === window.google.maps.places.PlacesServiceStatus.OK) {
-        // Process results and identify generic pharmacies
-        const processedPharmacies = results.map(place => ({
-          ...place,
-          isGeneric: isGenericPharmacy(place)
-        }));
-        
-        setPharmacies(processedPharmacies);
-        setLoading(false);
-      } else {
-        console.error('Error fetching nearby pharmacies:', status);
-        setError('Failed to find nearby pharmacies. Please try again.');
-        setLoading(false);
-      }
-    });
-  };
+    // Generate simulated pharmacy data
+    const simulatedPharmacies = generatePharmacies(userLocation);
+    setPharmacies(simulatedPharmacies);
+    setLoading(false);
+  }, [userLocation]);
   
   // Initialize map when container is ready, API is loaded, and we have user location
   useEffect(() => {
@@ -213,9 +328,6 @@ const PharmacyLocatePage = () => {
         });
         markersRef.current.push(userMarker);
         
-        // Search for nearby pharmacies
-        searchNearbyPharmacies(map, userLocation);
-        
         mapInitializedRef.current = true;
         setMapStatus('ready');
       } catch (error) {
@@ -261,16 +373,11 @@ const PharmacyLocatePage = () => {
     
     // Add pharmacy markers
     filteredPharmacies.forEach(pharmacy => {
-      if (!pharmacy.geometry?.location) return;
-      
-      const position = {
-        lat: pharmacy.geometry.location.lat(),
-        lng: pharmacy.geometry.location.lng()
-      };
+      if (!pharmacy.position) return;
       
       // Create marker
       const marker = new window.google.maps.Marker({
-        position: position,
+        position: pharmacy.position,
         map: mapInstanceRef.current,
         title: pharmacy.name,
         animation: window.google.maps.Animation.DROP,
@@ -289,54 +396,34 @@ const PharmacyLocatePage = () => {
           infoWindowRef.current.close();
         }
         
-        // Get additional details for the pharmacy
-        const getPlaceDetails = () => {
-          const request = {
-            placeId: pharmacy.place_id,
-            fields: ['name', 'formatted_address', 'formatted_phone_number', 'opening_hours', 'photos', 'rating', 'website']
-          };
-          
-          placesServiceRef.current.getDetails(request, (place, status) => {
-            if (status === window.google.maps.places.PlacesServiceStatus.OK) {
-              // Update selected pharmacy with details
-              setSelectedPharmacy({
-                ...pharmacy,
-                ...place,
-                photoUrl: place.photos && place.photos.length > 0 
-                  ? place.photos[0].getUrl({ maxWidth: 300, maxHeight: 200 })
-                  : null
-              });
-              
-              // Create info window content
-              const content = `
-                <div style="padding: 10px; max-width: 300px;">
-                  <h3 style="margin-top: 0; color: ${pharmacy.isGeneric ? '#2e7d32' : '#d32f2f'};">
-                    ${pharmacy.name} ${pharmacy.isGeneric ? '(Generic)' : ''}
-                  </h3>
-                  <p style="margin: 5px 0;">${pharmacy.vicinity || ''}</p>
-                  ${pharmacy.rating ? `<p style="margin: 5px 0;">Rating: ${pharmacy.rating} ⭐</p>` : ''}
-                  <p style="margin: 5px 0; font-size: 0.9em; color: #666;">Click for more details</p>
-                </div>
-              `;
-              
-              // Set info window content and open
-              infoWindowRef.current.setContent(content);
-              infoWindowRef.current.open(mapInstanceRef.current, marker);
-              
-              // Animate marker
-              if (marker.getAnimation() !== null) {
-                marker.setAnimation(null);
-              } else {
-                marker.setAnimation(window.google.maps.Animation.BOUNCE);
-                setTimeout(() => {
-                  marker.setAnimation(null);
-                }, 1500);
-              }
-            }
-          });
-        };
+        // Update selected pharmacy
+        setSelectedPharmacy(pharmacy);
         
-        getPlaceDetails();
+        // Create info window content
+        const content = `
+          <div style="padding: 10px; max-width: 300px;">
+            <h3 style="margin-top: 0; color: ${pharmacy.isGeneric ? '#2e7d32' : '#d32f2f'};">
+              ${pharmacy.name} ${pharmacy.isGeneric ? '(Generic)' : ''}
+            </h3>
+            <p style="margin: 5px 0;">${pharmacy.vicinity || ''}</p>
+            ${pharmacy.rating ? `<p style="margin: 5px 0;">Rating: ${pharmacy.rating} ⭐</p>` : ''}
+            <p style="margin: 5px 0; font-size: 0.9em; color: #666;">Click for more details</p>
+          </div>
+        `;
+        
+        // Set info window content and open
+        infoWindowRef.current.setContent(content);
+        infoWindowRef.current.open(mapInstanceRef.current, marker);
+        
+        // Animate marker
+        if (marker.getAnimation() !== null) {
+          marker.setAnimation(null);
+        } else {
+          marker.setAnimation(window.google.maps.Animation.BOUNCE);
+          setTimeout(() => {
+            marker.setAnimation(null);
+          }, 1500);
+        }
       });
       
       markersRef.current.push(marker);

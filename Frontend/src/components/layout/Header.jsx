@@ -30,7 +30,6 @@ import {
   Dashboard as DashboardIcon,
   Help as HelpIcon,
   Widgets as FeaturesIcon,
-  Search as SearchIcon,
   LightMode as LightModeIcon,
   ExitToApp,
   MarkEmailRead as VerifyEmailIcon
@@ -41,6 +40,7 @@ import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
 import './Header.css';
 import { useAuth } from '../../context/AuthContext';
 import { logout } from '../../services/authService';
+import LanguageSelector from '../ui/LanguageSelector';
 
 const Header = () => {
   const theme = useTheme();
@@ -56,10 +56,6 @@ const Header = () => {
   // State for header shadow (on scroll)
   const [scrolled, setScrolled] = useState(false);
   
-  // State for language menu
-  const [languageAnchorEl, setLanguageAnchorEl] = useState(null);
-  const languageMenuOpen = Boolean(languageAnchorEl);
-  
   // State for user menu
   const [userAnchorEl, setUserAnchorEl] = useState(null);
   const userMenuOpen = Boolean(userAnchorEl);
@@ -71,18 +67,6 @@ const Header = () => {
     { name: 'Dashboard', path: '/dashboard' },
     { name: 'Contact', path: '/contact' }
   ];
-
-  // Language options - Indian languages
-  const languages = ['English', 'Hindi', 'Bengali', 'Telugu', 'Marathi', 'Tamil', 'Gujarati', 'Kannada'];
-
-  // Handle language menu
-  const handleLanguageMenuOpen = (event) => {
-    setLanguageAnchorEl(event.currentTarget);
-  };
-
-  const handleLanguageMenuClose = () => {
-    setLanguageAnchorEl(null);
-  };
 
   // Handle user menu
   const handleUserMenuOpen = (event) => {
@@ -214,7 +198,7 @@ const Header = () => {
             }}
           >
             <ListItemText 
-              primary={item.name} 
+              primary={<Typography>{item.name}</Typography>} 
               sx={{ 
                 textAlign: 'center',
                 '& .MuiTypography-root': {
@@ -378,7 +362,10 @@ const Header = () => {
               display: { xs: 'none', md: 'flex' }, 
               position: 'absolute',
               left: '50%',
-              transform: 'translateX(-50%)'
+              transform: 'translateX(-50%)',
+              width: 'auto',
+              maxWidth: '40%',
+              justifyContent: 'center'
             }}
             component={motion.div}
             initial={{ opacity: 0, y: -10 }}
@@ -393,9 +380,9 @@ const Header = () => {
                 className={location.pathname === item.path ? 'nav-button active' : 'nav-button'}
                 sx={{ 
                   color: location.pathname === item.path ? 'primary.main' : 'text.primary',
-                  mx: 0.5,
-                  px: 2,
-                  py: 1,
+                  mx: 0.3,
+                  px: 1,
+                  py: 0.8,
                   borderRadius: '8px',
                   fontWeight: 500,
                   bgcolor: location.pathname === item.path ? 'rgba(103, 194, 124, 0.08)' : 'transparent',
@@ -409,7 +396,7 @@ const Header = () => {
                   }
                 }}
               >
-                {item.name}
+                <Typography>{item.name}</Typography>
               </Button>
             ))}
           </Box>
@@ -418,7 +405,8 @@ const Header = () => {
           <Box 
             sx={{ 
               display: 'flex', 
-              alignItems: 'center' 
+              alignItems: 'center',
+              ml: 'auto'
             }}
             component={motion.div}
             initial={{ opacity: 0, x: 20 }}
@@ -427,104 +415,22 @@ const Header = () => {
           >
             {!isMobile && (
               <>
-                <Tooltip title="Search">
-                  <IconButton 
-                    color="primary" 
-                    sx={{ 
-                      mr: 1,
-                      borderRadius: '8px',
-                      '&:hover': {
-                        bgcolor: 'rgba(103, 194, 124, 0.08)'
-                      }
-                    }}
-                  >
-                    <SearchIcon />
-                  </IconButton>
-                </Tooltip>
-                
-                <Tooltip title="Language">
-              <IconButton
-                    color="primary"
-                onClick={handleLanguageMenuOpen}
-                aria-controls={languageMenuOpen ? 'language-menu' : undefined}
-                aria-haspopup="true"
-                aria-expanded={languageMenuOpen ? 'true' : undefined}
-                    sx={{ 
-                      mr: 1,
-                      borderRadius: '8px',
-                      '&:hover': {
-                        bgcolor: 'rgba(103, 194, 124, 0.08)'
-                      }
-                    }}
-              >
-                <LanguageIcon />
-              </IconButton>
-            </Tooltip>
-            <Menu
-              id="language-menu"
-              anchorEl={languageAnchorEl}
-              open={languageMenuOpen}
-              onClose={handleLanguageMenuClose}
-              MenuListProps={{
-                'aria-labelledby': 'language-button',
-                className: 'custom-scrollbar'
-              }}
-              PaperProps={{
-                    elevation: 3,
-                    sx: {
-                      mt: 1.5,
-                      overflow: 'visible',
-                      borderRadius: '10px',
-                      border: '1px solid rgba(0, 128, 128, 0.1)',
-                      '&:before': {
-                        content: '""',
-                        display: 'block',
-                        position: 'absolute',
-                        top: 0,
-                        right: 14,
-                        width: 10,
-                        height: 10,
-                        bgcolor: 'background.paper',
-                        transform: 'translateY(-50%) rotate(45deg)',
-                        zIndex: 0,
-                        borderTop: '1px solid rgba(0, 128, 128, 0.1)',
-                        borderLeft: '1px solid rgba(0, 128, 128, 0.1)',
-                      },
-                    },
-                  }}
-                  transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-                  anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-                  className="dropdown-animation"
-                >
-                  {languages.map((lang) => (
-                    <MenuItem 
-                      key={lang} 
-                      onClick={handleLanguageMenuClose}
-                      sx={{
-                        py: 1,
-                        px: 2,
-                        '&:hover': {
-                          bgcolor: 'rgba(103, 194, 124, 0.08)',
-                        },
-                      }}
-                    >
-                      {lang}
-                </MenuItem>
-              ))}
-            </Menu>
+                <LanguageSelector />
 
                 <Tooltip title="Toggle Theme">
                   <IconButton 
                     color="primary"
+                    size="small"
                     sx={{ 
-                      mr: 2,
+                      mr: 1,
+                      p: 0.8,
                       borderRadius: '8px',
                       '&:hover': {
                         bgcolor: 'rgba(103, 194, 124, 0.08)'
                       }
                     }}
                   >
-                    <LightModeIcon />
+                    <LightModeIcon fontSize="small" />
                   </IconButton>
                 </Tooltip>
               </>
