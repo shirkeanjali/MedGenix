@@ -5,11 +5,24 @@ import cookieParser from 'cookie-parser';
 import connectDB from './config/mongodb.js';
 import authRouter from './routes/authRoutes.js';
 import userRouter from './routes/userRoutes.js';
+import prescriptionRouter from './routes/prescriptionRoutes.js';
 import session from 'express-session';
+import mongoose from 'mongoose';
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 8000;
+
+// Create uploads directory if it doesn't exist
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir);
+}
 
 // Connect to MongoDB
 connectDB();
@@ -36,10 +49,10 @@ app.use(
 // Middlewares
 app.use(express.json());
 app.use(cookieParser());
+app.use(express.urlencoded({ extended: true }));
 
 // Explicitly handle OPTIONS requests for preflight
 app.options('*', cors());
-
 
 // Test route
 app.get('/', (req, res) => {
@@ -49,6 +62,7 @@ app.get('/', (req, res) => {
 // Routes
 app.use('/api/auth', authRouter);
 app.use('/api/user', userRouter);
+app.use('/api/prescriptions', prescriptionRouter);
 
 // Error handling
 app.use((err, req, res, next) => {

@@ -9,12 +9,10 @@ import Footer from './components/layout/Footer';
 import SplineBackground from './components/ui/SplineBackground';
 import SignUpPage from './pages/SignUpPage';
 import LoginPage from './pages/LoginPage';
-import EmailVerificationPage from './pages/EmailVerificationPage';
 import OtpVerificationPage from './pages/OtpVerificationPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
-import Dashboard from './pages/Dashboard';
 import EmailVerifyPage from './pages/EmailVerifyPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import DashboardPage from './pages/DashboardPage';
@@ -23,6 +21,7 @@ import GenericMedicineDetailPage from './pages/GenericMedicineDetailPage';
 import PharmacyLocatePage from './pages/PharmacyLocatePage';
 import HowItWorksPage from './pages/HowItWorksPage';
 import FAQPage from './pages/FAQPage';
+import PrescriptionScannerPage from './pages/PrescriptionScannerPage';
 
 // Create a theme with teal as the primary color
 const theme = createTheme({
@@ -195,13 +194,14 @@ function App() {
               <Route path="/forgot-password" element={<ForgotPasswordPage />} />
               <Route path="/otp-verification" element={<OtpVerificationPage />} />
               <Route path="/reset-password" element={<ResetPasswordPage />} />
+              <Route path="/upload-prescription" element={<PrescriptionScannerPage />} />
               <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/medicine/:id" element={<MedicineDetailPage />} />
-            <Route path="/generic/medicine/:id" element={<GenericMedicineDetailPage />} />
-            <Route path="/pharmacy-locate" element={<PharmacyLocatePage />} />
-            <Route path="/how-it-works" element={<HowItWorksPage />} />
-            <Route path="/faq" element={<FAQPage />} />
-          </Routes>
+              <Route path="/medicine/:id" element={<MedicineDetailPage />} />
+              <Route path="/generic/medicine/:id" element={<GenericMedicineDetailPage />} />
+              <Route path="/pharmacy-locate" element={<PharmacyLocatePage />} />
+              <Route path="/how-it-works" element={<HowItWorksPage />} />
+              <Route path="/faq" element={<FAQPage />} />
+            </Routes>
           </Box>
         </BrowserRouter>
       </AuthProvider>

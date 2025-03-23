@@ -220,9 +220,9 @@ const LoginPage = () => {
         setSuccess(response.message);
         // Update auth context with user data
         loginContext(response.user);
-        // Redirect to home page after successful login
+        // Redirect to dashboard page after successful login
         setTimeout(() => {
-          navigate('/');
+          navigate('/dashboard');
         }, 1000);
       } catch (err) {
         setError(err.message || 'Login failed');
@@ -242,9 +242,9 @@ const LoginPage = () => {
         setSuccess(response.message);
         // Update auth context with user data
         loginContext(response.user);
-        // Redirect to home page after successful login
+        // Redirect to dashboard page after successful login
         setTimeout(() => {
-          navigate('/');
+          navigate('/dashboard');
         }, 1000);
       } catch (err) {
         setError(err.message || 'OTP verification failed');
