@@ -17,6 +17,10 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Dashboard from './pages/Dashboard';
 import EmailVerifyPage from './pages/EmailVerifyPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import DashboardPage from './pages/DashboardPage';
+import MedicineDetailPage from './pages/MedicineDetailPage';
+import GenericMedicineDetailPage from './pages/GenericMedicineDetailPage';
+import PharmacyLocatePage from './pages/PharmacyLocatePage';
 
 // Create a theme with teal as the primary color
 const theme = createTheme({
@@ -179,15 +183,11 @@ function App() {
               <Route path="/forgot-password" element={<ForgotPasswordPage />} />
               <Route path="/otp-verification" element={<OtpVerificationPage />} />
               <Route path="/reset-password" element={<ResetPasswordPage />} />
-              <Route
-                path="/dashboard"
-                element={
-                  <ProtectedRoute>
-                    <Dashboard />
-                  </ProtectedRoute>
-                }
-              />
-            </Routes>
+              <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/medicine/:id" element={<MedicineDetailPage />} />
+            <Route path="/generic/medicine/:id" element={<GenericMedicineDetailPage />} />
+            <Route path="/pharmacy-locate" element={<PharmacyLocatePage />} />
+          </Routes>
           </Box>
         </BrowserRouter>
       </AuthProvider>
