@@ -2,6 +2,61 @@
 
 MedGenix is an AI-powered Prescription Scanner & Generic Medicine Recommender. This platform helps users scan prescriptions using OCR (Optical Character Recognition) and provides cost-effective generic alternatives to prescribed medicines. 🏥📸
 
+## Demo video 
+```bash
+ https://drive.google.com/file/d/14s7C3Ej0nvG8bn8b3swybiJ3BHdwc3pf/view?usp=sharing 
+```
+
+## Folder Structure
+```bash
+📁 Frontend/
+├── 📁 node_modules/
+├── 📁 public/
+│   └── 📁 images/
+├── 📁 src/
+│   ├── 📁 components/
+│   │   └── 📁 layout/
+│   ├── 📁 context/
+│   ├── 📁 pages/
+│   ├── 📁 services/
+│   └── 📁 utils/
+├── .env
+├── .gitignore
+├── eslint.config.js
+├── index.html
+├── package.json
+├── package-lock.json
+├── README.md
+└── vite.config.js
+
+📁 Backend/
+├── 📁 config/
+├── 📁 controllers/
+├── 📁 logs/
+├── 📁 middleware/
+├── 📁 models/
+├── 📁 node_modules/
+├── 📁 routes/
+├── 📁 services/
+├── 📁 uploads/
+├── 📁 utils/
+├── .env
+├── .gitignore
+├── package.json
+├── package-lock.json
+├── server.js
+├── testEnv.js
+└── testPharmacyApi.js
+
+📁 ML_Backend/
+├── 📁 app/
+├── .gitignore
+├── Dockerfile
+├── generics_cache.json
+├── README.md
+└── requirements.txt
+```
+
 ## Features ✨
 - 📷 **Prescription Scanning**: Upload prescriptions, and MedGenix extracts medicine details using OCR.
 - 💰 **Generic Alternatives**: Find affordable generic substitutes for branded medicines.
