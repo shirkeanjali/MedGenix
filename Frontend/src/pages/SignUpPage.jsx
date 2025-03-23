@@ -172,7 +172,7 @@ const SignupPage = () => {
         flexDirection: 'column',
         position: 'relative',
         overflow: 'hidden',
-        background: 'linear-gradient(135deg, #006666 0%, #008080 50%, #00a0a0 100%)',
+        background: 'white',
       }}
     >
       <Header />
@@ -183,9 +183,24 @@ const SignupPage = () => {
           alignItems: 'center',
           justifyContent: 'center',
           py: { xs: 4, md: 8 },
+          position: 'relative',
+          backgroundImage: 'url("https://thumbs.dreamstime.com/b/pharmacist-black-woman-medicine-counter-pharmacy-druggist-stands-opposite-shelves-medicines-points-to-drug-flat-78490316.jpg")',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'white',
+            opacity: 0.4,
+            zIndex: 1,
+          }
         }}
       >
-        <Container maxWidth="sm">
+        <Container maxWidth="sm" sx={{ position: 'relative', zIndex: 2 }}>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}

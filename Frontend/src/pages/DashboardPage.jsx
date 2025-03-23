@@ -145,19 +145,19 @@ const StyledAvatar = styled(Avatar)(({ theme }) => ({
   height: 64,
   marginRight: theme.spacing(2),
   boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-  border: `2px solid ${theme.palette.primary.main}`,
+  border: '2px solid #008080',
 }));
 
 const StyledIconAvatar = styled(Avatar)(({ theme }) => ({
-  backgroundColor: 'rgba(0, 128, 128, 0.1)',
-  color: theme.palette.primary.main,
+  backgroundColor: 'rgba(103, 194, 124, 0.15)',
+  color: '#008080',
   width: 50,
   height: 50,
   boxShadow: '0 4px 10px rgba(0, 0, 0, 0.08)',
 }));
 
 const VisibilityIconButton = styled(IconButton)(({ theme }) => ({
-  backgroundColor: 'rgba(0, 128, 128, 0.1)',
+  backgroundColor: 'rgba(103, 194, 124, 0.1)',
   '&:hover': {
     backgroundColor: 'rgba(0, 128, 128, 0.2)',
   },
@@ -379,10 +379,24 @@ const DashboardPage = () => {
         sx={{
           flex: 1,
           py: { xs: 4, md: 5 },
-          px: { xs: 2, sm: 3, md: 4 }
+          px: { xs: 2, sm: 3, md: 4 },
+          position: 'relative',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: '100%',
+            backgroundImage: 'url(https://plus.unsplash.com/premium_photo-1664476984010-46bb839845f3?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTd8fG1lZGljYWwlMjBlcXVpcG1lbnR8ZW58MHx8MHx8fDA%3D)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            opacity: 0.3,
+            zIndex: 0,
+          }
         }}
       >
-        <Container maxWidth="xl">
+        <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
           {/* Welcome Section - Personalized Greeting & Profile Card */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -407,11 +421,7 @@ const DashboardPage = () => {
                     sx={{ 
                       fontWeight: 700,
                       mb: 1,
-                      background: 'linear-gradient(90deg, #006666 0%, #008080 50%, #00a0a0 100%)',
-                      backgroundClip: 'text',
-                      textFillColor: 'transparent',
-                      WebkitBackgroundClip: 'text',
-                      WebkitTextFillColor: 'transparent',
+                      color: '#008080',
                       display: 'inline-block',
                     }}
                     component={motion.h1}
@@ -423,7 +433,7 @@ const DashboardPage = () => {
                   </Typography>
                   <Typography 
                     variant="body1" 
-                    color="text.secondary"
+                    color="#333333"
                     component={motion.p}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -441,7 +451,7 @@ const DashboardPage = () => {
                         left: 0,
                         width: '40px',
                         height: '3px',
-                        backgroundColor: 'primary.main',
+                        backgroundColor: '#67c27c',
                         borderRadius: '2px',
                       }
                     }}
@@ -462,19 +472,21 @@ const DashboardPage = () => {
                   >
                     <Button
                       variant="contained"
-                      color="primary"
-                      startIcon={<Add />}
                       sx={{ 
                         mr: 2,
                         px: 3,
                         py: 1.2,
+                        backgroundColor: '#008080',
+                        color: 'white',
                         boxShadow: '0 4px 12px rgba(0, 128, 128, 0.3)',
                         '&:hover': {
-                          boxShadow: '0 6px 16px rgba(0, 128, 128, 0.4)',
+                          backgroundColor: '#67c27c',
+                          boxShadow: '0 6px 16px rgba(103, 194, 124, 0.4)',
                           transform: 'translateY(-2px)',
                         },
                         transition: 'all 0.3s ease',
                       }}
+                      startIcon={<Add />}
                     >
                       Scan New Prescription
                     </Button>
@@ -505,7 +517,7 @@ const DashboardPage = () => {
                       right: 0,
                       height: '100%',
                       opacity: 0.05,
-                      background: 'radial-gradient(circle at 30% 30%, rgba(0, 128, 128, 0.4) 0%, rgba(0, 128, 128, 0) 70%)',
+                      background: 'radial-gradient(circle at 30% 30%, rgba(103, 194, 124, 0.4) 0%, rgba(0, 128, 128, 0) 70%)',
                       zIndex: 0,
                     }}
                     component={motion.div}
@@ -637,7 +649,7 @@ const DashboardPage = () => {
                           component="div" 
                           sx={{ 
                             fontWeight: 700,
-                            color: 'primary.main',
+                            color: '#008080',
                           }}
                         >
                           ₹{totalSavings}
@@ -700,7 +712,7 @@ const DashboardPage = () => {
                           component="div" 
                           sx={{ 
                             fontWeight: 700,
-                            color: 'primary.main',
+                            color: '#008080',
                           }}
                         >
                           {totalPrescriptions}
@@ -763,7 +775,7 @@ const DashboardPage = () => {
                           component="div" 
                           sx={{ 
                             fontWeight: 700,
-                            color: 'primary.main',
+                            color: '#008080',
                           }}
                         >
                           {totalMedicines}
@@ -841,7 +853,7 @@ const DashboardPage = () => {
                         >
                           <defs>
                             <linearGradient id="colorSavings" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor="#008080" stopOpacity={0.8}/>
+                              <stop offset="5%" stopColor="#67c27c" stopOpacity={0.8}/>
                               <stop offset="95%" stopColor="#008080" stopOpacity={0.1}/>
                             </linearGradient>
                           </defs>
