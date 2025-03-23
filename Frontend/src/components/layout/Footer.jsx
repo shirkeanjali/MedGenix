@@ -31,11 +31,11 @@ const Footer = () => {
     {
       title: 'Quick Links',
       links: [
-        { name: 'Home', url: '#' },
-        { name: 'How It Works', url: '#' },
+        { name: 'Home', url: '/' },
+        { name: 'How It Works', url: '/how-it-works' },
         { name: 'About Us', url: '#' },
         { name: 'Blog', url: '#' },
-        { name: 'FAQ', url: '#' },
+        { name: 'FAQ', url: '/faq' },
         { name: 'Contact Us', url: '#' },
       ],
     },
@@ -106,7 +106,7 @@ const Footer = () => {
                   src="/images/MedGenix Logo.png"
                   alt="MedGenix Logo"
                   sx={{ 
-                    height: 32,
+                    height: 40,
                     mr: 1.5,
                     objectFit: 'contain'
                   }}
@@ -116,6 +116,7 @@ const Footer = () => {
                   component="div" 
                   sx={{ 
                     fontWeight: 700,
+                    fontSize: '1.6rem',
                     backgroundImage: 'linear-gradient(to bottom, #67c27c, #008080)',
                     backgroundClip: 'text',
                     WebkitBackgroundClip: 'text',

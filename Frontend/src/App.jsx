@@ -9,6 +9,8 @@ import Footer from './components/layout/Footer';
 import SplineBackground from './components/ui/SplineBackground';
 import SignUpPage from './pages/SignUpPage';
 import LoginPage from './pages/LoginPage';
+import HowItWorksPage from './pages/HowItWorksPage';
+import FAQPage from './pages/FAQPage';
 
 // Create a theme with teal as the primary color
 const theme = createTheme({
@@ -135,9 +137,10 @@ const HomePage = () => {
           position: 'relative',
           backgroundColor: 'transparent',
           zIndex: 2,
-          mt: 0,
+          mt: 0, // Reset margin to 0 since we're controlling spacing in the Features component
           pt: 0,
           borderTop: 'none',
+          overflow: 'visible',
         }}>
           {/* Features Section */}
           <FeaturesSection />
@@ -166,6 +169,8 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/signup" element={<SignUpPage />} />
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/how-it-works" element={<HowItWorksPage />} />
+            <Route path="/faq" element={<FAQPage />} />
           </Routes>
         </Box>
       </BrowserRouter>

@@ -61,6 +61,7 @@ const Header = () => {
   // Navigation items with icons
   const navItems = [
     { name: 'Home', path: '/' },
+    { name: 'How It Works', path: '/how-it-works' },
     { name: 'Dashboard', path: '/dashboard' },
     { name: 'Contact', path: '/contact' }
   ];
@@ -123,7 +124,7 @@ const Header = () => {
           src="/images/MedGenix Logo.png"
           alt="MedGenix Logo"
           sx={{ 
-            height: 40, 
+            height: 50, 
             mb: 1,
             objectFit: 'contain',
             border: 'none'
@@ -131,6 +132,7 @@ const Header = () => {
         />
         <Typography variant="h6" sx={{ 
             fontWeight: 700,
+            fontSize: '1.5rem',
             backgroundImage: 'linear-gradient(to bottom, #67c27c, #008080)',
             backgroundClip: 'text',
             WebkitBackgroundClip: 'text',
@@ -250,7 +252,7 @@ const Header = () => {
           {/* Left section with brand and tagline */}
           <Box 
             sx={{ 
-              display: 'flex', 
+            display: 'flex', 
               alignItems: 'center' 
             }}
             component={motion.div}
@@ -263,7 +265,7 @@ const Header = () => {
               src="/images/MedGenix Logo.png"
               alt="MedGenix Logo"
               sx={{ 
-                height: { xs: 30, md: 36 }, 
+                height: { xs: 36, md: 44 }, 
                 mr: 1.5,
                 objectFit: 'contain',
                 border: 'none'
@@ -282,7 +284,7 @@ const Header = () => {
                 WebkitBackgroundClip: 'text',
                 color: 'transparent',
                 textDecoration: 'none',
-                fontSize: { xs: '1.2rem', md: '1.5rem' },
+                fontSize: { xs: '1.4rem', md: '1.8rem' },
                 position: 'relative',
                 '&:hover .letter': {
                   animation: 'letterHover 0.5s ease forwards',
@@ -316,23 +318,30 @@ const Header = () => {
             </Typography>
             {!isSmall && (
               <>
-                <Divider orientation="vertical" flexItem sx={{ mx: 1.5, height: '24px' }} />
-                <Typography
+            <Divider orientation="vertical" flexItem sx={{ 
+                  mx: 1.5, 
+                  height: '24px',
+              alignSelf: 'center',
+                  mt: 1,
+            }} />
+            <Typography
                   variant="subtitle2"
-                  sx={{
+              sx={{
                     color: 'text.secondary',
                     fontWeight: 400,
-                  }}
-                >
-                  Where Health Meets Affordability
-                </Typography>
+                    alignSelf: 'center',
+                    mt: 1,
+              }}
+            >
+              Where Health Meets Affordability
+            </Typography>
               </>
             )}
           </Box>
 
           {/* Center section with navigation */}
           <Box 
-            sx={{ 
+            sx={{
               display: { xs: 'none', md: 'flex' }, 
               position: 'absolute',
               left: '50%',
@@ -344,7 +353,7 @@ const Header = () => {
             transition={{ duration: 0.5, delay: 0.1 }}
           >
             {navItems.map((item, index) => (
-              <Button 
+              <Button
                 key={item.name} 
                 component={RouterLink}
                 to={item.path}
@@ -401,12 +410,12 @@ const Header = () => {
                 </Tooltip>
                 
                 <Tooltip title="Language">
-                  <IconButton 
+              <IconButton
                     color="primary"
-                    onClick={handleLanguageMenuOpen}
-                    aria-controls={languageMenuOpen ? 'language-menu' : undefined}
-                    aria-haspopup="true"
-                    aria-expanded={languageMenuOpen ? 'true' : undefined}
+                onClick={handleLanguageMenuOpen}
+                aria-controls={languageMenuOpen ? 'language-menu' : undefined}
+                aria-haspopup="true"
+                aria-expanded={languageMenuOpen ? 'true' : undefined}
                     sx={{ 
                       mr: 1,
                       borderRadius: '8px',
@@ -414,20 +423,20 @@ const Header = () => {
                         bgcolor: 'rgba(103, 194, 124, 0.08)'
                       }
                     }}
-                  >
-                    <LanguageIcon />
-                  </IconButton>
-                </Tooltip>
-                <Menu
-                  id="language-menu"
-                  anchorEl={languageAnchorEl}
-                  open={languageMenuOpen}
-                  onClose={handleLanguageMenuClose}
-                  MenuListProps={{
-                    'aria-labelledby': 'language-button',
-                    className: 'custom-scrollbar'
-                  }}
-                  PaperProps={{
+              >
+                <LanguageIcon />
+              </IconButton>
+            </Tooltip>
+            <Menu
+              id="language-menu"
+              anchorEl={languageAnchorEl}
+              open={languageMenuOpen}
+              onClose={handleLanguageMenuClose}
+              MenuListProps={{
+                'aria-labelledby': 'language-button',
+                className: 'custom-scrollbar'
+              }}
+              PaperProps={{
                     elevation: 3,
                     sx: {
                       mt: 1.5,
@@ -467,10 +476,10 @@ const Header = () => {
                       }}
                     >
                       {lang}
-                    </MenuItem>
-                  ))}
-                </Menu>
-                
+                </MenuItem>
+              ))}
+            </Menu>
+
                 <Tooltip title="Toggle Theme">
                   <IconButton 
                     color="primary"
@@ -490,12 +499,12 @@ const Header = () => {
             
             {isMobile ? (
               <>
-                <Button
+            <Button
                   variant="contained"
                   color="primary"
                   component={RouterLink}
                   to="/signup"
-                  sx={{
+              sx={{
                     mr: 2,
                     borderRadius: '8px',
                     fontWeight: 500,
@@ -504,17 +513,17 @@ const Header = () => {
                     backgroundColor: '#008080',
                     color: 'white',
                     transition: 'all 0.3s ease',
-                    '&:hover': {
+                '&:hover': {
                       backgroundColor: '#006666',
                       color: 'white',
                       transform: 'translateY(-3px) scale(1.02)',
                       boxShadow: '0 6px 15px rgba(0, 128, 128, 0.3)'
                     }
                   }}
-                >
-                  Sign Up
-                </Button>
-                <IconButton
+            >
+              Sign Up
+            </Button>
+              <IconButton
                   aria-label="open drawer"
                   edge="end"
                   onClick={handleDrawerToggle}
@@ -582,7 +591,7 @@ const Header = () => {
           </Box>
         </Toolbar>
       </Container>
-      
+
       {/* Mobile Navigation Drawer */}
       <Drawer
         variant="temporary"
@@ -591,7 +600,7 @@ const Header = () => {
         ModalProps={{
           keepMounted: true, // Better mobile performance
         }}
-        sx={{
+            sx={{
           display: { xs: 'block', md: 'none' },
           '& .MuiDrawer-paper': { boxSizing: 'border-box', width: 280 },
         }}

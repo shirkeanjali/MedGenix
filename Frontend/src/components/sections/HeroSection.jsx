@@ -19,13 +19,13 @@ const HeroSection = () => {
     <Box 
       component="section" 
       sx={{ 
-        height: '94vh',
+        height: '90vh',
         display: 'flex',
         alignItems: 'center',
         pt: { xs: 8, md: 0 },
         pb: { xs: 0, md: 0 },
         position: 'relative',
-        overflow: 'hidden',
+        overflow: 'visible',
         backgroundColor: 'transparent',
         width: '100%',
         maxWidth: '100%',
@@ -105,11 +105,12 @@ const HeroSection = () => {
               <Button 
                 variant="contained" 
                 size="large"
-                startIcon={<DocumentScannerIcon />}
+                startIcon={<DocumentScannerIcon sx={{ fontSize: '1.8rem' }} />}
                 sx={{ 
                   px: 3,
                   py: 1.5,
                   fontWeight: 600,
+                  fontSize: '1.2rem',
                   borderRadius: '8px',
                   backgroundColor: '#008080',
                   color: 'white',
@@ -127,11 +128,12 @@ const HeroSection = () => {
               <Button 
                 variant="outlined" 
                 size="large" 
-                startIcon={<InfoOutlinedIcon />}
+                startIcon={<InfoOutlinedIcon sx={{ fontSize: '1.8rem' }} />}
                 sx={{
                   px: 3,
                   py: 1.5,
                   fontWeight: 600,
+                  fontSize: '1.2rem',
                   borderRadius: '8px',
                   borderWidth: '2px',
                   color: 'white',

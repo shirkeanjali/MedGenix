@@ -71,24 +71,24 @@ const FeaturesSection = () => {
         pb: { xs: 8, md: 12 },
         position: 'relative',
         zIndex: 1,
-        marginTop: 0,
+        marginTop: '1px',
         '&::after': {
           content: '""',
           position: 'absolute',
           top: 0,
           left: 0,
           width: '100%',
-          height: '60px',
-          background: 'linear-gradient(to bottom, rgba(255,255,255,0.8), rgba(255,255,255,0))',
+          height: '0',
+          background: 'transparent',
           zIndex: 0,
         },
         '&::before': {
           content: '""',
           position: 'absolute',
-          top: '60px',
+          top: '0',
           left: 0,
           width: '100%',
-          height: 'calc(100% - 60px)',
+          height: '100%',
           backgroundImage: `url(${featureBackgroundImg})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
@@ -98,14 +98,13 @@ const FeaturesSection = () => {
         }
       }}
     >
-      <Container sx={{ pt: 3 }}>
+      <Container sx={{ pt: 4 }}>
         <Paper 
           elevation={0} 
           sx={{ 
             p: 4, 
             textAlign: 'center', 
             mb: 8, 
-            mt: 3,
             borderRadius: '16px',
             backgroundColor: 'rgba(255,255,255,0.95)', 
             backdropFilter: 'blur(10px)',
@@ -122,8 +121,8 @@ const FeaturesSection = () => {
             <Typography
               variant="h6"
               component="p"
-              color="primary"
-              sx={{ fontWeight: 600, mb: 1 }}
+              color="text.primary"
+              sx={{ fontWeight: 600, mb: 1, color: '#333333' }}
             >
               POWERFUL FEATURES
             </Typography>
