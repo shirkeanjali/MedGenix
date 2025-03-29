@@ -32,6 +32,11 @@ const userSchema = new mongoose.Schema(
         enum: ['local', 'google'],
         default: 'local'
     },
+    role: {
+      type: String,
+      enum: ['user', 'chemist'],
+      default: 'user'
+    },
     mobileNumber: {
       type: String,
       required: true,
@@ -44,7 +49,40 @@ const userSchema = new mongoose.Schema(
     loginOtpExpireAt: {
       type: Date,
       default: null,
-    }
+    },
+    prescriptions: [{
+      prescriptionId: {
+        type: String,
+        required: true,
+        unique: true
+      },
+      imageUrl: {
+        type: String,
+        required: true
+      },
+      medicines: [{
+        brand_name: {
+          type: String,
+          required: true
+        },
+        dosage: {
+          type: String,
+          default: ''
+        },
+        frequency: {
+          type: String,
+          default: ''
+        },
+        duration: {
+          type: String,
+          default: ''
+        }
+      }],
+      createdAt: {
+        type: Date,
+        default: Date.now
+      }
+    }]
   },
   {
     timestamps: true,
