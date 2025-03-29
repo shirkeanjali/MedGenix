@@ -13,13 +13,13 @@ import { useTheme } from '@mui/material/styles';
 import { motion } from 'framer-motion';
 
 // Import feature icons
-import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import CompareArrowsOutlinedIcon from '@mui/icons-material/CompareArrowsOutlined';
 import MedicationOutlinedIcon from '@mui/icons-material/MedicationOutlined';
 import TranslateOutlinedIcon from '@mui/icons-material/TranslateOutlined';
 import HistoryOutlinedIcon from '@mui/icons-material/HistoryOutlined';
+import DocumentScannerIcon from '@mui/icons-material/DocumentScanner';
 
 // Feature section background
 const featureBackgroundImg = 'https://www.medicaldevice-network.com/wp-content/uploads/sites/23/2021/02/shutterstock_544348294-1.jpg';
@@ -28,7 +28,7 @@ const features = [
   {
     title: 'Read Your Prescription',
     description: 'Smart OCR technology reads and processes your prescription accurately',
-    icon: <DescriptionOutlinedIcon fontSize="large" color="primary" />,
+    icon: <DocumentScannerIcon fontSize="large" color="primary" />,
   },
   {
     title: 'Chat Bot',
@@ -154,15 +154,38 @@ const FeaturesSection = () => {
           </motion.div>
         </Paper>
 
-        <Grid container spacing={isMobile ? 2 : 3}>
+        <Grid 
+          container 
+          spacing={isMobile ? 2 : 3}
+          sx={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: 'center',
+            alignItems: 'stretch',
+            width: '100%',
+            minHeight: '200px',
+          }}
+        >
           {features.map((feature, index) => (
-            <Grid item xs={12} sm={6} md={4} key={index} sx={{ display: 'flex' }}>
+            <Grid 
+              item 
+              xs={12} 
+              sm={6} 
+              md={4} 
+              key={index} 
+              sx={{ 
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'stretch',
+                minHeight: '200px',
+              }}
+            >
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                style={{ width: '100%' }}
+                style={{ width: '100%', minHeight: '200px' }}
               >
                 <Card
                   elevation={1}
@@ -176,6 +199,7 @@ const FeaturesSection = () => {
                     transition: 'all 0.4s ease',
                     backgroundColor: 'rgba(255, 255, 255, 0.97)',
                     backdropFilter: 'blur(10px)',
+                    minHeight: '200px',
                     '&:hover': {
                       boxShadow: '0 12px 28px rgba(0, 128, 128, 0.2)',
                       transform: 'translateY(-15px)',
@@ -191,6 +215,7 @@ const FeaturesSection = () => {
                       textAlign: 'center',
                       p: 3,
                       flexGrow: 1,
+                      minHeight: '200px',
                     }}
                   >
                     <Box

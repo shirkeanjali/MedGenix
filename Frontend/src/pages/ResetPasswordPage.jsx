@@ -151,7 +151,7 @@ const ResetPasswordPage = () => {
         flexDirection: 'column',
         position: 'relative',
         overflow: 'hidden',
-        background: 'white',
+        background: '#f7fdfd',
       }}
     >
       <Header />
@@ -163,9 +163,6 @@ const ResetPasswordPage = () => {
           justifyContent: 'center',
           py: { xs: 4, md: 8 },
           position: 'relative',
-          backgroundImage: 'url("https://thumbs.dreamstime.com/b/pharmacist-black-woman-medicine-counter-pharmacy-druggist-stands-opposite-shelves-medicines-points-to-drug-flat-78490316.jpg")',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
           '&::before': {
             content: '""',
             position: 'absolute',
@@ -173,13 +170,15 @@ const ResetPasswordPage = () => {
             left: 0,
             right: 0,
             bottom: 0,
-            background: 'white',
-            opacity: 0.4,
-            zIndex: 1,
+            backgroundImage: 'url(/images/pharmacist.jpg)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            opacity: 0.5,
+            zIndex: 0,
           }
         }}
       >
-        <Container maxWidth="sm" sx={{ position: 'relative', zIndex: 2 }}>
+        <Container maxWidth="sm" sx={{ position: 'relative', zIndex: 1 }}>
           <Box
             sx={{
               opacity: 1,
@@ -321,9 +320,7 @@ const ResetPasswordPage = () => {
           </Box>
         </Container>
       </Box>
-      <Box sx={{ background: 'rgba(255, 255, 255, 0.9)' }}>
-        <Footer />
-      </Box>
+      <Footer />
     </Box>
   );
 };

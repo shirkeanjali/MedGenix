@@ -58,7 +58,7 @@ const EmailVerifyPage = () => {
   useEffect(() => {
     if (!user) {
       navigate('/login');
-    } else if (user.isEmailVerified) {
+    } else if (user.isAccountVerified) {
       navigate('/dashboard');
     }
   }, [user, navigate]);
@@ -134,7 +134,7 @@ const EmailVerifyPage = () => {
         flexDirection: 'column',
         position: 'relative',
         overflow: 'hidden',
-        background: 'linear-gradient(135deg, #006666 0%, #008080 50%, #00a0a0 100%)',
+        background: '#f7fdfd',
       }}
     >
       <Header />
@@ -145,9 +145,23 @@ const EmailVerifyPage = () => {
           alignItems: 'center',
           justifyContent: 'center',
           py: { xs: 4, md: 8 },
+          position: 'relative',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundImage: 'url(/images/pharmacist.jpg)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            opacity: 0.2,
+            zIndex: 0,
+          }
         }}
       >
-        <Container maxWidth="sm">
+        <Container maxWidth="sm" sx={{ position: 'relative', zIndex: 1 }}>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -168,7 +182,7 @@ const EmailVerifyPage = () => {
                     color: 'primary.dark',
                   }}
                 >
-                  Verify Your Email
+                  Verify Your Account
                 </Typography>
                 <Typography
                   variant="body1"
@@ -233,11 +247,9 @@ const EmailVerifyPage = () => {
           </motion.div>
         </Container>
       </Box>
-      <Box sx={{ background: 'rgba(255, 255, 255, 0.9)' }}>
-        <Footer />
-      </Box>
+      <Footer />
     </Box>
   );
 };
 
-export default EmailVerifyPage;
+export default EmailVerifyPage; 
