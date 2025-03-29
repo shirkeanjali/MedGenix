@@ -44,7 +44,6 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 const ChemistDashboard = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [searchTerm, setSearchTerm] = useState('');
   const [selectedPrescription, setSelectedPrescription] = useState(null);
   const [prescriptions, setPrescriptions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -189,16 +188,6 @@ const ChemistDashboard = () => {
     }
   };
 
-  // Filter prescriptions based on search term
-  const filteredPrescriptions = prescriptions.filter(prescription => {
-    const matchesSearch = prescription.result.medicines.some(med => 
-      med.brand_name.toLowerCase().includes(searchTerm.toLowerCase())
-    ) || 
-    (prescription.result.patient_details?.name?.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    (prescription.result.doctor_name?.toLowerCase().includes(searchTerm.toLowerCase()));
-    return matchesSearch;
-  });
-
   // Calculate statistics
   const totalPrescriptions = prescriptions.length;
   const totalMedicines = prescriptions.reduce((total, prescription) => 
@@ -228,10 +217,10 @@ const ChemistDashboard = () => {
           </Alert>
         )}
 
-        {/* Welcome and Search Section */}
+        {/* Welcome Section */}
         <Box sx={{ px: 15, mb: 4 }}>
           <Grid container spacing={2} alignItems="center">
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12}>
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
                 <Avatar sx={{ 
                   width: 48, 
@@ -256,35 +245,6 @@ const ChemistDashboard = () => {
                     Your Pharmacy Dashboard
                   </Typography>
                 </Box>
-              </Box>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <TextField
-                  size="small"
-                  placeholder="Search medicines..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  sx={{
-                    width: 300,
-                    '& .MuiOutlinedInput-root': {
-                      backgroundColor: 'white',
-                      borderRadius: 2,
-                      '&:hover': {
-                        '& .MuiOutlinedInput-notchedOutline': {
-                          borderColor: '#67c27c',
-                        }
-                      }
-                    }
-                  }}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <SearchIcon color="action" />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
               </Box>
             </Grid>
           </Grid>
@@ -587,7 +547,7 @@ const ChemistDashboard = () => {
                 },
               }}
             >
-              {filteredPrescriptions.map((prescription, index) => (
+              {prescriptions.map((prescription, index) => (
                 <ListItem
                   key={index}
                   sx={{
