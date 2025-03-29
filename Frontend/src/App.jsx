@@ -1,18 +1,19 @@
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { Box } from '@mui/material';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Header from './components/layout/Header';
 import HeroSection from './components/sections/HeroSection';
 import FeaturesSection from './components/sections/FeaturesSection';
 import Footer from './components/layout/Footer';
-import SplineBackground from './components/ui/SplineBackground';
+import VideoBackground from './components/ui/VideoBackground';
 import SignUpPage from './pages/SignUpPage';
 import LoginPage from './pages/LoginPage';
 import OtpVerificationPage from './pages/OtpVerificationPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import { AuthProvider } from './context/AuthContext';
 import { LanguageProvider } from './context/LanguageContext';
+import { LoadingProvider } from './context/LoadingContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import EmailVerifyPage from './pages/EmailVerifyPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
@@ -22,9 +23,14 @@ import GenericMedicineDetailPage from './pages/GenericMedicineDetailPage';
 import PharmacyLocatePage from './pages/PharmacyLocatePage';
 import HowItWorksPage from './pages/HowItWorksPage';
 import FAQPage from './pages/FAQPage';
-import PrescriptionPage from './pages/PrescriptionPage';
-import PrescriptionScannerPage from './pages/PrescriptionScannerPage';
-
+import PrescriptionUploadPage from './pages/FileUploadPage';
+import PrescriptionDetailPage from './pages/PrescriptionDetailPage';
+import GenericAlternativesPage from './pages/GenericAlternativesPage';
+import MedicineComparisonPage from './pages/MedicineComparisonPage';
+import ChemistDashboard from './pages/ChemistDashboard';
+import AnimationTestPage from './pages/AnimationTestPage';
+import PrescriptionGuidePage from './pages/PrescriptionGuidePage';
+import AboutUsPage from './pages/AboutUsPage';
 // Create a theme with teal as the primary color
 const theme = createTheme({
   palette: {
@@ -143,8 +149,8 @@ const theme = createTheme({
 const HomePage = () => {
   return (
     <>
-      {/* 3D Spline background limited to hero section height */}
-      <SplineBackground />
+      {/* Video background for hero section */}
+      <VideoBackground />
       
       {/* Header */}
       <Header />
@@ -190,22 +196,111 @@ function App() {
               overflowX: 'hidden',
             }}>
               <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/signup" element={<SignUpPage />} />
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/verify-email" element={<EmailVerifyPage />} />
-                <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-                <Route path="/otp-verification" element={<OtpVerificationPage />} />
-                <Route path="/reset-password" element={<ResetPasswordPage />} />
-                <Route path="/upload-prescription" element={<PrescriptionScannerPage />} />
-              <Route path="/dashboard" element={<DashboardPage />} />
-              <Route path="/prescriptions" element={<PrescriptionPage />} />
-                  <Route path="/medicine/:id" element={<MedicineDetailPage />} />
-                  <Route path="/generic/medicine/:id" element={<GenericMedicineDetailPage />} />
-                  <Route path="/pharmacy-locate" element={<PharmacyLocatePage />} />
-                  <Route path="/how-it-works" element={<HowItWorksPage />} />
-                  <Route path="/faq" element={<FAQPage />} />
-                </Routes>
+                {/* Dashboard is rendered without LoadingProvider */}
+                <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+                
+                {/* All other routes are wrapped in LoadingProvider */}
+                <Route path="/" element={
+                  <LoadingProvider>
+                    <HomePage />
+                  </LoadingProvider>
+                } />
+                <Route path="/chemist-dashboard" element={
+                  <LoadingProvider>
+                    <ProtectedRoute><ChemistDashboard /></ProtectedRoute>
+                  </LoadingProvider>
+                } />
+                <Route path="/signup" element={
+                  <LoadingProvider>
+                    <SignUpPage />
+                  </LoadingProvider>
+                } />
+                <Route path="/login" element={
+                  <LoadingProvider>
+                    <LoginPage />
+                  </LoadingProvider>
+                } />
+                <Route path="/verify-email" element={
+                  <LoadingProvider>
+                    <ProtectedRoute><EmailVerifyPage /></ProtectedRoute>
+                  </LoadingProvider>
+                } />
+                <Route path="/forgot-password" element={
+                  <LoadingProvider>
+                    <ProtectedRoute><ForgotPasswordPage /></ProtectedRoute>
+                  </LoadingProvider>
+                } />
+                <Route path="/otp-verification" element={
+                  <LoadingProvider>
+                    <ProtectedRoute><OtpVerificationPage /></ProtectedRoute>
+                  </LoadingProvider>
+                } />
+                <Route path="/reset-password" element={
+                  <LoadingProvider>
+                    <ProtectedRoute><ResetPasswordPage /></ProtectedRoute>
+                  </LoadingProvider>
+                } />
+                <Route path="/medicine/:id" element={
+                  <LoadingProvider>
+                    <ProtectedRoute><MedicineDetailPage /></ProtectedRoute>
+                  </LoadingProvider>
+                } />
+                <Route path="/generic/medicine/:id" element={
+                  <LoadingProvider>
+                    <ProtectedRoute><GenericMedicineDetailPage /></ProtectedRoute>
+                  </LoadingProvider>
+                } />
+                <Route path="/pharmacy-locate" element={
+                  <LoadingProvider>
+                    <ProtectedRoute><PharmacyLocatePage /></ProtectedRoute>
+                  </LoadingProvider>
+                } />
+                <Route path="/how-it-works" element={
+                  <LoadingProvider>
+                    <HowItWorksPage />
+                  </LoadingProvider>
+                } />
+                <Route path="/faq" element={
+                  <LoadingProvider>
+                    <FAQPage />
+                  </LoadingProvider>
+                } />
+                <Route path="/file-upload" element={
+                  <LoadingProvider>
+                    <ProtectedRoute><PrescriptionUploadPage /></ProtectedRoute>
+                  </LoadingProvider>
+                } />
+                <Route path="/prescription/:id" element={
+                  <LoadingProvider>
+                    <ProtectedRoute><PrescriptionDetailPage /></ProtectedRoute>
+                  </LoadingProvider>
+                } />
+                <Route path="/generic-alternatives" element={
+                  <LoadingProvider>
+                    <ProtectedRoute><GenericAlternativesPage /></ProtectedRoute>
+                  </LoadingProvider>
+                } />
+                <Route path="/compare-medicines" element={
+                  <LoadingProvider>
+                    <ProtectedRoute><MedicineComparisonPage /></ProtectedRoute>
+                  </LoadingProvider>
+                } />
+                <Route path="/test-animation" element={
+                  <LoadingProvider>
+                    <AnimationTestPage />
+                  </LoadingProvider>
+                } />
+                <Route path="/prescription-guide" element={
+                  <LoadingProvider>
+                    <PrescriptionGuidePage />
+                  </LoadingProvider>
+                } />
+                <Route path="/about-us" element={
+                  <LoadingProvider>
+                    <AboutUsPage />
+                  </LoadingProvider>
+                } />
+              </Routes>
             </Box>
           </BrowserRouter>
         </LanguageProvider>
