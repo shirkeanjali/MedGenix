@@ -120,8 +120,12 @@ const Chatbot = () => {
   }, [messages]);
 
   const handleNavigation = (route) => {
-    // Remove any URL encoding and curly braces from the route
-    const cleanRoute = route.replace(/%7B|%7D/g, '').replace(/[{}]/g, '');
+    // Remove any URL encoding, quotes, and curly braces from the route
+    const cleanRoute = route
+      .replace(/%7B|%7D/g, '')  // Remove URL encoded braces
+      .replace(/[{}]/g, '')     // Remove curly braces
+      .replace(/"/g, '')        // Remove quotes
+      .trim();                  // Remove any extra whitespace
     
     // Handle role-based dashboard navigation
     if (cleanRoute === '/dashboard') {
