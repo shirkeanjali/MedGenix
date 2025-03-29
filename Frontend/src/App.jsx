@@ -22,8 +22,13 @@ import GenericMedicineDetailPage from './pages/GenericMedicineDetailPage';
 import PharmacyLocatePage from './pages/PharmacyLocatePage';
 import HowItWorksPage from './pages/HowItWorksPage';
 import FAQPage from './pages/FAQPage';
-import PrescriptionPage from './pages/PrescriptionPage';
-import PrescriptionScannerPage from './pages/PrescriptionScannerPage';
+// import PrescriptionPage from './pages/PrescriptionPage';
+import PrescriptionScanPage from './pages/PrescriptionScanPage';
+import PrescriptionResultsPage from './pages/PrescriptionResultsPage';
+import PrescriptionScannerPage from './pages/PrescriptionScanPage';
+import CelarMedicinePage from './pages/CelarMedicinePage';
+import XamicMedicinePage from './pages/XamicMedicinePage';
+import EsobetMedicinePage from './pages/EsobetMedicinePage';
 
 // Create a theme with teal as the primary color
 const theme = createTheme({
@@ -198,14 +203,19 @@ function App() {
                 <Route path="/otp-verification" element={<OtpVerificationPage />} />
                 <Route path="/reset-password" element={<ResetPasswordPage />} />
                 <Route path="/upload-prescription" element={<PrescriptionScannerPage />} />
-              <Route path="/dashboard" element={<DashboardPage />} />
-              <Route path="/prescriptions" element={<PrescriptionPage />} />
-                  <Route path="/medicine/:id" element={<MedicineDetailPage />} />
-                  <Route path="/generic/medicine/:id" element={<GenericMedicineDetailPage />} />
-                  <Route path="/pharmacy-locate" element={<PharmacyLocatePage />} />
-                  <Route path="/how-it-works" element={<HowItWorksPage />} />
-                  <Route path="/faq" element={<FAQPage />} />
-                </Routes>
+                <Route path="/scan-prescription" element={<PrescriptionScanPage />} />
+                <Route path="/prescription-results" element={<PrescriptionResultsPage />} />
+                <Route path="/dashboard" element={<DashboardPage />} />
+                {/* <Route path="/prescriptions" element={<PrescriptionPage />} /> */}
+                <Route path="/medicine/:id" element={<MedicineDetailPage />} />
+                <Route path="/medicine/celar-500mg" element={<CelarMedicinePage />} />
+                <Route path="/medicine/xamic-500mg" element={<XamicMedicinePage />} />
+                <Route path="/medicine/esobet-20mg" element={<EsobetMedicinePage />} />
+                <Route path="/generic/medicine/:id" element={<GenericMedicineDetailPage />} />
+                <Route path="/pharmacy-locate" element={<PharmacyLocatePage />} />
+                <Route path="/how-it-works" element={<HowItWorksPage />} />
+                <Route path="/faq" element={<FAQPage />} />
+              </Routes>
             </Box>
           </BrowserRouter>
         </LanguageProvider>

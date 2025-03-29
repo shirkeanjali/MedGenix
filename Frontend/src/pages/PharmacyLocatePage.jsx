@@ -6,7 +6,7 @@ import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
 import PharmacyMap from '../components/layout/PharmacyMap';
 import usePageLoading from '../hooks/usePageLoading';
-import { findNearbyPharmacies, identifyGenericPharmacy } from '../services/pharmacyService';
+// import { findNearbyPharmacies, identifyGenericPharmacy } from '../services/pharmacyService';
 import { transformPharmacyData } from '../services/transformPharmacyData';
 
 // Google Maps API key

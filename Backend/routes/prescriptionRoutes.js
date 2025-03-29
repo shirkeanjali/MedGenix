@@ -1,20 +1,30 @@
 import express from 'express';
-import { uploadPrescription, getUserPrescriptions, getPrescription } from '../controllers/prescriptionController.js';
-import { authMiddleware } from '../middleware/authMiddleware.js';
-import { upload } from '../config/cloudinary.js';
+import { 
+  getUserPrescriptions, 
+  createPrescription, 
+  getPrescription, 
+  updatePrescription, 
+  deletePrescription,
+  processPrescription 
+} from '../controllers/prescriptionController.js';
+import { upload } from '../middleware/uploadMiddleware.js';
+import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-// Protected routes - require authentication
-router.use(authMiddleware);
+// Get user prescriptions
+router.get('/user', protect, getUserPrescriptions);
 
-// Upload prescription
-router.post('/upload', upload.single('prescription'), uploadPrescription);
+// Create prescription
+router.post('/', protect, upload.single('prescription'), createPrescription);
 
-// Get user's prescriptions
-router.get('/user', getUserPrescriptions);
+// Get, update, delete a prescription
+router.route('/:id')
+  .get(protect, getPrescription)
+  .put(protect, upload.single('prescription'), updatePrescription)
+  .delete(protect, deletePrescription);
 
-// Get single prescription
-router.get('/:id', getPrescription);
+// Add a new route for OCR processing of prescriptions
+router.post('/process', protect, upload.single('file'), processPrescription);
 
 export default router; 
