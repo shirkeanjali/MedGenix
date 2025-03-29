@@ -250,7 +250,7 @@ const ChemistDashboard = () => {
                     alignItems: 'center',
                     gap: 1
                   }}>
-                    Welcome, Dr. {firstName}! <span style={{ fontSize: '1.5rem' }}>👋</span>
+                    Welcome, {firstName}! <span style={{ fontSize: '1.5rem' }}>👋</span>
                   </Typography>
                   <Typography variant="subtitle1" color="text.secondary">
                     Your Pharmacy Dashboard

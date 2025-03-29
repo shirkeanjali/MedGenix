@@ -7,6 +7,7 @@ import HeroSection from './components/sections/HeroSection';
 import FeaturesSection from './components/sections/FeaturesSection';
 import Footer from './components/layout/Footer';
 import SplineBackground from './components/ui/SplineBackground';
+import Chatbot from './components/ui/Chatbot';
 import SignUpPage from './pages/SignUpPage';
 import LoginPage from './pages/LoginPage';
 import OtpVerificationPage from './pages/OtpVerificationPage';
@@ -274,7 +275,7 @@ function App() {
                 } />
                 <Route path="/file-upload" element={
                   <LoadingProvider>
-                    <ProtectedRoute><PrescriptionUploadPage /></ProtectedRoute>
+                    <PrescriptionUploadPage />
                   </LoadingProvider>
                 } />
                 <Route path="/prescription/:id" element={
@@ -309,6 +310,7 @@ function App() {
                 } />
                 <Route path="*" element={<NotFoundPage />} />
               </Routes>
+              <Chatbot />
             </Box>
           </LanguageProvider>
         </AuthProvider>

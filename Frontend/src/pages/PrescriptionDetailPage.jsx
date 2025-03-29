@@ -378,61 +378,226 @@ const PrescriptionDetailPage = () => {
   // Generate bot response based on user input and prescription data
   const generateBotResponse = (userMessage, data) => {
     const { result } = data || {};
-    const { medicines = [], original_text = '' } = result || {};
+    const { medicines = [] } = result || {};
     const lowercaseMsg = userMessage.toLowerCase();
     
-    // Add generic alternatives responses
-    if (lowercaseMsg.includes('generic') || lowercaseMsg.includes('alternative') || lowercaseMsg.includes('cheaper') || lowercaseMsg.includes('save money')) {
-      return "You can find generic alternatives by clicking the green 'Save Money with Generic Alternatives' button at the top of the medicines list. Generic medicines have the same active ingredients as brand-name medicines but often cost much less.";
-    }
-    
-    // Basic response logic
-    if (lowercaseMsg.includes('medicine') || lowercaseMsg.includes('medication') || lowercaseMsg.includes('drug')) {
-      if (medicines.length === 0) {
-        return "I couldn't find any medicines in your prescription.";
+    // Function to find medicine by name (case-insensitive)
+    const findMedicineByName = (name) => {
+      // Clean and normalize the input name
+      const cleanName = name.toLowerCase().trim();
+      
+      // Log available medicines for debugging
+      console.log('Available medicines:', medicines.map(m => ({
+        brand: m.brand_name,
+        generic: m.generic_name
+      })));
+      console.log('Searching for:', cleanName);
+      
+      // First try exact match
+      let medicine = medicines.find(m => {
+        const brandMatch = m.brand_name?.toLowerCase() === cleanName;
+        const genericMatch = m.generic_name?.toLowerCase() === cleanName;
+        return brandMatch || genericMatch;
+      });
+      
+      // If no exact match, try partial match
+      if (!medicine) {
+        medicine = medicines.find(m => {
+          const brandMatch = m.brand_name?.toLowerCase().includes(cleanName);
+          const genericMatch = m.generic_name?.toLowerCase().includes(cleanName);
+          return brandMatch || genericMatch;
+        });
       }
-      return `Your prescription contains ${medicines.length} medicines: ${medicines.map(m => m.brand_name).join(', ')}. You can find more affordable generic alternatives by clicking the green button above the medicines list.`;
+      
+      // If still no match, try fuzzy matching
+      if (!medicine) {
+        medicine = medicines.find(m => {
+          // Split the search term into words
+          const searchWords = cleanName.split(' ');
+          const brandWords = m.brand_name?.toLowerCase().split(' ') || [];
+          const genericWords = m.generic_name?.toLowerCase().split(' ') || [];
+          
+          // Check if any word matches
+          return searchWords.some(word => 
+            brandWords.includes(word) || 
+            genericWords.includes(word)
+          );
+        });
+      }
+      
+      if (medicine) {
+        console.log('Found medicine:', medicine);
+      } else {
+        console.log('No medicine found for:', cleanName);
+      }
+      
+      return medicine;
+    };
+
+    // Function to extract medicine name from query
+    const extractMedicineName = (msg) => {
+      // Clean the message
+      const cleanMsg = msg.toLowerCase().trim();
+      
+      // First try to find medicine in the whole message
+      let medicine = findMedicineByName(cleanMsg);
+      if (medicine) return medicine;
+      
+      // If no match, try individual words
+      const words = cleanMsg.split(' ');
+      for (let i = 0; i < words.length; i++) {
+        const word = words[i];
+        // Skip common words and short words
+        if (word.length < 3 || ['the', 'and', 'or', 'but', 'for', 'with', 'when', 'how', 'take', 'should', 'i', 'tell', 'me', 'about'].includes(word)) {
+          continue;
+        }
+        medicine = findMedicineByName(word);
+        if (medicine) return medicine;
+      }
+      
+      // If still no match, try combining words
+      for (let i = 0; i < words.length - 1; i++) {
+        const combinedWord = words[i] + ' ' + words[i + 1];
+        medicine = findMedicineByName(combinedWord);
+        if (medicine) return medicine;
+      }
+      
+      return null;
+    };
+
+    // Check for direct medicine queries first
+    const specificMedicine = extractMedicineName(lowercaseMsg);
+    if (specificMedicine) {
+      let response = `Here's what I found about ${specificMedicine.brand_name}`;
+      if (specificMedicine.generic_name) {
+        response += ` (Generic name: ${specificMedicine.generic_name})`;
+      }
+      response += `:\n`;
+      
+      if (specificMedicine.dosage) response += `- Dosage: ${specificMedicine.dosage}\n`;
+      if (specificMedicine.frequency) response += `- Frequency: ${specificMedicine.frequency}\n`;
+      if (specificMedicine.duration) response += `- Duration: ${specificMedicine.duration}\n`;
+      if (specificMedicine.instructions) response += `- Instructions: ${specificMedicine.instructions}\n`;
+      if (specificMedicine.quantity) response += `- Quantity: ${specificMedicine.quantity}\n`;
+      
+      response += `\nYou can find generic alternatives for this medicine by clicking the 'Find Generic' button next to it.`;
+      return response;
     }
     
+    // Enhanced frequency information
+    if (lowercaseMsg.includes('frequency') || lowercaseMsg.includes('often') || lowercaseMsg.includes('when') || lowercaseMsg.includes('how') || lowercaseMsg.includes('take')) {
+      if (medicines.length === 0) {
+        return "I couldn't find any frequency information in your prescription.";
+      }
+      
+      // If asking about specific medicine frequency
+      const specificMedicine = extractMedicineName(lowercaseMsg);
+      if (specificMedicine) {
+        let response = `${specificMedicine.brand_name}`;
+        if (specificMedicine.generic_name) {
+          response += ` (${specificMedicine.generic_name})`;
+        }
+        response += ` should be taken: ${specificMedicine.frequency || 'Not specified'}`;
+        if (specificMedicine.dosage) {
+          response += `\nDosage: ${specificMedicine.dosage}`;
+        }
+        return response;
+      }
+      
+      // List all frequencies
+      return `Here's how often to take each medicine:
+${medicines.map(m => `• ${m.brand_name}${m.generic_name ? ` (${m.generic_name})` : ''}: ${m.frequency || 'Not specified'}`).join('\n')}`;
+    }
+    
+    // Enhanced dosage information
     if (lowercaseMsg.includes('dosage') || lowercaseMsg.includes('dose')) {
       if (medicines.length === 0) {
         return "I couldn't find any dosage information in your prescription.";
       }
-      return medicines.map(m => `${m.brand_name}: ${m.dosage || 'Dosage not specified'}`).join('\n');
-    }
-    
-    if (lowercaseMsg.includes('frequency') || lowercaseMsg.includes('often') || lowercaseMsg.includes('when')) {
-      if (medicines.length === 0) {
-        return "I couldn't find any frequency information in your prescription.";
+      
+      // If asking about specific medicine dosage
+      const specificMedicine = extractMedicineName(lowercaseMsg);
+      if (specificMedicine) {
+        return `${specificMedicine.brand_name}${specificMedicine.generic_name ? ` (${specificMedicine.generic_name})` : ''} dosage: ${specificMedicine.dosage || 'Not specified'}`;
       }
-      return medicines.map(m => `${m.brand_name}: ${m.frequency || 'Frequency not specified'}`).join('\n');
+      
+      // List all dosages
+      return `Here are the dosages for all medicines:
+${medicines.map(m => `• ${m.brand_name}${m.generic_name ? ` (${m.generic_name})` : ''}: ${m.dosage || 'Not specified'}`).join('\n')}`;
     }
     
+    // Enhanced duration information
     if (lowercaseMsg.includes('duration') || lowercaseMsg.includes('how long') || lowercaseMsg.includes('days')) {
       if (medicines.length === 0) {
         return "I couldn't find any duration information in your prescription.";
       }
-      return medicines.map(m => `${m.brand_name}: ${m.duration || 'Duration not specified'}`).join('\n');
+      
+      // If asking about specific medicine duration
+      const specificMedicine = extractMedicineName(lowercaseMsg);
+      if (specificMedicine) {
+        return `${specificMedicine.brand_name}${specificMedicine.generic_name ? ` (${specificMedicine.generic_name})` : ''} should be taken for: ${specificMedicine.duration || 'Not specified'}`;
+      }
+      
+      // List all durations
+      return `Here's how long to take each medicine:
+${medicines.map(m => `• ${m.brand_name}${m.generic_name ? ` (${m.generic_name})` : ''}: ${m.duration || 'Not specified'}`).join('\n')}`;
     }
     
+    // Enhanced complete prescription information
+    if (lowercaseMsg.includes('complete') || lowercaseMsg.includes('all') || lowercaseMsg.includes('full')) {
+      if (medicines.length === 0) {
+        return "I couldn't find any prescription information.";
+      }
+      
+      return `Here's your complete prescription information:
+${medicines.map(m => `
+• ${m.brand_name}${m.generic_name ? ` (${m.generic_name})` : ''}
+  - Dosage: ${m.dosage || 'Not specified'}
+  - Frequency: ${m.frequency || 'Not specified'}
+  - Duration: ${m.duration || 'Not specified'}
+  ${m.instructions ? `- Instructions: ${m.instructions}` : ''}
+  ${m.quantity ? `- Quantity: ${m.quantity}` : ''}
+`).join('\n')}
+You can find generic alternatives for any of these medicines by clicking the green button above the list.`;
+    }
+    
+    // What is this medicine for?
     if (lowercaseMsg.includes('what') && lowercaseMsg.includes('for')) {
+      const specificMedicine = extractMedicineName(lowercaseMsg);
+      if (specificMedicine) {
+        return `I can see that ${specificMedicine.brand_name}${specificMedicine.generic_name ? ` (${specificMedicine.generic_name})` : ''} is prescribed, but I don't have information about what it's for. Please consult your doctor or pharmacist for this information.`;
+      }
       return "I'm sorry, I don't have information about what each medicine is for. Please consult your doctor or pharmacist for this information.";
     }
     
+    // Side effects
     if (lowercaseMsg.includes('side effect') || lowercaseMsg.includes('risks')) {
+      const specificMedicine = extractMedicineName(lowercaseMsg);
+      if (specificMedicine) {
+        return `I can see that ${specificMedicine.brand_name}${specificMedicine.generic_name ? ` (${specificMedicine.generic_name})` : ''} is prescribed, but I don't have information about its side effects. Please consult your doctor, pharmacist, or the medicine package insert for side effect information.`;
+      }
       return "I don't have information about side effects. Please consult your doctor, pharmacist, or the medicine package insert for side effect information.";
     }
     
+    // Thank you
     if (lowercaseMsg.includes('thank')) {
-      return "You're welcome! Is there anything else you'd like to know about your prescription? Remember, you can also check for generic alternatives to save money.";
+      return "You're welcome! Is there anything else you'd like to know about your prescription? I can help you with medicine details, dosages, frequencies, or finding generic alternatives to save money.";
     }
     
+    // Greeting
     if (lowercaseMsg.includes('hello') || lowercaseMsg.includes('hi')) {
-      return "Hello! How can I help you with your prescription today? I can tell you about your medicines or help you find generic alternatives to save money.";
+      return `Hello! I can help you understand your prescription. You have ${medicines.length} medicines listed. I can tell you about:
+• Medicine names and details
+• Dosages
+• Frequencies
+• Duration
+• Generic alternatives to save money
+
+What would you like to know?`;
     }
     
     // Default response
-    return "I'm not sure how to answer that. You can ask me about the medicines in your prescription, their dosages, frequency, or click the green button to find generic alternatives that could save you money.";
+    return "I can help you understand your prescription. You can ask me about medicine names, dosages, frequencies, durations, or finding generic alternatives to save money. What would you like to know?";
   };
   
   const handleGenerateAlternatives = () => {

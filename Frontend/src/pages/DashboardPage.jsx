@@ -670,52 +670,6 @@ const DashboardPage = () => {
               )}
             </StyledPaper>
           </motion.div>
-          
-          {/* Your Extracted Medicines Section */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-          >
-            <Typography 
-              variant="h5" 
-              component="h2" 
-              sx={{ 
-                mt: 5,
-                mb: 3, 
-                fontWeight: 600,
-                display: 'flex',
-                alignItems: 'center', 
-              }}
-            >
-              Your Extracted Medicines
-              <Tooltip title="All medicines extracted from your prescriptions">
-                <IconButton size="small" sx={{ ml: 1 }}>
-                  <InfoOutlined fontSize="small" />
-                </IconButton>
-              </Tooltip>
-            </Typography>
-            
-            <StyledPaper sx={{ p: 4, textAlign: 'center' }}>
-              <Box sx={{ mb: 2 }}>
-                <MedicalServices sx={{ fontSize: 60, color: 'text.secondary', opacity: 0.4 }} />
-              </Box>
-              <Typography variant="h6" gutterBottom>
-                No Medicines Found
-              </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                Upload a prescription to extract medicine information.
-              </Typography>
-              <Button 
-                variant="contained" 
-                color="primary"
-                startIcon={<Add />}
-                onClick={handleScanPrescription}
-              >
-                Scan New Prescription
-              </Button>
-            </StyledPaper>
-          </motion.div>
         </Container>
       </Box>
       <Footer />
